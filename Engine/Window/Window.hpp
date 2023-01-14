@@ -4,6 +4,7 @@
 #include "GLFW/glfw3.h"
 
 #include <functional>
+#include <map>
 
 class Window
 {
@@ -23,6 +24,8 @@ class Window
         GLFWwindow* glfwWindow;
 
         RenderCallback cb;
+
+        static void FramebufferSizeCallback(GLFWwindow* win, int width, int height);
 };
 
 #endif
