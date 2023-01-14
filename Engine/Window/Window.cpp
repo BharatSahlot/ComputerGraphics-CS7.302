@@ -15,6 +15,7 @@ Window* Window::Create(int width, int height, const char* title)
     if(window->glfwWindow == NULL)
     {
         std::cerr << "Window error" << std::endl;
+        delete(window);
         // TODO: log error
         return nullptr;
     }
