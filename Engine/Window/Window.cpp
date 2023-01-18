@@ -1,6 +1,7 @@
 #include "Window.hpp"
 
 #include "GLFW/glfw3.h"
+#include "glm/fwd.hpp"
 #include <glad/glad.h>
 
 #include <iostream>
@@ -24,6 +25,8 @@ Window* Window::Create(int width, int height, const char* title)
 
     window->width = width;
     window->height = height;
+    window->camera.viewMat = glm::mat4(1.0f);
+    window->camera.SetPerspective(60.f, (float)width / height);
 
     glfwToWindow[window->glfwWindow] = window;
 
@@ -75,4 +78,5 @@ void Window::FramebufferSizeCallback(GLFWwindow* win, int width, int height)
     Window* window = glfwToWindow[win];
     window->height = height;
     window->width = width;
+    window->camera.SetPerspective(60.0f, window->Aspect());
 }

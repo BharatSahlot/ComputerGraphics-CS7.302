@@ -1,6 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "Engine/Camera.hpp"
 #include "GLFW/glfw3.h"
 
 #include <functional>
@@ -10,6 +11,8 @@ class Window
 {
     public:
         using RenderCallback = std::function<bool(const Window& window)>;
+
+        Camera camera;
 
         static Window* Create(int width, int height, const char* title);
         void MakeCurrent();

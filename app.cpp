@@ -1,3 +1,4 @@
+#include "Engine/Camera.hpp"
 #include "Engine/Engine.hpp"
 #include "Engine/Render/Material.hpp"
 #include "Engine/Render/Mesh.hpp"
@@ -42,14 +43,13 @@ int main(int argc, const char** argv)
 
     mesh.mMat = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
-    glm::mat4 vp = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
-    vp = glm::perspective(glm::radians(45.0f), window->Aspect(), 0.1f, 100.0f) * vp;
+    window->camera.viewMat = glm::translate(window->camera.viewMat, glm::vec3(0.0f, 0.0f, -3.0f));
 
-    window->SetRenderCallback([&](const Window& _) -> bool {
+    window->SetRenderCallback([&](const Window& window) -> bool {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        mesh.Render(vp);
+        mesh.Render(window.camera.ViewProj());
 
         return false;
     });
