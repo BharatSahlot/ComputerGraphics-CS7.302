@@ -8,15 +8,75 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/trigonometric.hpp"
 
+#include <cstdlib>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
 #include <memory>
+#include <iostream>
 #include <vector>
+
+// generates prism of radius 1 and length 2
+Mesh GeneratePrism(int sides, std::shared_ptr<Material> mat)
+{
+    std::vector<float> vertices;
+    std::vector<int> indices;
+
+    float angle = 90.0f; // to keep one top vertex at the center
+    const float delta = 360.0f / sides;
+
+    for(int i = 0; i < sides; i++, angle += delta)
+    {
+        float x = glm::cos(glm::radians(angle));
+        float y = glm::sin(glm::radians(angle));
+
+        vertices.insert(vertices.end(), {x, y, 1.0f});
+
+        indices.push_back(i);
+        indices.push_back((i + 1) % sides);
+        indices.push_back(sides);
+    }
+    vertices.insert(vertices.end(), {0.0f, 0.5f, 1.0f});
+
+    for(int i = 0; i < sides; i++, angle += delta)
+    {
+        float x = glm::cos(glm::radians(angle));
+        float y = glm::sin(glm::radians(angle));
+
+        vertices.insert(vertices.end(), {x, y, -1.0f});
+
+        indices.push_back(sides + 1 + i);
+        indices.push_back(sides + 1 + ((i + 1) % sides));
+        indices.push_back(sides + 1 + sides);
+    }
+    vertices.insert(vertices.end(), {0.0f, 0.5f, -1.0f});
+
+    for(int i = 0; i < sides; i++)
+    {
+        indices.push_back(i);
+        indices.push_back(sides + 1 + i);
+        indices.push_back(sides + 1 + ((i + 1) % sides));
+
+        indices.push_back(i);
+        indices.push_back((i + 1) % sides);
+        indices.push_back(sides + 1 + ((i + 1) % sides));
+    }
+
+    return Mesh(vertices, indices, mat);
+}
 
 int main(int argc, const char** argv)
 {
     if(EngineInit() == -1) return -1;
+
+    if(argc != 2)
+    {
+        std::cout << "Wrong number of arguements provided. Provide exactly 1 arguement." << std::endl;
+        EngineClean();
+        return -1;
+    }
+
+    int sides = std::atoi(argv[1]);
 
     Window* window = Window::Create(800, 600, "pls");
     window->MakeCurrent();
@@ -29,19 +89,9 @@ int main(int argc, const char** argv)
     Material* mat = Material::MakeMaterial(baseVert, baseFrag);
     std::shared_ptr<Material> baseMat(mat);
 
-    Mesh mesh(std::vector<float>({
-                0.5f,   0.5f,   0.0f,
-                0.5f,  -0.5f,   0.0f,
-                -0.5f, -0.5f,   0.0f,
-                -0.5f,  0.5f,   0.0f
-            }),
-            std::vector<int>({
-                0, 1, 3,
-                1, 2, 3
-            }),
-            baseMat);
+    Mesh mesh = GeneratePrism(sides, baseMat);
 
-    mesh.mMat = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    mesh.mMat = glm::rotate(glm::mat4(1.0f), glm::radians(-35.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     window->camera.viewMat = glm::translate(window->camera.viewMat, glm::vec3(0.0f, 0.0f, -3.0f));
 

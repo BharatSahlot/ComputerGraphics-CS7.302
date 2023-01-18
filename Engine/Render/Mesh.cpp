@@ -4,8 +4,6 @@
 #include <glad/glad.h>
 #include <memory>
 
-#include <glm/gtc/type_ptr.hpp>
-
 Mesh::Mesh(vector<float> vertices, vector<int> indices, std::shared_ptr<Material> material)
 {
     glGenVertexArrays(1, &this->VAO);
@@ -31,6 +29,8 @@ Mesh::Mesh(vector<float> vertices, vector<int> indices, std::shared_ptr<Material
     this->indices = indices.size();
 
     this->material = material;
+
+    this->mMat = glm::mat4(1.0f);
 }
 
 void Mesh::Render(const glm::mat4& vpMat)
