@@ -54,10 +54,14 @@ void Window::Render()
     if(!this->cb) return;
 
     glViewport(0, 0, this->width, this->height);
+    glEnable(GL_DEPTH_TEST);
 
     while(!glfwWindowShouldClose(this->glfwWindow))
     {
         glViewport(0, 0, this->width, this->height);
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         if(this->cb(*this))
         {
             break;

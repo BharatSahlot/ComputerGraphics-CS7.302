@@ -46,8 +46,6 @@ int main(int argc, const char** argv)
     window->camera.viewMat = glm::translate(window->camera.viewMat, glm::vec3(0.0f, 0.0f, -3.0f));
 
     window->SetRenderCallback([&](const Window& window) -> bool {
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
 
         mesh.Render(window.camera.ViewProj());
 
