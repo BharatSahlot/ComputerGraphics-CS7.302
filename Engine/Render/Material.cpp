@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 #include <iostream>
+#include <glm/gtc/type_ptr.hpp>
 
 // TODO:just do this better
 static char infoLog[512];
@@ -46,6 +47,12 @@ void Material::SetInt(const std::string &name, int value) const
 void Material::SetFloat(const std::string &name, float value) const
 {
     glUniform1f(glGetUniformLocation(this->shaderProgram, name.c_str()), value);
+}
+
+void Material::SetUniformMat4(const std::string &name, const glm::mat4 &mat)
+{
+    int loc = glGetUniformLocation(this->shaderProgram, name.c_str());
+    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 Material::~Material()

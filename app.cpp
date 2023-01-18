@@ -3,8 +3,13 @@
 #include "Engine/Render/Mesh.hpp"
 #include "Engine/Render/Shader.hpp"
 #include "Engine/Window/Window.hpp"
+#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/ext/matrix_transform.hpp"
+#include "glm/trigonometric.hpp"
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
+
 #include <memory>
 #include <vector>
 
@@ -35,11 +40,16 @@ int main(int argc, const char** argv)
             }),
             baseMat);
 
+    mesh.mMat = glm::rotate(glm::mat4(1.0f), glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+    glm::mat4 vp = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -3.0f));
+    vp = glm::perspective(glm::radians(45.0f), window->Aspect(), 0.1f, 100.0f) * vp;
+
     window->SetRenderCallback([&](const Window& _) -> bool {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        mesh.Render();
+        mesh.Render(vp);
 
         return false;
     });

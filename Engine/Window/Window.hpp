@@ -16,6 +16,7 @@ class Window
         void Render();
         void SetRenderCallback(RenderCallback callback);
         bool ShouldClose();
+        float Aspect();
         ~Window();
 
     private:

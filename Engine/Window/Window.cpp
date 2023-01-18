@@ -65,6 +65,11 @@ void Window::Render()
     }
 }
 
+float Window::Aspect()
+{
+    return (float)this->width / this->height;
+}
+
 void Window::FramebufferSizeCallback(GLFWwindow* win, int width, int height)
 {
     Window* window = glfwToWindow[win];

@@ -4,6 +4,8 @@
 #include <glad/glad.h>
 #include <memory>
 
+#include <glm/gtc/type_ptr.hpp>
+
 Mesh::Mesh(vector<float> vertices, vector<int> indices, std::shared_ptr<Material> material)
 {
     glGenVertexArrays(1, &this->VAO);
@@ -31,9 +33,13 @@ Mesh::Mesh(vector<float> vertices, vector<int> indices, std::shared_ptr<Material
     this->material = material;
 }
 
-void Mesh::Render()
+void Mesh::Render(const glm::mat4& vpMat)
 {
     this->material->Use();
+
+    this->material->SetUniformMat4("vp", vpMat);
+    this->material->SetUniformMat4("model", this->mMat);
+
     glBindVertexArray(this->VAO);
     glDrawElements(GL_TRIANGLES, this->indices, GL_UNSIGNED_INT, 0);
 }
