@@ -54,7 +54,11 @@ void Window::Render()
     if(!this->cb) return;
 
     glViewport(0, 0, this->width, this->height);
+
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     while(!glfwWindowShouldClose(this->glfwWindow))
     {

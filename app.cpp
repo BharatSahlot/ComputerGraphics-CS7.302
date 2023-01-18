@@ -6,6 +6,7 @@
 #include "Engine/Window/Window.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
+#include "glm/fwd.hpp"
 #include "glm/trigonometric.hpp"
 
 #include <cstdlib>
@@ -30,36 +31,53 @@ Mesh GeneratePrism(int sides, std::shared_ptr<Material> mat)
         float x = glm::cos(glm::radians(angle));
         float y = glm::sin(glm::radians(angle));
 
-        vertices.insert(vertices.end(), {x, y, 1.0f});
+        vertices.insert(vertices.end(), {x, y, 1.0f, 0.f, 0.f, 1.f});
 
         indices.push_back(i);
         indices.push_back((i + 1) % sides);
         indices.push_back(sides);
     }
-    vertices.insert(vertices.end(), {0.0f, 0.5f, 1.0f});
+    vertices.insert(vertices.end(), {0.0f, 0.0f, 1.0f, 0.f, 0.f, 1.f});
 
+    angle = 90.0f;
     for(int i = 0; i < sides; i++, angle += delta)
     {
         float x = glm::cos(glm::radians(angle));
         float y = glm::sin(glm::radians(angle));
 
-        vertices.insert(vertices.end(), {x, y, -1.0f});
+        vertices.insert(vertices.end(), {x, y, -1.0f, 0.f, 0.f, -1.f});
 
         indices.push_back(sides + 1 + i);
         indices.push_back(sides + 1 + ((i + 1) % sides));
         indices.push_back(sides + 1 + sides);
     }
-    vertices.insert(vertices.end(), {0.0f, 0.5f, -1.0f});
+    vertices.insert(vertices.end(), {0.0f, 0.0f, -1.0f, 0.f, 0.f, -1.f});
 
-    for(int i = 0; i < sides; i++)
+    angle = 90.0f;
+    for(int i = 0; i < sides; i++, angle += delta)
     {
-        indices.push_back(i);
-        indices.push_back(sides + 1 + i);
-        indices.push_back(sides + 1 + ((i + 1) % sides));
+        float x1 = glm::cos(glm::radians(angle));
+        float y1 = glm::sin(glm::radians(angle));
 
-        indices.push_back(i);
-        indices.push_back((i + 1) % sides);
-        indices.push_back(sides + 1 + ((i + 1) % sides));
+        float x2 = glm::cos(glm::radians(angle + delta));
+        float y2 = glm::sin(glm::radians(angle + delta));
+
+        glm::vec3 normal = glm::cross(glm::vec3(x1, y1, 0.0f) - glm::vec3(x2, y2, 0.0f),
+                                      glm::vec3(0.0f, 0.0f, 1.0f));
+
+        int v = (sides + 1) * 2 + i * 4;
+        vertices.insert(vertices.end(), {x1, y1, 1.0f , normal.x, normal.y, normal.z});
+        vertices.insert(vertices.end(), {x1, y1, -1.0f, normal.x, normal.y, normal.z});
+        vertices.insert(vertices.end(), {x2, y2, 1.0f , normal.x, normal.y, normal.z});
+        vertices.insert(vertices.end(), {x2, y2, -1.0f, normal.x, normal.y, normal.z});
+
+        indices.push_back(v);
+        indices.push_back(v + 1);
+        indices.push_back(v + 3);
+
+        indices.push_back(v);
+        indices.push_back(v + 3);
+        indices.push_back(v + 2);
     }
 
     return Mesh(vertices, indices, mat);
