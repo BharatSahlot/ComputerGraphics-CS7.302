@@ -9,6 +9,7 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/fwd.hpp"
+#include "glm/geometric.hpp"
 #include "glm/trigonometric.hpp"
 
 #include <cstdlib>
@@ -224,22 +225,25 @@ int main(int argc, const char** argv)
         {
             meshRot += -50.f * delta;
         }
-        current->mMat = glm::rotate(current->mMat, 
+        current->mMat = glm::rotate(current->mMat,
                 glm::radians(meshRot),
                 glm::vec3(0.0f, 1.0f, 0.0f));
 
+        // current->mMat = glm::translate(current->mMat, meshPos);
+
         // TODO:make a simple good transform component for every scene object
-        if(camMoveVec.length() > 0)
+        if(glm::length(camMoveVec) > 0)
         {
             camMoveVec /= camMoveVec.length(); // normalize
             cameraPos += camMoveVec * delta * 10.f;
+
+            // dont follow mesh
+            camera->viewMat = glm::lookAt(cameraPos,
+                    meshPos,
+                    glm::vec3(0, 1, 0));
+
+            camera->SetPerspective(60.f, window.Aspect());
         }
-
-        camera->viewMat = glm::lookAt(cameraPos,
-                meshPos,
-                glm::vec3(0, 1, 0));
-
-        camera->SetPerspective(60.f, window.Aspect());
 
         current->Render(camera->ViewProj());
 
