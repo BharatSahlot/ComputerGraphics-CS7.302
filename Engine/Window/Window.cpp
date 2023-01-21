@@ -1,12 +1,9 @@
 #include "Window.hpp"
 
-#include "GLFW/glfw3.h"
 #include "glm/fwd.hpp"
 #include <glad/glad.h>
 
 #include <iostream>
-
-// TODO:: handle framebuffer size change
 
 static std::map<GLFWwindow*, Window*> glfwToWindow;
 
@@ -25,13 +22,17 @@ Window* Window::Create(int width, int height, const char* title)
 
     window->width = width;
     window->height = height;
-    window->camera.viewMat = glm::mat4(1.0f);
-    window->camera.SetPerspective(60.f, (float)width / height);
 
     glfwToWindow[window->glfwWindow] = window;
 
     glfwSetFramebufferSizeCallback(window->glfwWindow, Window::FramebufferSizeCallback);
     return window;
+}
+
+void Window::SetCamera(std::shared_ptr<Camera> camera)
+{
+    this->camera = camera;
+    this->camera->SetPerspective(60.f, (float)this->width / this->height);
 }
 
 void Window::SetRenderCallback(RenderCallback callback)
@@ -54,7 +55,11 @@ void Window::Render()
     if(!this->cb) return;
 
     glViewport(0, 0, this->width, this->height);
+
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     while(!glfwWindowShouldClose(this->glfwWindow))
     {
@@ -72,7 +77,7 @@ void Window::Render()
     }
 }
 
-float Window::Aspect()
+float Window::Aspect() const
 {
     return (float)this->width / this->height;
 }
@@ -82,5 +87,5 @@ void Window::FramebufferSizeCallback(GLFWwindow* win, int width, int height)
     Window* window = glfwToWindow[win];
     window->height = height;
     window->width = width;
-    window->camera.SetPerspective(60.0f, window->Aspect());
+    if(window->camera) window->camera->SetPerspective(60.0f, window->Aspect());
 }

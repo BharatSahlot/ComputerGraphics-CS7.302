@@ -6,23 +6,34 @@
 
 #include <functional>
 #include <map>
+#include <memory>
 
 class Window
 {
     public:
         using RenderCallback = std::function<bool(const Window& window)>;
 
-        Camera camera;
-
         static Window* Create(int width, int height, const char* title);
+
+        // changes the active camera
+        void SetCamera(std::shared_ptr<Camera> camera);
+
         void MakeCurrent();
+        
         void Render();
+        
         void SetRenderCallback(RenderCallback callback);
+        
         bool ShouldClose();
-        float Aspect();
+        
+        float Aspect() const;
+
+        int GetKey(int key) const { return glfwGetKey(this->glfwWindow, key); }
         ~Window();
 
     private:
+        std::shared_ptr<Camera> camera;
+
         int width;
         int height;
         GLFWwindow* glfwWindow;
