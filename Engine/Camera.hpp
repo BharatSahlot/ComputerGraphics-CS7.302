@@ -6,13 +6,13 @@
 class Camera
 {
     public:
-        glm::mat4 viewMat;
+        glm::mat4 view;
         void SetPerspective(float fov, float aspect);
-        const glm::mat4& ViewProj() const;
+        glm::mat4 ViewProj() const;
+        glm::mat4 Proj() const { return proj; }
 
     private:
         glm::mat4 proj;
-        glm::mat4 vp;
 };
 
 #endif
