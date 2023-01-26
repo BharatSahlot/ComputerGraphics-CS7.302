@@ -5,6 +5,7 @@
 #include "Engine/Render/Material.hpp"
 #include "Engine/Render/Mesh.hpp"
 #include "Engine/Render/Shader.hpp"
+#include "Engine/Utils/Util.hpp"
 #include "Engine/Window/Window.hpp"
 #include "GLFW/glfw3.h"
 #include "Game/Levels/Levels.hpp"
@@ -28,6 +29,7 @@
 
 std::shared_ptr<Mesh> Plane;
 std::shared_ptr<Material> BasicMat;
+std::shared_ptr<Material> BasicTexMat;
 
 int main(int argc, const char** argv)
 {
@@ -44,15 +46,19 @@ int main(int argc, const char** argv)
 
     Shader* baseVert = Shader::MakeShader("Shaders/base.vs", GL_VERTEX_SHADER);
     Shader* baseFrag = Shader::MakeShader("Shaders/base.fs", GL_FRAGMENT_SHADER);
+    Shader* texFrag = Shader::MakeShader("Shaders/tex.fs", GL_FRAGMENT_SHADER);
 
     Material* mat = Material::MakeMaterial(baseVert, baseFrag);
     BasicMat = std::shared_ptr<Material>(mat);
 
+    BasicTexMat = std::shared_ptr<Material>(
+            Material::MakeMaterial(baseVert, texFrag));
+
     std::vector<float> vertices({
-            0.5f,  0.5f, 0.0f,  // top right
-            0.5f, -0.5f, 0.0f, // bottom right
-            -0.5f, -0.5f, 0.0f, // bottom left
-            -0.5f,  0.5f, 0.0f
+            0.5f,  0.5f, 0.0f, 1.f, 1.f,  // top right
+            0.5f, -0.5f, 0.0f, 1.f, 0.f, // bottom right
+            -0.5f, -0.5f, 0.0f, 0.f, 0.f, // bottom left
+            -0.5f,  0.5f, 0.0f, 0.f, 1.f
     });
 
     std::vector<int> indices({
@@ -77,7 +83,7 @@ int main(int argc, const char** argv)
             level1.Start();
         }
         
-        level1.Tick(delta);
+        level1.Tick(window, delta);
         level1.Render(camera->view, camera->Proj());
         return false;
     });

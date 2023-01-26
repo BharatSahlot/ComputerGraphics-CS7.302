@@ -16,7 +16,7 @@ class Level
         virtual int Load();
 
         void Start();
-        void Tick(float deltaTime);
+        void Tick(const Window& window, float deltaTime);
         virtual int Unload();
 
         void Render(const glm::mat4& view, const glm::mat4& proj);

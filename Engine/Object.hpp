@@ -3,8 +3,11 @@
 
 #include "Engine/Components/Transform.hpp"
 #include "Engine/Render/Mesh.hpp"
+#include "Engine/Render/Texture.hpp"
+#include "Engine/Window/Window.hpp"
 
 #include <memory>
+#include <vector>
 
 class Object
 {
@@ -15,10 +18,15 @@ class Object
 
         Object(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material);
 
+        void UseTexture(std::shared_ptr<Texture> tex);
+
         virtual void Render(const glm::mat4& viewMat, const glm::mat4& projMat);
 
         virtual void Start() {}
-        virtual void Tick(float deltaTime) {}
+        virtual void Tick(const Window& window, float deltaTime) {}
+
+    private:
+        std::vector<std::shared_ptr<Texture>> textures;
 };
 
 #endif
