@@ -18,6 +18,7 @@ class Transform
 
         glm::vec3 GetWorldPosition() const;
         void SetWorldPosition(glm::vec3 position);
+        void SetWorldPosition(float x, float y, float z);
 
         glm::vec3 GetLocalRotation() const;
         void SetLocalRotation(glm::vec3 rotation);
@@ -25,13 +26,17 @@ class Transform
         glm::vec3 GetWorldRotation() const;
         void SetWorldRotation(glm::vec3 rotation);
 
+        glm::vec3 GetLocalScale() const;
+        void SetLocalScale(glm::vec3 scale);
+
     private:
         glm::vec3 position;
         glm::vec3 rotation;
+        glm::vec3 localScale;
         glm::mat4 model;
 
         Transform* parent;
-        std::vector<std::shared_ptr<Transform>> children;
+        std::vector<std::weak_ptr<Transform>> children;
 };
 
 #endif

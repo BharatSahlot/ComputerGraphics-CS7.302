@@ -6,6 +6,7 @@ Transform::Transform()
 {
     this->position = glm::vec3(0, 0, 0);
     this->rotation = glm::vec3(0, 0, 0);
+    this->localScale = glm::vec3(1, 1, 1);
     this->model = glm::mat4(1);
     this->parent = nullptr;
 }
@@ -39,6 +40,8 @@ void Transform::SetLocalPosition(glm::vec3 position)
     model = glm::rotate(model, this->rotation.y, glm::vec3(0, 1, 0));
     model = glm::rotate(model, this->rotation.z, glm::vec3(0, 0, 1));
 
+    model = glm::scale(model, this->localScale);
+
     // model = glm::translate(model, position);
     this->model = model;
 }
@@ -59,6 +62,11 @@ void Transform::SetWorldPosition(glm::vec3 position)
 
     glm::mat4 inv = glm::inverse(this->parent->model);
     SetLocalPosition(inv * glm::vec4(position, 1));
+}
+
+void Transform::SetWorldPosition(float x, float y, float z)
+{
+    this->SetWorldPosition(glm::vec3(x, y, z));
 }
 
 glm::vec3 Transform::GetLocalRotation() const
@@ -87,4 +95,14 @@ void Transform::SetWorldRotation(glm::vec3 rotation)
     }
     glm::mat4 inv = glm::inverse(this->parent->model);
     SetLocalRotation(inv * glm::vec4(rotation, 1));
+}
+
+glm::vec3 Transform::GetLocalScale() const
+{
+    return this->localScale;
+}
+
+void Transform::SetLocalScale(glm::vec3 scale)
+{
+    this->localScale = scale;
 }

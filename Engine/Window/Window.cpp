@@ -16,7 +16,6 @@ Window* Window::Create(int width, int height, const char* title)
     {
         std::cerr << "Window error" << std::endl;
         delete(window);
-        // TODO: log error
         return nullptr;
     }
 
@@ -57,7 +56,6 @@ void Window::Render()
     glViewport(0, 0, this->width, this->height);
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -87,5 +85,9 @@ void Window::FramebufferSizeCallback(GLFWwindow* win, int width, int height)
     Window* window = glfwToWindow[win];
     window->height = height;
     window->width = width;
-    if(window->camera) window->camera->SetPerspective(60.0f, window->Aspect());
+    if(window->camera)
+    {
+        // window->camera->SetPerspective(60.0f, window->Aspect());
+        window->camera->SetOrthographic(width, height);
+    }
 }

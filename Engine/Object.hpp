@@ -15,7 +15,10 @@ class Object
 
         Object(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material);
 
-        void Render(const glm::mat4& viewMat, const glm::mat4& projMat);
+        virtual void Render(const glm::mat4& viewMat, const glm::mat4& projMat);
+
+        virtual void Start() {}
+        virtual void Tick(float deltaTime) {}
 };
 
 #endif

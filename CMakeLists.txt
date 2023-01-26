@@ -6,7 +6,7 @@ project(app)
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/")
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Libraries")
 set(INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/")
-file(GLOB_RECURSE SOURCES "${SRC_DIR}/app.cpp" "${SRC_DIR}/Engine/*.cpp")
+file(GLOB_RECURSE SOURCES "${SRC_DIR}/app.cpp" "${SRC_DIR}/Engine/*.cpp" "${SRC_DIR}/Game/**.cpp")
 
 # Executable definition and properties
 add_executable(${PROJECT_NAME} ${SOURCES})

@@ -7,6 +7,8 @@
 #include "Engine/Render/Shader.hpp"
 #include "Engine/Window/Window.hpp"
 #include "GLFW/glfw3.h"
+#include "Game/Levels/Levels.hpp"
+#include "Game/Player/Player.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/fwd.hpp"
@@ -21,6 +23,11 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
+
+#include "Globals.hpp"
+
+std::shared_ptr<Mesh> Plane;
+std::shared_ptr<Material> BasicMat;
 
 int main(int argc, const char** argv)
 {
@@ -39,12 +46,7 @@ int main(int argc, const char** argv)
     Shader* baseFrag = Shader::MakeShader("Shaders/base.fs", GL_FRAGMENT_SHADER);
 
     Material* mat = Material::MakeMaterial(baseVert, baseFrag);
-    std::shared_ptr<Material> baseMat(mat);
-
-    glm::vec3 cameraPos = glm::vec3(0.f, 0.f, -10.f);
-    camera->view = glm::lookAt(cameraPos,
-                                  glm::vec3(0, 0, 0),
-                                  glm::vec3(0, 1, 0));
+    BasicMat = std::shared_ptr<Material>(mat);
 
     std::vector<float> vertices({
             0.5f,  0.5f, 0.0f,  // top right
@@ -60,34 +62,29 @@ int main(int argc, const char** argv)
 
     Mesh* mesh = new Mesh(vertices, indices, false);
 
-    std::shared_ptr<Mesh> baseMesh(mesh);
+    Plane = std::shared_ptr<Mesh>(mesh);
 
-    Object o1(baseMesh, baseMat);
-    Object o2(baseMesh, baseMat);
-
-    o2.transform->SetParent(o1.transform);
-
-    o1.transform->SetWorldPosition(glm::vec3(5, 0, 0));
-    o2.transform->SetWorldPosition(glm::vec3(-5, 0, 0));
-
-    o1.transform->SetLocalRotation(glm::vec3(0, 0, glm::radians(20.f)));
-
+    Level1 level1(camera);
+    level1.Load();
 
     Timer timer;
     timer.Start();
     window->SetRenderCallback([&](const Window& window) -> bool {
         float delta = timer.Tick();
+        if(!level1.started)
+        {
+            level1.started = true;
+            level1.Start();
+        }
         
-        o1.material->SetVec3("col", glm::vec3(1, 0, 0));
-        o1.Render(camera->view, camera->Proj());
-
-        o2.material->SetVec3("col", glm::vec3(0, 1, 0));
-        o2.Render(camera->view, camera->Proj());
-
+        level1.Tick(delta);
+        level1.Render(camera->view, camera->Proj());
         return false;
     });
 
     window->Render();
+
+    level1.Unload();
 
     EngineClean();
     return 0;

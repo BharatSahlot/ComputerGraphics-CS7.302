@@ -29,7 +29,6 @@ int EngineInitGLAD()
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cerr << "Glad error" << std::endl;
-        // TODO: log error
         return -1;
     }
     return 0;
