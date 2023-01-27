@@ -70,6 +70,8 @@ int main(int argc, const char** argv)
 
     Plane = std::shared_ptr<Mesh>(mesh);
 
+    window->Init();
+
     Level1 level1(camera);
     level1.Load();
 

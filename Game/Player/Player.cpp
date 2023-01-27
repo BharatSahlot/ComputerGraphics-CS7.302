@@ -49,6 +49,6 @@ void Player::Tick(const Window& window, float deltaTime)
 void Player::Render(const glm::mat4 &viewMat, const glm::mat4 &projMat)
 {
     this->material->Use();
-    this->material->SetVec3("col", glm::vec3(1.f, 1.f, 1.f));
+    this->material->SetVec3("col", glm::vec3(2.f, 2.f, 2.f));
     Object::Render(viewMat, projMat);
 }

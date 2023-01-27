@@ -15,6 +15,8 @@ class Window
 
         static Window* Create(int width, int height, const char* title);
 
+        int Init();
+
         // changes the active camera
         void SetCamera(std::shared_ptr<Camera> camera);
 
@@ -36,6 +38,14 @@ class Window
 
         int width;
         int height;
+        
+        unsigned int framebuffer;
+        unsigned int fbColBuffers[2];
+        unsigned int rbo;
+
+        unsigned int ppFbos[2];
+        unsigned int ppBufs[2];
+
         GLFWwindow* glfwWindow;
 
         RenderCallback cb;
