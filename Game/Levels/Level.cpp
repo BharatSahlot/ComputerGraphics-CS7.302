@@ -1,7 +1,10 @@
 #include "Level.hpp"
+#include "Engine/Object.hpp"
+#include "Engine/Render/Material.hpp"
 #include "Engine/Render/Texture.hpp"
 #include "Engine/Utils/Util.hpp"
 #include "Game/Objects/Background.hpp"
+#include "Game/Objects/Zapper.hpp"
 #include "Game/Player/Player.hpp"
 #include "Globals.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -17,6 +20,8 @@ int Level::Load()
 {
     Player* player = new Player;
 
+    Zapper* zapper = new Zapper;
+
     Background* bg1 = new Background("Game/Assets/Background_0.png", -0.2f, -0.2f);
     Background* bg2 = new Background("Game/Assets/Background_1.png", -0.8f, -0.1f);
 
@@ -24,6 +29,7 @@ int Level::Load()
     this->objects.push_back(std::shared_ptr<Background>(bg2));
 
     this->objects.push_back(std::shared_ptr<Player>(player));
+    this->objects.push_back(std::shared_ptr<Zapper>(zapper));
 
     return 0;
 }
