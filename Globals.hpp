@@ -15,6 +15,8 @@ const float NITRO = 15.f - GRAVITY;
 
 const float MAX_Y_VELOCITY = 7.5f;
 
+const int SPRITE_ANIM_TIME_PER_FRAME = 50; // milliseconds
+
 struct GameState
 {
 };

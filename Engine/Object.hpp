@@ -25,7 +25,7 @@ class Object
         virtual void Start() {}
         virtual void Tick(const Window& window, float deltaTime) {}
 
-    private:
+    protected:
         std::vector<std::shared_ptr<Texture>> textures;
 };
 

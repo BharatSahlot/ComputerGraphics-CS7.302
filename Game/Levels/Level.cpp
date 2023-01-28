@@ -16,13 +16,14 @@ Level::Level(std::shared_ptr<Camera> camera)
 int Level::Load()
 {
     Player* player = new Player;
-    this->objects.push_back(std::shared_ptr<Player>(player));
 
     Background* bg1 = new Background("Game/Assets/Background_0.png", -0.2f, -0.2f);
     Background* bg2 = new Background("Game/Assets/Background_1.png", -0.8f, -0.1f);
 
     this->objects.push_back(std::shared_ptr<Background>(bg1));
     this->objects.push_back(std::shared_ptr<Background>(bg2));
+
+    this->objects.push_back(std::shared_ptr<Player>(player));
 
     return 0;
 }

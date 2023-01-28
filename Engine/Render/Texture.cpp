@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 #include <stb/stb_image.h>
 
-Texture* Texture::MakeTexture(const std::string& file)
+Texture* Texture::MakeTexture(const std::string& file, int filtering)
 {
     stbi_set_flip_vertically_on_load(true);
 
@@ -26,15 +26,16 @@ Texture* Texture::MakeTexture(const std::string& file)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     // set filtering to nearest, since we want pixel look in this game
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
     stbi_image_free(data);
 
     Texture* texture = new Texture;
     texture->texture = tex;
+    texture->dims = glm::vec2(width, height);
     return texture;
 }
 
