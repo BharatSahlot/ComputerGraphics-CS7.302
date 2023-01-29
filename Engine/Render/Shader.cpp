@@ -57,5 +57,5 @@ Shader::~Shader()
 
 int Shader::Opengl_ID() const
 {
-    return this->shaderObject;
+    return shaderObject;
 }

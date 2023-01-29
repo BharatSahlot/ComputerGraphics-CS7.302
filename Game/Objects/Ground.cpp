@@ -8,7 +8,7 @@
 #include <iostream>
 #include <cstdlib>
 
-Ground::Ground(float tileSize, int yCount, int xCount, float xSpeed) : Object(Plane, nullptr)
+Ground::Ground(float tileSize, int yCount, int xCount, float xSpeed) : Object("ground", Plane, nullptr)
 {
     sheet = Texture::MakeTexture("Game/Assets/Ground_Tileset.png", GL_NEAREST);
     if(sheet == nullptr)

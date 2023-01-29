@@ -7,7 +7,7 @@
 class Background : public Object
 {
     public:
-        Background(const std::string& file, float speed, float z);
+        Background(std::string name, const std::string& file, float speed, float z);
 
         void Tick(const Window &window, float deltaTime) override;
         void Render(const glm::mat4 &viewMat, const glm::mat4 &projMat) override;

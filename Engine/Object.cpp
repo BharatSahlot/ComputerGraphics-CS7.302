@@ -3,8 +3,9 @@
 #include <iostream>
 #include <string>
 
-Object::Object(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material)
+Object::Object(std::string name, std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material)
 {
+    this->name = name;
     this->mesh = mesh;
     this->material = material;
 

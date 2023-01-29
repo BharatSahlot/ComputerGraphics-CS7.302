@@ -12,11 +12,13 @@
 class Object
 {
     public:
+        std::string name;
+
         Transform* transform;
         std::shared_ptr<Mesh> mesh;
         std::shared_ptr<Material> material;
 
-        Object(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material);
+        Object(std::string name, std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material);
 
         void UseTexture(std::shared_ptr<Texture> tex);
 

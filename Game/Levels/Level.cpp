@@ -26,22 +26,22 @@ int Level::Load()
 
     Zapper* zapper = new Zapper(1.5f);
 
-    Background* bg1 = new Background("Game/Assets/Background_0.png", -0.2f, -0.2f);
-    Background* bg2 = new Background("Game/Assets/Background_1.png", -0.8f, -0.1f);
+    Background* bg1 = new Background("bg0", "Game/Assets/Background_0.png", -0.2f, -0.3f);
+    Background* bg2 = new Background("bg1", "Game/Assets/Background_1.png", -0.8f, -0.1f);
 
-    this->objects.push_back(std::shared_ptr<Background>(bg1));
-    this->objects.push_back(std::shared_ptr<Background>(bg2));
+    objects.push_back(std::shared_ptr<Background>(bg1));
+    objects.push_back(std::shared_ptr<Background>(bg2));
 
-    this->objects.push_back(std::shared_ptr<Player>(player));
-    this->objects.push_back(std::shared_ptr<Zapper>(zapper));
-    this->objects.push_back(std::shared_ptr<Ground>(ground));
+    objects.push_back(std::shared_ptr<Player>(player));
+    objects.push_back(std::shared_ptr<Zapper>(zapper));
+    objects.push_back(std::shared_ptr<Ground>(ground));
 
     return 0;
 }
 
 void Level::Start()
 {
-    for(auto obj: this->objects)
+    for(auto obj: objects)
     {
         obj->Start();
     }
@@ -49,7 +49,7 @@ void Level::Start()
 
 void Level::Tick(const Window& window, float deltaTime)
 {
-    for(auto obj: this->objects)
+    for(auto obj: objects)
     {
         obj->Tick(window, deltaTime);
     }
@@ -57,13 +57,13 @@ void Level::Tick(const Window& window, float deltaTime)
 
 int Level::Unload()
 {
-    this->objects.clear();
+    objects.clear();
     return 0;
 }
 
 void Level::Render(const glm::mat4 &view, const glm::mat4 &proj)
 {
-    for(auto obj: this->objects)
+    for(auto obj: objects)
     {
         obj->Render(view, proj);
     }

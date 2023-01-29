@@ -42,5 +42,5 @@ Texture* Texture::MakeTexture(const std::string& file, int filtering)
 void Texture::Use(int unit)
 {
     glActiveTexture(GL_TEXTURE0 + unit);
-    glBindTexture(GL_TEXTURE_2D, this->texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
 }

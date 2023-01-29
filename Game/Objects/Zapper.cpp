@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-Zapper::Zapper(float height) : Object(Plane, BasicTexMat)
+Zapper::Zapper(float height) : Object("zapper", Plane, BasicTexMat)
 {
     Shader* baseVs = Shader::MakeShader("Shaders/base.vs", GL_VERTEX_SHADER);
     Shader* lightingfs = Shader::MakeShader("Shaders/lighting.fs", GL_FRAGMENT_SHADER);
@@ -20,10 +20,10 @@ Zapper::Zapper(float height) : Object(Plane, BasicTexMat)
 
 void Zapper::Start()
 {
-    this->transform->SetLocalScale(glm::vec3(height / 3, height, 1));
-    this->transform->SetWorldPosition(9, 5, 0.1);
-    this->frame = 0;
-    this->frameTimer.Start();
+    transform->SetLocalScale(glm::vec3(height / 3, height, 1));
+    transform->SetWorldPosition(9, 5, 0.1);
+    frame = 0;
+    frameTimer.Start();
 }
 
 void Zapper::Tick(const Window &window, float deltaTime)
@@ -31,44 +31,44 @@ void Zapper::Tick(const Window &window, float deltaTime)
     int ind = (int)(frameTimer.TimeSinceStart() * 1000) / 150;
     if(ind > 0)
     {
-        this->frame = (this->frame + ind) % 8;
+        frame = (this->frame + ind) % 8;
         frameTimer.Start();
     }
 }
 
 void Zapper::Render(const glm::mat4 &viewMat, const glm::mat4 &projMat)
 {
-    if(!this->material)
+    if(!material)
     {
         std::cerr << "No material assigned to object" << std::endl;
         return;
     }
 
-    this->material->Use();
-    this->material->SetVec3("col", glm::vec3(0.3, 0.2, 0.8));
-    this->material->SetInt("texXCount", 5);
-    this->material->SetInt("texYCount", 3);
-    this->material->SetInt("index", this->frame);
+    material->Use();
+    material->SetVec3("col", glm::vec3(0.3, 0.2, 0.8));
+    material->SetInt("texXCount", 5);
+    material->SetInt("texYCount", 3);
+    material->SetInt("index", frame);
 
-    for(size_t i = 0; i < this->textures.size(); i++)
+    for(size_t i = 0; i < textures.size(); i++)
     {
-        this->textures[i]->Use(i);
+        textures[i]->Use(i);
     }
 
-    for(size_t i = 0; i < this->textures.size(); i++)
+    for(size_t i = 0; i < textures.size(); i++)
     {
         std::string tex = "texture";
         tex.append(std::to_string(i + 1));
-        this->material->SetInt(tex, i);
+        material->SetInt(tex, i);
     }
 
-    glm::vec2 texDims = this->textures[0]->GetDims();
-    this->material->SetVec2("texDims", texDims);
-    this->material->SetVec2("spriteDims", glm::vec2(texDims.x / 8.f, texDims.y));
+    glm::vec2 texDims = textures[0]->GetDims();
+    material->SetVec2("texDims", texDims);
+    material->SetVec2("spriteDims", glm::vec2(texDims.x / 8.f, texDims.y));
 
-    this->material->SetUniformMat4("view", viewMat);
-    this->material->SetUniformMat4("proj", projMat);
-    this->material->SetUniformMat4("model", this->transform->GetModelMatrix());
+    material->SetUniformMat4("view", viewMat);
+    material->SetUniformMat4("proj", projMat);
+    material->SetUniformMat4("model", transform->GetModelMatrix());
 
-    this->mesh->Render();
+    mesh->Render();
 }
