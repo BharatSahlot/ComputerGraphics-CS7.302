@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-Zapper::Zapper() : Object(Plane, BasicTexMat)
+Zapper::Zapper(float height) : Object(Plane, BasicTexMat)
 {
     Shader* baseVs = Shader::MakeShader("Shaders/base.vs", GL_VERTEX_SHADER);
     Shader* lightingfs = Shader::MakeShader("Shaders/lighting.fs", GL_FRAGMENT_SHADER);
@@ -12,14 +12,15 @@ Zapper::Zapper() : Object(Plane, BasicTexMat)
     Texture* lightingTex = Texture::MakeTexture("Game/Assets/Lighting.png", GL_LINEAR);
 
     std::shared_ptr<Material> lightingMat(Material::MakeMaterial(baseVs, lightingfs));
-    this->material = lightingMat;
+    material = lightingMat;
 
-    this->UseTexture(std::shared_ptr<Texture>(lightingTex));
+    UseTexture(std::shared_ptr<Texture>(lightingTex));
+    this->height = height;
 }
 
 void Zapper::Start()
 {
-    this->transform->SetLocalScale(glm::vec3(1, 3, 1));
+    this->transform->SetLocalScale(glm::vec3(height / 3, height, 1));
     this->transform->SetWorldPosition(9, 5, 0.1);
     this->frame = 0;
     this->frameTimer.Start();
@@ -61,7 +62,7 @@ void Zapper::Render(const glm::mat4 &viewMat, const glm::mat4 &projMat)
         this->material->SetInt(tex, i);
     }
 
-    glm::vec2 texDims = textures[0]->GetDims();
+    glm::vec2 texDims = this->textures[0]->GetDims();
     this->material->SetVec2("texDims", texDims);
     this->material->SetVec2("spriteDims", glm::vec2(texDims.x / 8.f, texDims.y));
 

@@ -34,6 +34,7 @@ std::shared_ptr<Material> BasicTexMat;
 int main(int argc, const char** argv)
 {
     if(EngineInit() == -1) return -1;
+    srand(time(0));
 
     std::shared_ptr<Camera> camera = std::shared_ptr<Camera>(new Camera);
     camera->view = glm::mat4(1.0f);

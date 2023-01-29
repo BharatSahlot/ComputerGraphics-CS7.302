@@ -70,15 +70,16 @@ void Player::Tick(const Window& window, float deltaTime)
         this->velocity.y = 0;
     }
 
-    if(pos.y <= GROUND + GROUND_HEIGHT && this->velocity.y < 0)
+    float playerHeight = (this->transform->GetLocalScale().y / 2) - 0.1;
+    if(pos.y <= GROUND + GROUND_HEIGHT + playerHeight && this->velocity.y < 0)
     {
-        pos.y = GROUND + GROUND_HEIGHT;
+        pos.y = GROUND + GROUND_HEIGHT + playerHeight;
         this->velocity.y = 0;
     }
 
     if(!flying)
     {
-        if(pos.y == GROUND + GROUND_HEIGHT)
+        if(pos.y == GROUND + GROUND_HEIGHT + playerHeight)
         {
             this->SetCurrentSheet(this->walkSheet);
         } else
