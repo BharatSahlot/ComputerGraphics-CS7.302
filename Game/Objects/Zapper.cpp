@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-Zapper::Zapper(float height) : Object("zapper", Plane, BasicTexMat)
+Zapper::Zapper(float height, float speed) : Object("zapper", Plane, BasicTexMat)
 {
     Shader* baseVs = Shader::MakeShader("Shaders/base.vs", GL_VERTEX_SHADER);
     Shader* lightingfs = Shader::MakeShader("Shaders/lighting.fs", GL_FRAGMENT_SHADER);
@@ -16,14 +16,27 @@ Zapper::Zapper(float height) : Object("zapper", Plane, BasicTexMat)
 
     UseTexture(std::shared_ptr<Texture>(lightingTex));
     this->height = height;
+    this->xSpeed = speed;
+    this->ySpeed = 0;
+}
+
+void Zapper::SetYSpeed(float ySpeed)
+{
+    this->ySpeed = ySpeed;
+}
+
+void Zapper::SetRotSpeed(float speed)
+{
+    rSpeed = speed;
 }
 
 void Zapper::Start()
 {
     transform->SetLocalScale(glm::vec3(height / 3, height, 1));
-    transform->SetWorldPosition(9, 5, 0.1);
+    transform->SetLocalRotation(glm::vec3(0));
     frame = 0;
     frameTimer.Start();
+    rSpeed = ySpeed = 0.f;
 }
 
 void Zapper::Tick(const Window &window, float deltaTime)
@@ -34,6 +47,16 @@ void Zapper::Tick(const Window &window, float deltaTime)
         frame = (this->frame + ind) % 8;
         frameTimer.Start();
     }
+
+    if(transform->GetLocalPosition().y - height / 2.f <= GROUND + GROUND_HEIGHT) ySpeed *= -1;
+    if(transform->GetLocalPosition().y + height / 2.f >= CEILING) ySpeed *= -1;
+
+    auto offset = glm::vec3(xSpeed, ySpeed, 0) * deltaTime;
+    transform->SetWorldPosition(transform->GetWorldPosition() + offset);
+
+    auto rOffset = glm::vec3(0, 0, glm::radians(rSpeed)) * deltaTime;
+    transform->SetLocalRotation(transform->GetLocalRotation() + rOffset);
+    transform->SetLocalScale(glm::vec3(height / 3, height, 1));
 }
 
 void Zapper::Render(const glm::mat4 &viewMat, const glm::mat4 &projMat)

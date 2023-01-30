@@ -1,5 +1,6 @@
 #include "Window.hpp"
 
+#include "Engine/Camera.hpp"
 #include "Engine/Object.hpp"
 #include "Engine/Render/Material.hpp"
 #include "Engine/Render/Mesh.hpp"
@@ -208,6 +209,17 @@ void Window::Render()
 float Window::Aspect() const
 {
     return (float)this->width / this->height;
+}
+
+glm::vec3 Window::ViewportPointToWorld(glm::vec3 point) const
+{
+    glm::mat4 viewInv = glm::inverse(camera->ViewProj());
+    return viewInv * glm::vec4(point, 1);
+}
+
+glm::vec3 Window::WorldToViewportPoint(glm::vec2 point) const
+{
+    return camera->ViewProj() * glm::vec4(point, 0, 1);
 }
 
 void Window::FramebufferSizeCallback(GLFWwindow* win, int width, int height)

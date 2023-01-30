@@ -105,4 +105,5 @@ glm::vec3 Transform::GetLocalScale() const
 void Transform::SetLocalScale(glm::vec3 scale)
 {
     localScale = scale;
+    SetLocalPosition(GetLocalPosition());
 }

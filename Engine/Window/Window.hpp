@@ -29,6 +29,12 @@ class Window
         bool ShouldClose();
         
         float Aspect() const;
+        int Width() const { return width; }
+        int Height() const { return height; }
+
+        glm::mat4 ViewProj() const { return camera->ViewProj(); }
+        glm::vec3 ViewportPointToWorld(glm::vec3 point) const;
+        glm::vec3 WorldToViewportPoint(glm::vec2 point) const;
 
         int GetKey(int key) const { return glfwGetKey(this->glfwWindow, key); }
         ~Window();

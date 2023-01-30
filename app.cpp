@@ -7,6 +7,7 @@
 #include "Engine/Render/Shader.hpp"
 #include "Engine/Utils/Util.hpp"
 #include "Engine/Window/Window.hpp"
+#include "Engine/Utils/Random.hpp"
 #include "GLFW/glfw3.h"
 #include "Game/Levels/Levels.hpp"
 #include "Game/Player/Player.hpp"
@@ -35,6 +36,7 @@ int main(int argc, const char** argv)
 {
     if(EngineInit() == -1) return -1;
     srand(time(0));
+    Random::Init();
 
     std::shared_ptr<Camera> camera = std::shared_ptr<Camera>(new Camera);
     camera->view = glm::mat4(1.0f);
