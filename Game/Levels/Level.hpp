@@ -22,6 +22,7 @@ struct ZSorter
 
 struct LevelSettings
 {
+    float duration;
     float speedModifier;
 
     float zapperSpawnInterval;
@@ -45,6 +46,7 @@ class Level
     public:
         bool started = false;
         bool hasEnded = false;
+        bool playerDied = false;
 
         Level(std::shared_ptr<Camera> camera, LevelSettings settings);
 
@@ -63,6 +65,7 @@ class Level
         LevelSettings settings;
         std::shared_ptr<Camera> camera;
         std::multiset<std::shared_ptr<Object>, ZSorter> objects;
+        Timer levelTimer;
 
     private:
         Timer zapperSpawnTimer;

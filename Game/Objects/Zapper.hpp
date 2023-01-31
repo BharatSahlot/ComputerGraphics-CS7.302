@@ -21,6 +21,7 @@ class Zapper : public Object
 
         float height;
         float xSpeed;
+        float defYSpeed;
         float ySpeed;
         float rSpeed;
 

@@ -23,6 +23,7 @@ Zapper::Zapper(float height, float speed, glm::vec3 col) : Object("zapper", Plan
 
 void Zapper::SetYSpeed(float ySpeed)
 {
+    this->defYSpeed = ySpeed;
     this->ySpeed = ySpeed;
 }
 
@@ -37,7 +38,7 @@ void Zapper::Start()
     transform->SetLocalRotation(glm::vec3(0));
     frame = 0;
     frameTimer.Start();
-    rSpeed = ySpeed = 0.f;
+    rSpeed = defYSpeed = ySpeed = 0.f;
 }
 
 void Zapper::Tick(const Window &window, float deltaTime)
@@ -49,8 +50,8 @@ void Zapper::Tick(const Window &window, float deltaTime)
         frameTimer.Start();
     }
 
-    if(transform->GetLocalPosition().y - height / 2.f <= GROUND + GROUND_HEIGHT) ySpeed *= -1;
-    if(transform->GetLocalPosition().y + height / 2.f >= CEILING) ySpeed *= -1;
+    if(transform->GetLocalPosition().y - height / 2.f <= GROUND + GROUND_HEIGHT) ySpeed = defYSpeed;
+    if(transform->GetLocalPosition().y + height / 2.f >= CEILING) ySpeed = -defYSpeed;
 
     auto offset = glm::vec3(xSpeed, ySpeed, 0) * deltaTime;
     transform->SetWorldPosition(transform->GetWorldPosition() + offset);

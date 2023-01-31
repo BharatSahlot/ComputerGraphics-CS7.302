@@ -23,7 +23,7 @@ void main()
     uv += vec2(Uv.x * spriteDims.x / texDims.x, Uv.y * spriteDims.y / texDims.y);
 
     FragColor = texture(texture1, uv);
-
+    // FragColor.a = 1;
     if(FragColor.r >= 0.7 && FragColor.g >= 0.2 && FragColor.b < 0.1)
     {
         BrightColor = FragColor;

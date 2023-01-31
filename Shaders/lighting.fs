@@ -29,6 +29,5 @@ void main()
     // FragColor = vec4(col, 1);
 
     if(FragColor.r < 0.1) FragColor.a = 0;
-
     BrightColor = FragColor;
 }

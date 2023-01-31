@@ -77,6 +77,7 @@ int main(int argc, const char** argv)
     window->Init();
 
     LevelSettings levelSettings1;
+    levelSettings1.duration = 30.f;
     levelSettings1.speedModifier = 1.f;
     levelSettings1.zapperSpawnInterval = 7.f;
     levelSettings1.zapperSpawnIntervalVar = 2.f;
@@ -89,10 +90,11 @@ int main(int argc, const char** argv)
     levelSettings1.zapperCol = glm::vec3(0.7f, 0.7f, 1.f);
 
     LevelSettings levelSettings2;
+    levelSettings1.duration = 20.f;
     levelSettings2.speedModifier = 1.f;
-    levelSettings2.zapperSpawnInterval = 7.f;
+    levelSettings2.zapperSpawnInterval = 5.f;
     levelSettings2.zapperSpawnIntervalVar = 2.f;
-    levelSettings2.zapperHeight = 2.5f;
+    levelSettings2.zapperHeight = 3.5f;
     levelSettings2.zapperHeightVar = 0.5f;
     levelSettings2.zapperRotSpeed = 30.f;
     levelSettings2.zapperRotSpeedVar = 10.f;
@@ -101,10 +103,11 @@ int main(int argc, const char** argv)
     levelSettings2.zapperCol = glm::vec3(0.7f, 0.7f, 1.f);
 
     LevelSettings levelSettings3;
+    levelSettings1.duration = 40.f;
     levelSettings3.speedModifier = 1.f;
-    levelSettings3.zapperSpawnInterval = 7.f;
-    levelSettings3.zapperSpawnIntervalVar = 2.f;
-    levelSettings3.zapperHeight = 2.5f;
+    levelSettings3.zapperSpawnInterval = 43.f;
+    levelSettings3.zapperSpawnIntervalVar = 1.f;
+    levelSettings3.zapperHeight = 4.f;
     levelSettings3.zapperHeightVar = 0.5f;
     levelSettings3.zapperRotSpeed = 30.f;
     levelSettings3.zapperRotSpeedVar = 10.f;
@@ -123,7 +126,7 @@ int main(int argc, const char** argv)
     levels[0]->Load();
     levels[1]->Load();
     levels[2]->Load();
-    std::cerr << startUpTimer.TimeSinceStart() << std::endl;
+    std::cerr << "Load time: " << startUpTimer.TimeSinceStart() << std::endl;
 
     int currentLevel = 0;
 
@@ -143,8 +146,13 @@ int main(int argc, const char** argv)
 
         if(levels[currentLevel]->hasEnded)
         {
+            bool playerDied = levels[currentLevel]->playerDied;
             levels[currentLevel]->Unload();
             delete levels[currentLevel];
+            if(playerDied)
+            {
+                return true;
+            }
             currentLevel++;
         }
         return currentLevel >= 3;

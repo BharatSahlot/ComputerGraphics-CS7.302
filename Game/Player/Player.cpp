@@ -64,17 +64,17 @@ bool CheckLineIntersection(glm::vec2 a1, glm::vec2 a2, glm::vec2 b1, glm::vec2 b
 bool CheckCollision(glm::mat4 a, glm::mat4 b)
 {
     std::pair<glm::vec2, glm::vec2> points[] = {
+        { glm::vec2(0.2, 0.4), glm::vec2(0.2, -0.4) },
+        { glm::vec2(0.2, 0.4), glm::vec2(0, 0.4) },
+        { glm::vec2(0, -0.4), glm::vec2(0, 0.4) },
+        { glm::vec2(0, -0.4), glm::vec2(0.2, -0.4) },
+    };
+
+    std::pair<glm::vec2, glm::vec2> points1[] = {
         { glm::vec2(0.2, 0.5), glm::vec2(0.2, -0.5) },
         { glm::vec2(0.2, 0.5), glm::vec2(-0.2, 0.5) },
         { glm::vec2(-0.2, -0.5), glm::vec2(-0.2, 0.5) },
         { glm::vec2(-0.2, -0.5), glm::vec2(0.2, -0.5) },
-    };
-
-    std::pair<glm::vec2, glm::vec2> points1[] = {
-        { glm::vec2(0.5, 0.5), glm::vec2(0.5, -0.5) },
-        { glm::vec2(0.5, 0.5), glm::vec2(-0.5, 0.5) },
-        { glm::vec2(-0.5, -0.5), glm::vec2(-0.5, 0.5) },
-        { glm::vec2(-0.5, -0.5), glm::vec2(0.5, -0.5) },
     };
 
     for(int i = 0; i < 4; i++)

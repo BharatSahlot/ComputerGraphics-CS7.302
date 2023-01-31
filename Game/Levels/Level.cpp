@@ -36,12 +36,6 @@ int Level::Load()
         zapperPool.push(std::shared_ptr<Zapper>(zapper));
     }
 
-    // Background* bg1 = new Background("bg0", "Game/Assets/Background_0.png", -0.2f * settings.speedModifier, -0.3f);
-    // Background* bg2 = new Background("bg1", "Game/Assets/Background_1.png", -0.8f * settings.speedModifier, -0.1f);
-
-    // objects.insert(std::shared_ptr<Background>(bg1));
-    // objects.insert(std::shared_ptr<Background>(bg2));
-
     objects.insert(std::shared_ptr<Player>(player));
     objects.insert(std::shared_ptr<Ground>(ground));
 
@@ -55,21 +49,30 @@ void Level::Start()
         obj->Start();
     }
     zapperSpawnTimer.Start();
+    levelTimer.Start();
 }
 
 void Level::Tick(const Window& window, float deltaTime)
 {
+    if(levelTimer.TimeSinceStart() >= settings.duration)
+    {
+        hasEnded = true;
+        return;
+    }
+
     float interval = settings.zapperSpawnInterval;
     interval += (1.f - 2 * Random::GetFloat()) * settings.zapperSpawnIntervalVar;
     if(zapperSpawnTimer.TimeSinceStart() >= interval)
     {
         if(!zapperPool.empty())
         {
-            float top = 0.9f;
-            float bot = -0.55f;
+            float top = CEILING - settings.zapperHeight / 2.f;
+            float bot = GROUND + GROUND_HEIGHT + settings.zapperHeight / 2.f;
             float y = bot + ((top - bot) * Random::GetFloat());
-            glm::vec3 pos = window.ViewportPointToWorld(glm::vec3(1, y, -0.0));
+            glm::vec3 pos = window.ViewportPointToWorld(glm::vec3(1, 0, 0));
             pos.x += 1;
+            pos.y = y;
+            pos.z = 0.3f;
 
             zapperSpawnTimer.Start();
             auto zapper = zapperPool.top();
@@ -85,7 +88,7 @@ void Level::Tick(const Window& window, float deltaTime)
                 zapper->SetRotSpeed(speed);
             } else
             {
-                float speed = settings.zapperYSpeed + (1.f - 2.f * Random::GetFloat()) * settings.zapperYSpeedVar;
+                float speed = settings.zapperYSpeed + (-Random::GetFloat()) * settings.zapperYSpeedVar;
                 zapper->SetYSpeed(speed);
             }
             zapper->transform->SetWorldPosition(pos);
@@ -111,7 +114,9 @@ void Level::Tick(const Window& window, float deltaTime)
 
 void Level::EndLevel()
 {
+    playerDied = true;
     hasEnded = true;
+    // hasEnded = true;
 }
 
 int Level::Unload()
