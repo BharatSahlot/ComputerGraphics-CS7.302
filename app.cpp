@@ -12,6 +12,7 @@
 #include "GLFW/glfw3.h"
 #include "Game/Levels/Level.hpp"
 #include "Game/Levels/Levels.hpp"
+#include "Game/Objects/Text.hpp"
 #include "Game/Player/Player.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
@@ -92,7 +93,7 @@ int main(int argc, const char** argv)
     window->Init();
 
     LevelSettings levelSettings1;
-    levelSettings1.duration = 10.f;
+    levelSettings1.duration = 20.f;
     levelSettings1.speedModifier = 1.f;
     levelSettings1.zapperSpawnInterval = 7.f;
     levelSettings1.zapperSpawnIntervalVar = 2.f;
@@ -111,7 +112,7 @@ int main(int argc, const char** argv)
 
 
     LevelSettings levelSettings2;
-    levelSettings2.duration = 10.f;
+    levelSettings2.duration = 25.f;
     levelSettings2.speedModifier = 1.f;
     levelSettings2.zapperSpawnInterval = 5.f;
     levelSettings2.zapperSpawnIntervalVar = 2.f;
@@ -129,7 +130,7 @@ int main(int argc, const char** argv)
     levelSettings2.coinSpawnRadiusVar = 0.5f;
 
     LevelSettings levelSettings3;
-    levelSettings3.duration = 10.f;
+    levelSettings3.duration = 30.f;
     levelSettings3.speedModifier = 1.f;
     levelSettings3.zapperSpawnInterval = 4.f;
     levelSettings3.zapperSpawnIntervalVar = 1.f;
@@ -163,10 +164,36 @@ int main(int argc, const char** argv)
 
     font = Font::LoadFont("Game/Assets/font.ttf", 96);
 
+    bool gameEnded = false;
+    bool gameWon = false;
+
+    Text gameEndText(-0.2f, 0.9f, 1.5f, glm::vec3(1, 1, 1));
+    Text gameEndEnterText(-0.22f, 1.0f, 0.5f, glm::vec3(0.4, 0.4, 0.4));
+    Text gameEndScoreText(-0.21f, 1.1f, 0.75f, glm::vec3(1, 1, 1));
+
+    gameEndEnterText.SetText("Press enter to close the game.");
+
     Timer timer;
     timer.Start();
     window->SetRenderCallback([&](const Window& window) -> bool {
         float delta = timer.Tick();
+
+        if(gameEnded)
+        {
+            windowFade += delta;
+            if(windowFade >= 1.f) windowFade = 1.f;
+
+            gameEndText.Tick(window, delta);
+            gameEndEnterText.Tick(window, delta);
+            gameEndScoreText.Tick(window, delta);
+
+            gameEndText.Render(camera->view, camera->Proj());
+            gameEndEnterText.Render(camera->view, camera->Proj());
+            gameEndScoreText.Render(camera->view, camera->Proj());
+
+            if(window.GetKey(GLFW_KEY_ENTER)) return true;
+            return false;
+        }
 
         if(!levels[currentLevel]->started)
         {
@@ -181,14 +208,40 @@ int main(int argc, const char** argv)
         {
             bool playerDied = levels[currentLevel]->playerDied;
             levels[currentLevel]->Unload();
-            delete levels[currentLevel];
             if(playerDied)
             {
-                return true;
+                gameEndText.Start();
+                gameEndEnterText.Start();
+                gameEndScoreText.Start();
+
+                std::string txt = "Coins collected: ";
+                txt += std::to_string(levels[currentLevel]->coinsCollected);
+                gameEndScoreText.SetText(txt);
+
+                gameEnded = true;
+                gameWon = false;
+                gameEndText.SetText("You lost!");
             }
+            delete levels[currentLevel];
             currentLevel++;
         }
-        return currentLevel >= 3;
+
+        if(currentLevel >= 3)
+        {
+            gameEndText.Start();
+            gameEndText.SetText("You won!");
+            gameEndEnterText.Start();
+            gameEndScoreText.Start();
+
+            std::string txt = "Distance: ";
+            txt += levels[currentLevel]->GetDistance();
+            txt += " Coins collected: ";
+            txt += std::to_string(levels[currentLevel]->coinsCollected);
+            gameEndScoreText.SetText(txt);
+            gameEnded = true;
+            gameWon = true;
+        }
+        return false;
     });
 
     window->Render();

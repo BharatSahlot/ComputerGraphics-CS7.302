@@ -12,6 +12,8 @@
 #include <stack>
 #include <queue>
 #include <set>
+#include <sstream>
+#include <iomanip>
 
 struct ZSorter
 {
@@ -58,6 +60,7 @@ class Level
         bool started = false;
         bool hasEnded = false;
         bool playerDied = false;
+        int coinsCollected = 0;
 
         Level(std::shared_ptr<Camera> camera, LevelSettings settings);
 
@@ -71,6 +74,12 @@ class Level
         void Render(const glm::mat4& view, const glm::mat4& proj);
         void EndLevel();
 
+        std::string GetDistance() const { 
+            std::stringstream ss;
+            ss << std::fixed << std::setprecision(2) << dist;
+            return ss.str();
+        }
+
         const std::vector<std::shared_ptr<Zapper>>& GetActiveZappers() const { return zapperActive; }
         const std::vector<std::shared_ptr<Coin>>& GetActiveCoins() const { return coinsActive; }
 
@@ -78,7 +87,6 @@ class Level
 
     protected:
         float dist;
-        int coinsCollected = 0;
 
         LevelSettings settings;
         std::shared_ptr<Camera> camera;

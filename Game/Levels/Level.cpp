@@ -171,7 +171,7 @@ void Level::Tick(const Window& window, float deltaTime)
 
     dist += settings.speedModifier * deltaTime;
     coinsText->SetText(std::to_string(coinsCollected));
-    distText->SetText(std::to_string((int)(dist * 100)));
+    distText->SetText(GetDistance());
     for(auto obj: objects)
     {
         obj->Tick(window, deltaTime);
