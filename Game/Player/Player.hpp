@@ -6,13 +6,13 @@
 #include "Engine/Render/Mesh.hpp"
 #include "Engine/Utils/Timer.hpp"
 #include "Engine/Window/Window.hpp"
+#include "Game/Levels/Level.hpp"
 #include <memory>
 
 class Player : public Object
 {
     public:
-        // TODO: use some sort of resource map
-        Player();
+        Player(Level* level);
 
         void Start() override;
         void Tick(const Window& window, float deltaTime) override;
@@ -21,6 +21,7 @@ class Player : public Object
     private:
         void SetCurrentSheet(Texture* sheet);
 
+        Level* level;
         Texture* idleSheet;
         Texture* walkSheet;
         Texture* flySheet;

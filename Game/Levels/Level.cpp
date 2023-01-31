@@ -24,7 +24,7 @@ Level::Level(std::shared_ptr<Camera> camera)
 
 int Level::Load()
 {
-    Player* player = new Player;
+    Player* player = new Player(this);
 
     float tileSize = 0.5f;
     Ground* ground = new Ground(tileSize, GROUND_HEIGHT / tileSize, 100, -2.f);

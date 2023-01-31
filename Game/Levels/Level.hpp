@@ -20,10 +20,26 @@ struct ZSorter
     }
 };
 
+struct LevelSettings
+{
+    float speedModifier;
+
+    float zapperSpawnInterval;
+    float zapperSpawnIntervalVar;
+
+    float zapperHeight;
+    // zapper height variance, new zapper height = zapperHeight + [-zapperHeightVar, zapperHeightVar];
+    float zapperHeightVar;
+
+    float zapperRotSpeed;
+    float zapperRotSpeedVar;
+};
+
 class Level
 {
     public:
         bool started = false;
+        bool hasEnded = false;
 
         Level(std::shared_ptr<Camera> camera);
 
@@ -34,13 +50,12 @@ class Level
         virtual int Unload();
 
         void Render(const glm::mat4& view, const glm::mat4& proj);
+        void EndLevel();
 
-        // TODO:
-        // std::weak_ptr<T> GetObjectsOfType(T type);
+        const std::vector<std::shared_ptr<Zapper>>& GetActiveZappers() const { return zapperActive; }
 
     protected:
         std::shared_ptr<Camera> camera;
-        // std::vector<std::shared_ptr<Object>> objects;
         std::multiset<std::shared_ptr<Object>, ZSorter> objects;
 
     private:

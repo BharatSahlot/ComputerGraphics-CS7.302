@@ -9,8 +9,10 @@
 #include "glm/common.hpp"
 #include <iostream>
 
-Player::Player() : Object("player", Plane, nullptr)
+Player::Player(Level* level) : Object("player", Plane, nullptr)
 {
+    this->level = level;
+
     idleSheet = Texture::MakeTexture("Game/Assets/Player_Idle.png", GL_LINEAR);
     walkSheet = Texture::MakeTexture("Game/Assets/Player_Run.png", GL_LINEAR);
     flySheet = Texture::MakeTexture("Game/Assets/Player_Fly.png", GL_LINEAR);
@@ -41,6 +43,46 @@ void Player::SetCurrentSheet(Texture* sheet)
         frame = 0;
         frameTimer.Start();
     }
+}
+
+bool CheckLineIntersection(glm::vec2 a1, glm::vec2 a2, glm::vec2 b1, glm::vec2 b2)
+{
+    float tn = (a1.x - b1.x) * (b1.y - b2.y) - (a1.y - b1.y) * (b1.x - b2.x);
+    float td = (a1.x - a2.x) * (b1.y - b2.y) - (a1.y - a2.y) * (b1.x - b2.x);
+
+    if(td == 0) return false;
+
+    float un = (a1.x - b1.x) * (a1.y - a2.y) - (a1.y - b1.y) * (a1.x - a2.x);
+    float ud = td;
+
+    if(tn < 0 && td < 0) tn *= -1, td *= -1;
+    if(un < 0 && ud < 0) un *= -1, ud *= -1;
+
+    return tn >= 0 && tn <= td && un >= 0 && un <= ud;
+}
+
+bool CheckCollision(glm::mat4 a, glm::mat4 b)
+{
+    std::pair<glm::vec2, glm::vec2> points[] = {
+        { glm::vec2(0.5, 0.5), glm::vec2(0.5, -0.5) },
+        { glm::vec2(0.5, 0.5), glm::vec2(-0.5, 0.5) },
+        { glm::vec2(-0.5, -0.5), glm::vec2(-0.5, 0.5) },
+        { glm::vec2(-0.5, -0.5), glm::vec2(0.5, -0.5) },
+    };
+
+    for(int i = 0; i < 4; i++)
+    {
+        glm::vec2 a1 = a * glm::vec4(points[i].first, 0, 1);
+        glm::vec2 a2 = a * glm::vec4(points[i].second, 0, 1);
+        for(int j = 0; j < 4; j++)
+        {
+            glm::vec2 b1 = b * glm::vec4(points[j].first, 0, 1);
+            glm::vec2 b2 = b * glm::vec4(points[j].second, 0, 1);
+
+            if(CheckLineIntersection(a1, a2, b1, b2)) return true;
+        }
+    }
+    return false;
 }
 
 void Player::Tick(const Window& window, float deltaTime)
@@ -95,6 +137,16 @@ void Player::Tick(const Window& window, float deltaTime)
     {
         frame = (frame + ind) % 15;
         frameTimer.Start();
+    }
+
+    static int colCount = 0;
+    auto zappers = level->GetActiveZappers();
+    for(auto zapper: zappers)
+    {
+        if(CheckCollision(transform->GetModelMatrix(), zapper->transform->GetModelMatrix()))
+        {
+            level->EndLevel();
+        }
     }
 }
 
