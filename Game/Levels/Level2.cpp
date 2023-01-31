@@ -17,5 +17,10 @@ int Level2::Load()
 
     objects.insert(std::shared_ptr<Background>(bg1));
     objects.insert(std::shared_ptr<Background>(bg2));
+
+    auto enterText = std::shared_ptr<Text>(new Text(-0.2f, 0.9f, 1.75f, glm::vec3(1, 1, 1)));
+    enterText->SetText("Level 2");
+    enterText->transform->SetWorldPosition(0, 0, 0.5f);
+    menuObjects.insert(enterText);
     return 0;
 }

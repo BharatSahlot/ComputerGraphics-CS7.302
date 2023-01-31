@@ -3,6 +3,8 @@
 #include "Engine/Render/Material.hpp"
 #include "Engine/Render/Texture.hpp"
 #include "Engine/Utils/Util.hpp"
+#include "Engine/Window/Window.hpp"
+#include "GLFW/glfw3.h"
 #include "Game/Objects/Background.hpp"
 #include "Game/Objects/Ground.hpp"
 #include "Game/Objects/Text.hpp"
@@ -53,10 +55,25 @@ int Level::Load()
     objects.insert(player);
     objects.insert(std::shared_ptr<Ground>(ground));
 
+    auto enterText = std::shared_ptr<Text>(new Text(-0.6f, 1.1f, 1.5f, glm::vec3(1, 1, 1)));
+    enterText->SetText("Press enter to start the game.");
+    enterText->transform->SetWorldPosition(0, 0, 0.5f);
+    menuObjects.insert(enterText);
+
     return 0;
 }
 
 void Level::Start()
+{
+    inMenu = true;
+    for(auto obj: menuObjects)
+    {
+        obj->Start();
+    }
+    fadeDir = 1.f;
+}
+
+void Level::StartGame()
 {
     for(auto obj: objects)
     {
@@ -64,13 +81,54 @@ void Level::Start()
     }
     zapperSpawnTimer.Start();
     levelTimer.Start();
+    inMenu = false;
+    fadeDir = 1.f;
 }
 
 void Level::Tick(const Window& window, float deltaTime)
 {
+    if(levelEnded)
+    {
+        windowFade -= deltaTime;
+        if(windowFade <= 0.f)
+        {
+            hasEnded = true;
+            windowFade = 0.f;
+        }
+        return;
+    }
+
+    if(inMenu)
+    {
+        if(enterPressed)
+        {
+            windowFade -= deltaTime;
+            if(windowFade <= 0.f)
+            {
+                StartGame();
+            }
+            return;
+        }
+
+        windowFade += fadeDir * deltaTime;
+        if(windowFade >= 1.f) windowFade = 1.f;
+        for(auto obj: menuObjects)
+        {
+            obj->Tick(window, deltaTime);
+        }
+        if(window.GetKey(GLFW_KEY_ENTER))
+        {
+            enterPressed = true;
+        }
+        return;
+    }
+
+    windowFade += fadeDir * deltaTime;
+    if(windowFade >= 1.f) windowFade = 1.f;
+
     if(levelTimer.TimeSinceStart() >= settings.duration)
     {
-        hasEnded = true;
+        levelEnded = true;
         return;
     }
 
@@ -132,7 +190,8 @@ void Level::Tick(const Window& window, float deltaTime)
 void Level::EndLevel()
 {
     playerDied = true;
-    hasEnded = true;
+    levelEnded = true;
+    // hasEnded = true;
     // hasEnded = true;
 }
 
@@ -144,6 +203,15 @@ int Level::Unload()
 
 void Level::Render(const glm::mat4 &view, const glm::mat4 &proj)
 {
+    if(inMenu)
+    {
+        for(auto obj: menuObjects)
+        {
+            obj->Render(view, proj);
+        }
+        return;
+    }
+
     for(auto obj: objects)
     {
         obj->Render(view, proj);

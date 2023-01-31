@@ -12,6 +12,8 @@
 
 #include <iostream>
 
+float windowFade;
+
 static std::map<GLFWwindow*, Window*> glfwToWindow;
 
 Window* Window::Create(int width, int height, const char* title)
@@ -199,6 +201,7 @@ void Window::Render()
         screen.material->Use();
         screen.material->SetInt("screenTexture", 0);
         screen.material->SetInt("bloomTexture", 1);
+        screen.material->SetFloat("fade", windowFade);
         screen.Render(glm::mat4(1), glm::mat4(1));
 
         glfwSwapBuffers(this->glfwWindow);

@@ -86,7 +86,7 @@ int main(int argc, const char** argv)
     window->Init();
 
     LevelSettings levelSettings1;
-    levelSettings1.duration = 30.f;
+    levelSettings1.duration = 10.f;
     levelSettings1.speedModifier = 1.f;
     levelSettings1.zapperSpawnInterval = 7.f;
     levelSettings1.zapperSpawnIntervalVar = 2.f;
@@ -99,7 +99,7 @@ int main(int argc, const char** argv)
     levelSettings1.zapperCol = glm::vec3(0.7f, 0.7f, 1.f);
 
     LevelSettings levelSettings2;
-    levelSettings2.duration = 20.f;
+    levelSettings2.duration = 10.f;
     levelSettings2.speedModifier = 1.f;
     levelSettings2.zapperSpawnInterval = 5.f;
     levelSettings2.zapperSpawnIntervalVar = 2.f;
@@ -112,7 +112,7 @@ int main(int argc, const char** argv)
     levelSettings2.zapperCol = glm::vec3(0.7f, 0.7f, 1.f);
 
     LevelSettings levelSettings3;
-    levelSettings3.duration = 40.f;
+    levelSettings3.duration = 10.f;
     levelSettings3.speedModifier = 1.f;
     levelSettings3.zapperSpawnInterval = 4.f;
     levelSettings3.zapperSpawnIntervalVar = 1.f;

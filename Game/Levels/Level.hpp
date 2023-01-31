@@ -45,6 +45,7 @@ struct LevelSettings
 class Level
 {
     public:
+        bool inMenu = true;
         bool started = false;
         bool hasEnded = false;
         bool playerDied = false;
@@ -54,6 +55,7 @@ class Level
         virtual int Load();
 
         void Start();
+        void StartGame();
         void Tick(const Window& window, float deltaTime);
         virtual int Unload();
 
@@ -68,12 +70,18 @@ class Level
         LevelSettings settings;
         std::shared_ptr<Camera> camera;
         std::multiset<std::shared_ptr<Object>, ZSorter> objects;
+        std::multiset<std::shared_ptr<Object>, ZSorter> menuObjects;
+
         Timer levelTimer;
 
         std::shared_ptr<Text> distText;
         std::shared_ptr<Text> coinsText;
 
     private:
+        bool enterPressed = false;
+        bool levelEnded = false; // hasEnded gets true after fading is finished
+
+        int fadeDir;
         Timer zapperSpawnTimer;
         float zapperSpawnInterval;
         std::stack<std::shared_ptr<Zapper>> zapperPool;

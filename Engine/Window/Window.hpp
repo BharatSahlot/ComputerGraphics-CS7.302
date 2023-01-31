@@ -8,6 +8,9 @@
 #include <map>
 #include <memory>
 
+// so bad, not so bad
+extern float windowFade;
+
 class Window
 {
     public:
