@@ -16,9 +16,10 @@
 #include "Engine/Utils/Random.hpp"
 #include "glm/trigonometric.hpp"
 
-Level::Level(std::shared_ptr<Camera> camera)
+Level::Level(std::shared_ptr<Camera> camera, LevelSettings settings)
 {
     this->camera = camera;
+    this->settings = settings;
     zapperSpawnInterval = 4;
 }
 
@@ -27,19 +28,19 @@ int Level::Load()
     Player* player = new Player(this);
 
     float tileSize = 0.5f;
-    Ground* ground = new Ground(tileSize, GROUND_HEIGHT / tileSize, 100, -2.f);
+    Ground* ground = new Ground(tileSize, GROUND_HEIGHT / tileSize, 100, -2.f * settings.speedModifier);
 
     for(int i = 0; i < 5; i++)
     {
-        Zapper* zapper = new Zapper(2.5f, -2.f);
+        Zapper* zapper = new Zapper(settings.zapperHeight, -2.f * settings.speedModifier, settings.zapperCol);
         zapperPool.push(std::shared_ptr<Zapper>(zapper));
     }
 
-    Background* bg1 = new Background("bg0", "Game/Assets/Background_0.png", -0.2f, -0.3f);
-    Background* bg2 = new Background("bg1", "Game/Assets/Background_1.png", -0.8f, -0.1f);
+    // Background* bg1 = new Background("bg0", "Game/Assets/Background_0.png", -0.2f * settings.speedModifier, -0.3f);
+    // Background* bg2 = new Background("bg1", "Game/Assets/Background_1.png", -0.8f * settings.speedModifier, -0.1f);
 
-    objects.insert(std::shared_ptr<Background>(bg1));
-    objects.insert(std::shared_ptr<Background>(bg2));
+    // objects.insert(std::shared_ptr<Background>(bg1));
+    // objects.insert(std::shared_ptr<Background>(bg2));
 
     objects.insert(std::shared_ptr<Player>(player));
     objects.insert(std::shared_ptr<Ground>(ground));
@@ -58,17 +59,17 @@ void Level::Start()
 
 void Level::Tick(const Window& window, float deltaTime)
 {
-    if(zapperSpawnTimer.TimeSinceStart() >= zapperSpawnInterval + (1.f - 2 * Random::GetFloat()) * (zapperSpawnInterval / 2.f))
+    float interval = settings.zapperSpawnInterval;
+    interval += (1.f - 2 * Random::GetFloat()) * settings.zapperSpawnIntervalVar;
+    if(zapperSpawnTimer.TimeSinceStart() >= interval)
     {
         if(!zapperPool.empty())
         {
-            float top = 0.8f;
+            float top = 0.9f;
             float bot = -0.55f;
             float y = bot + ((top - bot) * Random::GetFloat());
-            glm::vec3 pos = window.ViewportPointToWorld(glm::vec3(1, y, -0.3));
+            glm::vec3 pos = window.ViewportPointToWorld(glm::vec3(1, y, -0.0));
             pos.x += 1;
-
-            glm::vec3 rot(0, 0, glm::radians((1.f - 2 * Random::GetFloat()) * 30.f));
 
             zapperSpawnTimer.Start();
             auto zapper = zapperPool.top();
@@ -79,10 +80,13 @@ void Level::Tick(const Window& window, float deltaTime)
             zapper->Start();
             if((Random::GetInt() % 2) == 0)
             {
-                zapper->SetRotSpeed(20.f + Random::GetFloat() * 20.f);
+                float speed = settings.zapperRotSpeed + (1.f - 2.f * Random::GetFloat()) * settings.zapperRotSpeedVar;
+                if(Random::GetInt() % 2) speed *= -1;
+                zapper->SetRotSpeed(speed);
             } else
             {
-                zapper->SetYSpeed(Random::GetFloat() * 2.f);
+                float speed = settings.zapperYSpeed + (1.f - 2.f * Random::GetFloat()) * settings.zapperYSpeedVar;
+                zapper->SetYSpeed(speed);
             }
             zapper->transform->SetWorldPosition(pos);
         }
@@ -95,7 +99,7 @@ void Level::Tick(const Window& window, float deltaTime)
 
     for(size_t i = 0; i < zapperActive.size(); i++)
     {
-        if(zapperActive[i]->transform->GetWorldPosition().x < 0)
+        if(zapperActive[i]->transform->GetWorldPosition().x < -0.2f)
         {
             objects.erase(std::find(objects.begin(), objects.end(), zapperActive[i]));
             zapperPool.push(zapperActive[i]);
@@ -103,6 +107,11 @@ void Level::Tick(const Window& window, float deltaTime)
             i--;
         }
     }
+}
+
+void Level::EndLevel()
+{
+    hasEnded = true;
 }
 
 int Level::Unload()

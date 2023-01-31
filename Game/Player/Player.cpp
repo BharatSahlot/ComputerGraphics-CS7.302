@@ -64,6 +64,13 @@ bool CheckLineIntersection(glm::vec2 a1, glm::vec2 a2, glm::vec2 b1, glm::vec2 b
 bool CheckCollision(glm::mat4 a, glm::mat4 b)
 {
     std::pair<glm::vec2, glm::vec2> points[] = {
+        { glm::vec2(0.2, 0.5), glm::vec2(0.2, -0.5) },
+        { glm::vec2(0.2, 0.5), glm::vec2(-0.2, 0.5) },
+        { glm::vec2(-0.2, -0.5), glm::vec2(-0.2, 0.5) },
+        { glm::vec2(-0.2, -0.5), glm::vec2(0.2, -0.5) },
+    };
+
+    std::pair<glm::vec2, glm::vec2> points1[] = {
         { glm::vec2(0.5, 0.5), glm::vec2(0.5, -0.5) },
         { glm::vec2(0.5, 0.5), glm::vec2(-0.5, 0.5) },
         { glm::vec2(-0.5, -0.5), glm::vec2(-0.5, 0.5) },
@@ -76,8 +83,8 @@ bool CheckCollision(glm::mat4 a, glm::mat4 b)
         glm::vec2 a2 = a * glm::vec4(points[i].second, 0, 1);
         for(int j = 0; j < 4; j++)
         {
-            glm::vec2 b1 = b * glm::vec4(points[j].first, 0, 1);
-            glm::vec2 b2 = b * glm::vec4(points[j].second, 0, 1);
+            glm::vec2 b1 = b * glm::vec4(points1[j].first, 0, 1);
+            glm::vec2 b2 = b * glm::vec4(points1[j].second, 0, 1);
 
             if(CheckLineIntersection(a1, a2, b1, b2)) return true;
         }

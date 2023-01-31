@@ -9,6 +9,7 @@
 #include "Engine/Window/Window.hpp"
 #include "Engine/Utils/Random.hpp"
 #include "GLFW/glfw3.h"
+#include "Game/Levels/Level.hpp"
 #include "Game/Levels/Levels.hpp"
 #include "Game/Player/Player.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
@@ -75,27 +76,81 @@ int main(int argc, const char** argv)
 
     window->Init();
 
-    Level1 level1(camera);
-    level1.Load();
+    LevelSettings levelSettings1;
+    levelSettings1.speedModifier = 1.f;
+    levelSettings1.zapperSpawnInterval = 7.f;
+    levelSettings1.zapperSpawnIntervalVar = 2.f;
+    levelSettings1.zapperHeight = 2.5f;
+    levelSettings1.zapperHeightVar = 0.5f;
+    levelSettings1.zapperRotSpeed = 30.f;
+    levelSettings1.zapperRotSpeedVar = 10.f;
+    levelSettings1.zapperYSpeed = 3.f;
+    levelSettings1.zapperYSpeedVar = 2.f;
+    levelSettings1.zapperCol = glm::vec3(0.7f, 0.7f, 1.f);
+
+    LevelSettings levelSettings2;
+    levelSettings2.speedModifier = 1.f;
+    levelSettings2.zapperSpawnInterval = 7.f;
+    levelSettings2.zapperSpawnIntervalVar = 2.f;
+    levelSettings2.zapperHeight = 2.5f;
+    levelSettings2.zapperHeightVar = 0.5f;
+    levelSettings2.zapperRotSpeed = 30.f;
+    levelSettings2.zapperRotSpeedVar = 10.f;
+    levelSettings2.zapperYSpeed = 3.f;
+    levelSettings2.zapperYSpeedVar = 2.f;
+    levelSettings2.zapperCol = glm::vec3(0.7f, 0.7f, 1.f);
+
+    LevelSettings levelSettings3;
+    levelSettings3.speedModifier = 1.f;
+    levelSettings3.zapperSpawnInterval = 7.f;
+    levelSettings3.zapperSpawnIntervalVar = 2.f;
+    levelSettings3.zapperHeight = 2.5f;
+    levelSettings3.zapperHeightVar = 0.5f;
+    levelSettings3.zapperRotSpeed = 30.f;
+    levelSettings3.zapperRotSpeedVar = 10.f;
+    levelSettings3.zapperYSpeed = 3.f;
+    levelSettings3.zapperYSpeedVar = 2.f;
+    levelSettings3.zapperCol = glm::vec3(1.f, 0.0f, 0.2f);
+
+    Level* levels[] = {
+        new Level1(camera, levelSettings1),
+        new Level2(camera, levelSettings2),
+        new Level3(camera, levelSettings3),
+    };
+
+    Timer startUpTimer;
+    startUpTimer.Start();
+    levels[0]->Load();
+    levels[1]->Load();
+    levels[2]->Load();
+    std::cerr << startUpTimer.TimeSinceStart() << std::endl;
+
+    int currentLevel = 0;
 
     Timer timer;
     timer.Start();
     window->SetRenderCallback([&](const Window& window) -> bool {
         float delta = timer.Tick();
-        if(!level1.started)
+
+        if(!levels[currentLevel]->started)
         {
-            level1.started = true;
-            level1.Start();
+            levels[currentLevel]->started = true;
+            levels[currentLevel]->Start();
         }
-        
-        level1.Tick(window, delta);
-        level1.Render(camera->view, camera->Proj());
-        return false;
+
+        levels[currentLevel]->Tick(window, delta);
+        levels[currentLevel]->Render(camera->view, camera->Proj());
+
+        if(levels[currentLevel]->hasEnded)
+        {
+            levels[currentLevel]->Unload();
+            delete levels[currentLevel];
+            currentLevel++;
+        }
+        return currentLevel >= 3;
     });
 
     window->Render();
-
-    level1.Unload();
 
     EngineClean();
     return 0;

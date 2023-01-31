@@ -7,7 +7,7 @@
 class Zapper : public Object
 {
     public:
-        Zapper(float height, float speed);
+        Zapper(float height, float speed, glm::vec3 col);
 
         void Start() override;
         void Tick(const Window &window, float deltaTime) override;
@@ -17,6 +17,8 @@ class Zapper : public Object
         void SetRotSpeed(float speed);
 
     private:
+        glm::vec3 col;
+
         float height;
         float xSpeed;
         float ySpeed;

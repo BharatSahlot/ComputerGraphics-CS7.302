@@ -33,6 +33,11 @@ struct LevelSettings
 
     float zapperRotSpeed;
     float zapperRotSpeedVar;
+    
+    float zapperYSpeed;
+    float zapperYSpeedVar;
+
+    glm::vec3 zapperCol;
 };
 
 class Level
@@ -41,7 +46,7 @@ class Level
         bool started = false;
         bool hasEnded = false;
 
-        Level(std::shared_ptr<Camera> camera);
+        Level(std::shared_ptr<Camera> camera, LevelSettings settings);
 
         virtual int Load();
 
@@ -55,6 +60,7 @@ class Level
         const std::vector<std::shared_ptr<Zapper>>& GetActiveZappers() const { return zapperActive; }
 
     protected:
+        LevelSettings settings;
         std::shared_ptr<Camera> camera;
         std::multiset<std::shared_ptr<Object>, ZSorter> objects;
 

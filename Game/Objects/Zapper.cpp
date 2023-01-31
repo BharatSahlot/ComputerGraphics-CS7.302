@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-Zapper::Zapper(float height, float speed) : Object("zapper", Plane, BasicTexMat)
+Zapper::Zapper(float height, float speed, glm::vec3 col) : Object("zapper", Plane, BasicTexMat)
 {
     Shader* baseVs = Shader::MakeShader("Shaders/base.vs", GL_VERTEX_SHADER);
     Shader* lightingfs = Shader::MakeShader("Shaders/lighting.fs", GL_FRAGMENT_SHADER);
@@ -18,6 +18,7 @@ Zapper::Zapper(float height, float speed) : Object("zapper", Plane, BasicTexMat)
     this->height = height;
     this->xSpeed = speed;
     this->ySpeed = 0;
+    this->col = col;
 }
 
 void Zapper::SetYSpeed(float ySpeed)
@@ -68,7 +69,7 @@ void Zapper::Render(const glm::mat4 &viewMat, const glm::mat4 &projMat)
     }
 
     material->Use();
-    material->SetVec3("col", glm::vec3(0.3, 0.2, 0.8));
+    material->SetVec3("col", col);
     material->SetInt("texXCount", 5);
     material->SetInt("texYCount", 3);
     material->SetInt("index", frame);
