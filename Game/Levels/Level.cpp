@@ -5,6 +5,7 @@
 #include "Engine/Utils/Util.hpp"
 #include "Game/Objects/Background.hpp"
 #include "Game/Objects/Ground.hpp"
+#include "Game/Objects/Text.hpp"
 #include "Game/Objects/Zapper.hpp"
 #include "Game/Player/Player.hpp"
 #include "Globals.hpp"
@@ -12,6 +13,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <string>
 
 #include "Engine/Utils/Random.hpp"
 #include "glm/trigonometric.hpp"
@@ -25,8 +27,9 @@ Level::Level(std::shared_ptr<Camera> camera, LevelSettings settings)
 
 int Level::Load()
 {
-    Player* player = new Player(this);
+    auto player = std::shared_ptr<Player>(new Player(this));
 
+    started = hasEnded = playerDied = false;
     float tileSize = 0.5f;
     Ground* ground = new Ground(tileSize, GROUND_HEIGHT / tileSize, 100, -2.f * settings.speedModifier);
 
@@ -36,7 +39,18 @@ int Level::Load()
         zapperPool.push(std::shared_ptr<Zapper>(zapper));
     }
 
-    objects.insert(std::shared_ptr<Player>(player));
+    coinsText = std::shared_ptr<Text>(new Text(-0.99f, 0.1f, 1, glm::vec3(1, 1, 1)));
+    coinsText->SetText("Coins");
+    coinsText->transform->SetWorldPosition(0, 0, 0.5f);
+
+    distText = std::shared_ptr<Text>(new Text(-0.99f, 0.24f, 1, glm::vec3(1, 1, 1)));
+    distText->SetText("Dist");
+    distText->transform->SetWorldPosition(0, 0, 0.5f);
+
+    objects.insert(coinsText);
+    objects.insert(distText);
+
+    objects.insert(player);
     objects.insert(std::shared_ptr<Ground>(ground));
 
     return 0;
@@ -95,6 +109,9 @@ void Level::Tick(const Window& window, float deltaTime)
         }
     }
 
+    dist += settings.speedModifier * deltaTime;
+    coinsText->SetText(std::to_string(0));
+    distText->SetText(std::to_string((int)(dist * 100)));
     for(auto obj: objects)
     {
         obj->Tick(window, deltaTime);

@@ -1,6 +1,7 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#include "Engine/Render/Font.hpp"
 #include "Engine/Render/Mesh.hpp"
 #include <memory>
 
@@ -25,5 +26,8 @@ extern GameState State;
 extern std::shared_ptr<Mesh> Plane;
 extern std::shared_ptr<Material> BasicMat;
 extern std::shared_ptr<Material> BasicTexMat;
+extern std::shared_ptr<Material> TextMat;
+
+extern Font* font;
 
 #endif

@@ -5,6 +5,11 @@
 
 #include <iostream>
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+FT_Library ft;
+
 void APIENTRY glDebugOutput(GLenum source, 
                             GLenum type, 
                             unsigned int id, 
@@ -89,11 +94,19 @@ int EngineInitGLAD()
         glDebugMessageCallback(glDebugOutput, nullptr);
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
     } 
+
+    if(FT_Init_FreeType(&ft))
+    {
+        std::cerr << "Could not init FreeType" << std::endl;
+        return -1;
+    }
+
     return 0;
 }
 
 int EngineClean()
 {
     glfwTerminate();
+    FT_Done_FreeType(ft);
     return 0;
 }

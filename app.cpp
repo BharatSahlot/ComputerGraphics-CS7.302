@@ -1,6 +1,7 @@
 #include "Engine/Camera.hpp"
 #include "Engine/Engine.hpp"
 #include "Engine/Object.hpp"
+#include "Engine/Render/Font.hpp"
 #include "Engine/Utils/Timer.hpp"
 #include "Engine/Render/Material.hpp"
 #include "Engine/Render/Mesh.hpp"
@@ -32,6 +33,8 @@
 std::shared_ptr<Mesh> Plane;
 std::shared_ptr<Material> BasicMat;
 std::shared_ptr<Material> BasicTexMat;
+std::shared_ptr<Material> TextMat;
+Font* font;
 
 int main(int argc, const char** argv)
 {
@@ -52,11 +55,17 @@ int main(int argc, const char** argv)
     Shader* baseFrag = Shader::MakeShader("Shaders/base.fs", GL_FRAGMENT_SHADER);
     Shader* texFrag = Shader::MakeShader("Shaders/tex.fs", GL_FRAGMENT_SHADER);
 
+    Shader* textVert = Shader::MakeShader("Shaders/text.vs", GL_VERTEX_SHADER);
+    Shader* textFrag = Shader::MakeShader("Shaders/text.fs", GL_FRAGMENT_SHADER);
+
     Material* mat = Material::MakeMaterial(baseVert, baseFrag);
     BasicMat = std::shared_ptr<Material>(mat);
 
     BasicTexMat = std::shared_ptr<Material>(
             Material::MakeMaterial(baseVert, texFrag));
+
+    TextMat = std::shared_ptr<Material>(
+            Material::MakeMaterial(textVert, textFrag));
 
     std::vector<float> vertices({
             0.5f,  0.5f, 0.0f, 1.f, 1.f,  // top right
@@ -90,7 +99,7 @@ int main(int argc, const char** argv)
     levelSettings1.zapperCol = glm::vec3(0.7f, 0.7f, 1.f);
 
     LevelSettings levelSettings2;
-    levelSettings1.duration = 20.f;
+    levelSettings2.duration = 20.f;
     levelSettings2.speedModifier = 1.f;
     levelSettings2.zapperSpawnInterval = 5.f;
     levelSettings2.zapperSpawnIntervalVar = 2.f;
@@ -103,9 +112,9 @@ int main(int argc, const char** argv)
     levelSettings2.zapperCol = glm::vec3(0.7f, 0.7f, 1.f);
 
     LevelSettings levelSettings3;
-    levelSettings1.duration = 40.f;
+    levelSettings3.duration = 40.f;
     levelSettings3.speedModifier = 1.f;
-    levelSettings3.zapperSpawnInterval = 43.f;
+    levelSettings3.zapperSpawnInterval = 4.f;
     levelSettings3.zapperSpawnIntervalVar = 1.f;
     levelSettings3.zapperHeight = 4.f;
     levelSettings3.zapperHeightVar = 0.5f;
@@ -129,6 +138,8 @@ int main(int argc, const char** argv)
     std::cerr << "Load time: " << startUpTimer.TimeSinceStart() << std::endl;
 
     int currentLevel = 0;
+
+    font = Font::LoadFont("Game/Assets/font.ttf", 96);
 
     Timer timer;
     timer.Start();
@@ -155,6 +166,7 @@ int main(int argc, const char** argv)
             }
             currentLevel++;
         }
+        // font->RenderText("Level 1", 2, 9, 0.01f, camera->Proj(), glm::vec3(1, 1, 1));
         return currentLevel >= 3;
     });
 

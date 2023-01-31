@@ -1,4 +1,5 @@
 #include "Game/Objects/Background.hpp"
+#include "Game/Objects/Text.hpp"
 #include "Levels.hpp"
 #include <string>
 
@@ -16,5 +17,10 @@ int Level3::Load()
 
         objects.insert(std::shared_ptr<Background>(bg));
     }
+
+    Text* text = new Text(0.81f, 0.1f, 1, glm::vec3(1, 1, 1));
+    text->SetText("Level 3");
+    text->transform->SetWorldPosition(0, 0, 0.5f);
+    objects.insert(std::shared_ptr<Text>(text));
     return 0;
 }

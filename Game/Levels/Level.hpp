@@ -4,6 +4,7 @@
 #include "Engine/Camera.hpp"
 #include "Engine/Object.hpp"
 #include "Engine/Utils/Timer.hpp"
+#include "Game/Objects/Text.hpp"
 #include "Game/Objects/Zapper.hpp"
 #include <memory>
 #include <vector>
@@ -62,10 +63,15 @@ class Level
         const std::vector<std::shared_ptr<Zapper>>& GetActiveZappers() const { return zapperActive; }
 
     protected:
+        float dist;
+
         LevelSettings settings;
         std::shared_ptr<Camera> camera;
         std::multiset<std::shared_ptr<Object>, ZSorter> objects;
         Timer levelTimer;
+
+        std::shared_ptr<Text> distText;
+        std::shared_ptr<Text> coinsText;
 
     private:
         Timer zapperSpawnTimer;
