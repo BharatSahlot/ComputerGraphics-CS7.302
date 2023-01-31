@@ -61,7 +61,7 @@ bool CheckLineIntersection(glm::vec2 a1, glm::vec2 a2, glm::vec2 b1, glm::vec2 b
     return tn >= 0 && tn <= td && un >= 0 && un <= ud;
 }
 
-bool CheckCollision(glm::mat4 a, glm::mat4 b)
+bool CheckCollision(glm::mat4 a, glm::mat4 b, float bHalfWidth)
 {
     std::pair<glm::vec2, glm::vec2> points[] = {
         { glm::vec2(0.2, 0.4), glm::vec2(0.2, -0.4) },
@@ -71,10 +71,10 @@ bool CheckCollision(glm::mat4 a, glm::mat4 b)
     };
 
     std::pair<glm::vec2, glm::vec2> points1[] = {
-        { glm::vec2(0.2, 0.5), glm::vec2(0.2, -0.5) },
-        { glm::vec2(0.2, 0.5), glm::vec2(-0.2, 0.5) },
-        { glm::vec2(-0.2, -0.5), glm::vec2(-0.2, 0.5) },
-        { glm::vec2(-0.2, -0.5), glm::vec2(0.2, -0.5) },
+        { glm::vec2(bHalfWidth, 0.5), glm::vec2(bHalfWidth, -0.5) },
+        { glm::vec2(bHalfWidth, 0.5), glm::vec2(-bHalfWidth, 0.5) },
+        { glm::vec2(-bHalfWidth, -0.5), glm::vec2(-bHalfWidth, 0.5) },
+        { glm::vec2(-bHalfWidth, -0.5), glm::vec2(bHalfWidth, -0.5) },
     };
 
     for(int i = 0; i < 4; i++)
@@ -146,13 +146,21 @@ void Player::Tick(const Window& window, float deltaTime)
         frameTimer.Start();
     }
 
-    static int colCount = 0;
     auto zappers = level->GetActiveZappers();
     for(auto zapper: zappers)
     {
-        if(CheckCollision(transform->GetModelMatrix(), zapper->transform->GetModelMatrix()))
+        if(CheckCollision(transform->GetModelMatrix(), zapper->transform->GetModelMatrix(), 0.2f))
         {
             level->EndLevel();
+        }
+    }
+
+    auto coins = level->GetActiveCoins();
+    for(auto coin: coins)
+    {
+        if(CheckCollision(transform->GetModelMatrix(), coin->transform->GetModelMatrix(), 0.5f))
+        {
+            level->PlayerCoinCollision(coin);
         }
     }
 }

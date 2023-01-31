@@ -4,11 +4,13 @@
 #include "Engine/Camera.hpp"
 #include "Engine/Object.hpp"
 #include "Engine/Utils/Timer.hpp"
+#include "Game/Objects/Coin.hpp"
 #include "Game/Objects/Text.hpp"
 #include "Game/Objects/Zapper.hpp"
 #include <memory>
 #include <vector>
 #include <stack>
+#include <queue>
 #include <set>
 
 struct ZSorter
@@ -40,6 +42,13 @@ struct LevelSettings
     float zapperYSpeedVar;
 
     glm::vec3 zapperCol;
+
+    float coinRadius;
+    float coinSpawnInterval;
+    float coinSpawnIntervalVar;
+
+    float coinSpawnRadius;
+    float coinSpawnRadiusVar;
 };
 
 class Level
@@ -63,9 +72,13 @@ class Level
         void EndLevel();
 
         const std::vector<std::shared_ptr<Zapper>>& GetActiveZappers() const { return zapperActive; }
+        const std::vector<std::shared_ptr<Coin>>& GetActiveCoins() const { return coinsActive; }
+
+        void PlayerCoinCollision(const std::shared_ptr<Coin>& coin);
 
     protected:
         float dist;
+        int coinsCollected = 0;
 
         LevelSettings settings;
         std::shared_ptr<Camera> camera;
@@ -78,14 +91,20 @@ class Level
         std::shared_ptr<Text> coinsText;
 
     private:
+        void SpawnCoins(const Window& window);
+
         bool enterPressed = false;
         bool levelEnded = false; // hasEnded gets true after fading is finished
 
         int fadeDir;
         Timer zapperSpawnTimer;
-        float zapperSpawnInterval;
-        std::stack<std::shared_ptr<Zapper>> zapperPool;
+        std::queue<std::shared_ptr<Zapper>> zapperPool;
         std::vector<std::shared_ptr<Zapper>> zapperActive;
+
+
+        Timer coinSpawnTimer;
+        std::queue<std::shared_ptr<Coin>> coinsPool;
+        std::vector<std::shared_ptr<Coin>> coinsActive;
 };
 
 #endif

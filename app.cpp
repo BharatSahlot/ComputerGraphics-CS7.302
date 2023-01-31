@@ -34,6 +34,8 @@ std::shared_ptr<Mesh> Plane;
 std::shared_ptr<Material> BasicMat;
 std::shared_ptr<Material> BasicTexMat;
 std::shared_ptr<Material> TextMat;
+std::shared_ptr<Material> SpriteSheetMat;
+
 Font* font;
 
 int main(int argc, const char** argv)
@@ -58,6 +60,8 @@ int main(int argc, const char** argv)
     Shader* textVert = Shader::MakeShader("Shaders/text.vs", GL_VERTEX_SHADER);
     Shader* textFrag = Shader::MakeShader("Shaders/text.fs", GL_FRAGMENT_SHADER);
 
+    Shader* spriteSheetFrag = Shader::MakeShader("Shaders/spritesheet.fs", GL_FRAGMENT_SHADER);
+
     Material* mat = Material::MakeMaterial(baseVert, baseFrag);
     BasicMat = std::shared_ptr<Material>(mat);
 
@@ -66,6 +70,8 @@ int main(int argc, const char** argv)
 
     TextMat = std::shared_ptr<Material>(
             Material::MakeMaterial(textVert, textFrag));
+
+    SpriteSheetMat = std::shared_ptr<Material>(Material::MakeMaterial(baseVert, spriteSheetFrag));
 
     std::vector<float> vertices({
             0.5f,  0.5f, 0.0f, 1.f, 1.f,  // top right
@@ -97,6 +103,12 @@ int main(int argc, const char** argv)
     levelSettings1.zapperYSpeed = 3.f;
     levelSettings1.zapperYSpeedVar = 2.f;
     levelSettings1.zapperCol = glm::vec3(0.7f, 0.7f, 1.f);
+    levelSettings1.coinRadius = 0.5f;
+    levelSettings1.coinSpawnInterval = 8.f;
+    levelSettings1.coinSpawnIntervalVar = 2.f;
+    levelSettings1.coinSpawnRadius = 1.f;
+    levelSettings1.coinSpawnRadiusVar = 0.5f;
+
 
     LevelSettings levelSettings2;
     levelSettings2.duration = 10.f;
@@ -110,6 +122,11 @@ int main(int argc, const char** argv)
     levelSettings2.zapperYSpeed = 3.f;
     levelSettings2.zapperYSpeedVar = 2.f;
     levelSettings2.zapperCol = glm::vec3(0.7f, 0.7f, 1.f);
+    levelSettings2.coinRadius = 0.5f;
+    levelSettings2.coinSpawnInterval = 8.f;
+    levelSettings2.coinSpawnIntervalVar = 2.f;
+    levelSettings2.coinSpawnRadius = 1.f;
+    levelSettings2.coinSpawnRadiusVar = 0.5f;
 
     LevelSettings levelSettings3;
     levelSettings3.duration = 10.f;
@@ -123,6 +140,11 @@ int main(int argc, const char** argv)
     levelSettings3.zapperYSpeed = 3.f;
     levelSettings3.zapperYSpeedVar = 2.f;
     levelSettings3.zapperCol = glm::vec3(1.f, 0.0f, 0.2f);
+    levelSettings3.coinRadius = 0.5f;
+    levelSettings3.coinSpawnInterval = 8.f;
+    levelSettings3.coinSpawnIntervalVar = 2.f;
+    levelSettings3.coinSpawnRadius = 1.f;
+    levelSettings3.coinSpawnRadiusVar = 0.5f;
 
     Level* levels[] = {
         new Level1(camera, levelSettings1),
@@ -166,7 +188,6 @@ int main(int argc, const char** argv)
             }
             currentLevel++;
         }
-        // font->RenderText("Level 1", 2, 9, 0.01f, camera->Proj(), glm::vec3(1, 1, 1));
         return currentLevel >= 3;
     });
 

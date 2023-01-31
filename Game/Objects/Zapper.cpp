@@ -71,8 +71,8 @@ void Zapper::Render(const glm::mat4 &viewMat, const glm::mat4 &projMat)
 
     material->Use();
     material->SetVec3("col", col);
-    material->SetInt("texXCount", 5);
-    material->SetInt("texYCount", 3);
+    material->SetInt("texXCount", 8);
+    material->SetInt("texYCount", 1);
     material->SetInt("index", frame);
 
     for(size_t i = 0; i < textures.size(); i++)

@@ -6,6 +6,7 @@
 #include "Engine/Window/Window.hpp"
 #include "GLFW/glfw3.h"
 #include "Game/Objects/Background.hpp"
+#include "Game/Objects/Coin.hpp"
 #include "Game/Objects/Ground.hpp"
 #include "Game/Objects/Text.hpp"
 #include "Game/Objects/Zapper.hpp"
@@ -24,7 +25,6 @@ Level::Level(std::shared_ptr<Camera> camera, LevelSettings settings)
 {
     this->camera = camera;
     this->settings = settings;
-    zapperSpawnInterval = 4;
 }
 
 int Level::Load()
@@ -147,7 +147,7 @@ void Level::Tick(const Window& window, float deltaTime)
             pos.z = 0.3f;
 
             zapperSpawnTimer.Start();
-            auto zapper = zapperPool.top();
+            auto zapper = zapperPool.front();
             objects.insert(zapper);
             zapperActive.push_back(zapper);
             zapperPool.pop();
@@ -167,8 +167,10 @@ void Level::Tick(const Window& window, float deltaTime)
         }
     }
 
+    SpawnCoins(window);
+
     dist += settings.speedModifier * deltaTime;
-    coinsText->SetText(std::to_string(0));
+    coinsText->SetText(std::to_string(coinsCollected));
     distText->SetText(std::to_string((int)(dist * 100)));
     for(auto obj: objects)
     {
@@ -187,17 +189,88 @@ void Level::Tick(const Window& window, float deltaTime)
     }
 }
 
+void Level::SpawnCoins(const Window& window)
+{
+    float interval = settings.coinSpawnInterval;
+    interval += settings.coinSpawnIntervalVar * (1.f - 2.f * Random::GetFloat());
+    if(coinSpawnTimer.TimeSinceStart() < interval) return;
+
+    coinSpawnTimer.Start();
+
+    float radius = settings.coinSpawnRadius;
+    radius += settings.coinSpawnRadiusVar * (1.f - 2.f * Random::GetFloat());
+
+    float top = CEILING - radius;
+    float bot = GROUND + GROUND_HEIGHT + radius;
+    float y = bot + ((top - bot) * Random::GetFloat());
+    glm::vec3 center = window.ViewportPointToWorld(glm::vec3(1, 0, 0));
+    center.x += radius + settings.coinRadius;
+    center.y = y;
+    center.z = 0.9f;
+
+    for(float x = -radius; x <= radius; x += settings.coinRadius)
+    {
+        for(float y = -radius; y <= radius; y += settings.coinRadius)
+        {
+            float cx = std::max(x + settings.coinRadius / 2.f, x - settings.coinRadius / 2.f);
+            float cy = std::max(y + settings.coinRadius / 2.f, y - settings.coinRadius / 2.f);
+            if(cx * cx + cy * cy >= radius * radius) continue;
+
+            std::shared_ptr<Coin> coin;
+            if(!coinsPool.empty())
+            {
+                coin = coinsPool.front();
+                coinsPool.pop();
+            } else 
+            {
+                coin = std::shared_ptr<Coin>(new Coin(settings.coinRadius, -2.f * settings.speedModifier));
+            }
+
+            objects.insert(coin);
+            coinsActive.push_back(coin);
+
+            coin->Start();
+
+            glm::vec3 pos = glm::vec3(x, y, 0) + center;
+            coin->transform->SetWorldPosition(pos);
+        }
+    }
+
+    for(size_t i = 0; i < coinsActive.size(); i++)
+    {
+        if(coinsActive[i]->transform->GetWorldPosition().x < -0.2f)
+        {
+            objects.erase(std::find(objects.begin(), objects.end(), coinsActive[i]));
+            coinsPool.push(coinsActive[i]);
+            coinsActive.erase(coinsActive.begin() + i);
+            i--;
+        }
+    }
+}
+
+void Level::PlayerCoinCollision(const std::shared_ptr<Coin>& coin)
+{
+    objects.erase(std::find(objects.begin(), objects.end(), coin));
+    auto c = std::find(coinsActive.begin(), coinsActive.end(), coin);
+    coinsPool.push(*c);
+    coinsActive.erase(c);
+
+    coinsCollected++;
+}
+
 void Level::EndLevel()
 {
     playerDied = true;
     levelEnded = true;
-    // hasEnded = true;
-    // hasEnded = true;
 }
 
 int Level::Unload()
 {
     objects.clear();
+    coinsActive.clear();
+    coinsPool = {};
+    zapperActive = {};
+    zapperPool = {};
     return 0;
 }
 

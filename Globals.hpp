@@ -27,6 +27,7 @@ extern std::shared_ptr<Mesh> Plane;
 extern std::shared_ptr<Material> BasicMat;
 extern std::shared_ptr<Material> BasicTexMat;
 extern std::shared_ptr<Material> TextMat;
+extern std::shared_ptr<Material> SpriteSheetMat;
 
 extern Font* font;
 

@@ -8,17 +8,13 @@
 #include <iostream>
 #include <cstdlib>
 
-Ground::Ground(float tileSize, int yCount, int xCount, float xSpeed) : Object("ground", Plane, nullptr)
+Ground::Ground(float tileSize, int yCount, int xCount, float xSpeed) : Object("ground", Plane, SpriteSheetMat)
 {
     sheet = Texture::MakeTexture("Game/Assets/Ground_Tileset.png", GL_NEAREST);
     if(sheet == nullptr)
     {
         std::cerr << "Unable to load ground tilesheet image file" << std::endl;
     }
-
-    Shader* vs = Shader::MakeShader("Shaders/base.vs", GL_VERTEX_SHADER);
-    Shader* fs = Shader::MakeShader("Shaders/ground.fs", GL_FRAGMENT_SHADER);
-    material = std::shared_ptr<Material>(Material::MakeMaterial(vs, fs));
 
     floorTiles = {6, 7};
     soilTiles = {22};
