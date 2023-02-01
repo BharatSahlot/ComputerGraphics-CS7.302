@@ -224,19 +224,15 @@ int main(int argc, const char** argv)
             }
             delete levels[currentLevel];
             currentLevel++;
-        }
-
-        if(currentLevel >= 3)
+        } else if(currentLevel >= 3)
         {
             gameEndText.Start();
             gameEndText.SetText("You won!");
             gameEndEnterText.Start();
             gameEndScoreText.Start();
 
-            std::string txt = "Distance: ";
-            txt += levels[currentLevel]->GetDistance();
-            txt += " Coins collected: ";
-            txt += std::to_string(levels[currentLevel]->coinsCollected);
+            std::string txt = " Coins collected: ";
+            txt += std::to_string(levels[currentLevel - 1]->coinsCollected);
             gameEndScoreText.SetText(txt);
             gameEnded = true;
             gameWon = true;
