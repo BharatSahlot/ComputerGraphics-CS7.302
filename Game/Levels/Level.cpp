@@ -43,11 +43,11 @@ int Level::Load()
 
     coinsText = std::shared_ptr<Text>(new Text(-0.99f, 0.1f, 1, glm::vec3(1, 1, 1)));
     coinsText->SetText("Coins");
-    coinsText->transform->SetWorldPosition(0, 0, 0.5f);
+    coinsText->transform->SetWorldPosition(0, 0, -0.01f);
 
     distText = std::shared_ptr<Text>(new Text(-0.99f, 0.24f, 1, glm::vec3(1, 1, 1)));
     distText->SetText("Dist");
-    distText->transform->SetWorldPosition(0, 0, 0.5f);
+    distText->transform->SetWorldPosition(0, 0, -0.01f);
 
     objects.insert(coinsText);
     objects.insert(distText);

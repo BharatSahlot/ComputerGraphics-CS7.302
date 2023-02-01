@@ -76,7 +76,7 @@ class Level
 
         std::string GetDistance() const { 
             std::stringstream ss;
-            ss << std::fixed << std::setprecision(2) << dist << "m";
+            ss << std::fixed << std::setprecision(2) << dist << "m / " << settings.duration << "m";
             return ss.str();
         }
 
