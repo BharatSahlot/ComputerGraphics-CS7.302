@@ -179,7 +179,6 @@ void Window::Render()
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D,
                     first ? fbColBuffers[1] : ppBufs[!horizontal]);
-            // glGenerateMipmap(GL_TEXTURE_2D);
             blurMat->SetInt("image", 0);
             blurMat->SetInt("horizontal", horizontal);
             blurQ.Render(glm::mat4(1), glm::mat4(1));

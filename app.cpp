@@ -165,14 +165,15 @@ int main(int argc, const char** argv)
     font = Font::LoadFont("Game/Assets/font.ttf", 96);
 
     bool gameEnded = false;
-    bool gameWon = false;
+    bool gameWon = true;
 
     Text gameEndText(-0.2f, 0.9f, 1.5f, glm::vec3(1, 1, 1));
     Text gameEndEnterText(-0.22f, 1.0f, 0.5f, glm::vec3(0.4, 0.4, 0.4));
-    Text gameEndScoreText(-0.21f, 1.1f, 0.75f, glm::vec3(1, 1, 1));
+    Text gameEndScoreText(-0.15f, 1.1f, 0.75f, glm::vec3(1, 1, 1));
 
     gameEndEnterText.SetText("Press enter to close the game.");
 
+    int coinsCollected = 0;
     Timer timer;
     timer.Start();
     window->SetRenderCallback([&](const Window& window) -> bool {
@@ -206,6 +207,7 @@ int main(int argc, const char** argv)
 
         if(levels[currentLevel]->hasEnded)
         {
+            coinsCollected += levels[currentLevel]->coinsCollected;
             bool playerDied = levels[currentLevel]->playerDied;
             levels[currentLevel]->Unload();
             if(playerDied)
@@ -214,8 +216,8 @@ int main(int argc, const char** argv)
                 gameEndEnterText.Start();
                 gameEndScoreText.Start();
 
-                std::string txt = "Coins collected: ";
-                txt += std::to_string(levels[currentLevel]->coinsCollected);
+                std::string txt = "Score: ";
+                txt += std::to_string(coinsCollected);
                 gameEndScoreText.SetText(txt);
 
                 gameEnded = true;
@@ -224,18 +226,18 @@ int main(int argc, const char** argv)
             }
             delete levels[currentLevel];
             currentLevel++;
-        } else if(currentLevel >= 3)
+        }
+        if(gameWon && currentLevel >= 3)
         {
             gameEndText.Start();
             gameEndText.SetText("You won!");
             gameEndEnterText.Start();
             gameEndScoreText.Start();
 
-            std::string txt = " Coins collected: ";
-            txt += std::to_string(levels[currentLevel - 1]->coinsCollected);
+            std::string txt = "Score: ";
+            txt += std::to_string(coinsCollected);
             gameEndScoreText.SetText(txt);
             gameEnded = true;
-            gameWon = true;
         }
         return false;
     });

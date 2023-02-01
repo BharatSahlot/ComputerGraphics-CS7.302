@@ -30,6 +30,7 @@ Level::Level(std::shared_ptr<Camera> camera, LevelSettings settings)
 int Level::Load()
 {
     auto player = std::shared_ptr<Player>(new Player(this));
+    player->transform->SetWorldPosition(0, 0, 0);
 
     started = hasEnded = playerDied = false;
     float tileSize = 0.5f;
@@ -132,42 +133,45 @@ void Level::Tick(const Window& window, float deltaTime)
         return;
     }
 
-    float interval = settings.zapperSpawnInterval;
-    interval += (1.f - 2 * Random::GetFloat()) * settings.zapperSpawnIntervalVar;
-    if(zapperSpawnTimer.TimeSinceStart() >= interval)
+    if(levelTimer.TimeSinceStart() <= settings.duration - 4.f)
     {
-        if(!zapperPool.empty())
+        float interval = settings.zapperSpawnInterval;
+        interval += (1.f - 2 * Random::GetFloat()) * settings.zapperSpawnIntervalVar;
+        if(zapperSpawnTimer.TimeSinceStart() >= interval)
         {
-            float top = CEILING - settings.zapperHeight / 2.f;
-            float bot = GROUND + GROUND_HEIGHT + settings.zapperHeight / 2.f;
-            float y = bot + ((top - bot) * Random::GetFloat());
-            glm::vec3 pos = window.ViewportPointToWorld(glm::vec3(1, 0, 0));
-            pos.x += 1;
-            pos.y = y;
-            pos.z = 0.3f;
-
-            zapperSpawnTimer.Start();
-            auto zapper = zapperPool.front();
-            objects.insert(zapper);
-            zapperActive.push_back(zapper);
-            zapperPool.pop();
-
-            zapper->Start();
-            if((Random::GetInt() % 2) == 0)
+            if(!zapperPool.empty())
             {
-                float speed = settings.zapperRotSpeed + (1.f - 2.f * Random::GetFloat()) * settings.zapperRotSpeedVar;
-                if(Random::GetInt() % 2) speed *= -1;
-                zapper->SetRotSpeed(speed);
-            } else
-            {
-                float speed = settings.zapperYSpeed + (-Random::GetFloat()) * settings.zapperYSpeedVar;
-                zapper->SetYSpeed(speed);
+                float top = CEILING - settings.zapperHeight / 2.f;
+                float bot = GROUND + GROUND_HEIGHT + settings.zapperHeight / 2.f;
+                float y = bot + ((top - bot) * Random::GetFloat());
+                glm::vec3 pos = window.ViewportPointToWorld(glm::vec3(1, 0, 0));
+                pos.x += 1;
+                pos.y = y;
+                pos.z = 0.3f;
+
+                zapperSpawnTimer.Start();
+                auto zapper = zapperPool.front();
+                zapperPool.pop();
+
+                zapper->Start();
+                if((Random::GetInt() % 2) == 0)
+                {
+                    float speed = settings.zapperRotSpeed + (1.f - 2.f * Random::GetFloat()) * settings.zapperRotSpeedVar;
+                    if(Random::GetInt() % 2) speed *= -1;
+                    zapper->SetRotSpeed(speed);
+                } else
+                {
+                    float speed = settings.zapperYSpeed + (-Random::GetFloat()) * settings.zapperYSpeedVar;
+                    zapper->SetYSpeed(speed);
+                }
+                zapper->transform->SetWorldPosition(pos);
+                objects.insert(zapper);
+                zapperActive.push_back(zapper);
             }
-            zapper->transform->SetWorldPosition(pos);
         }
-    }
 
-    SpawnCoins(window);
+        SpawnCoins(window);
+    }
 
     dist += settings.speedModifier * deltaTime;
     coinsText->SetText(std::to_string(coinsCollected));
@@ -226,13 +230,14 @@ void Level::SpawnCoins(const Window& window)
                 coin = std::shared_ptr<Coin>(new Coin(settings.coinRadius, -2.f * settings.speedModifier));
             }
 
-            objects.insert(coin);
-            coinsActive.push_back(coin);
 
             coin->Start();
 
             glm::vec3 pos = glm::vec3(x, y, 0) + center;
             coin->transform->SetWorldPosition(pos);
+
+            objects.insert(coin);
+            coinsActive.push_back(coin);
         }
     }
 

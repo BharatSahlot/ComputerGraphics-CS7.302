@@ -25,5 +25,7 @@ void main()
     vec4 tex = texture(texture1, uv);
     FragColor = tex;
 
-    BrightColor = vec4(0);
+    float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+    if(brightness > 0.96) BrightColor = FragColor;
+    else BrightColor = vec4(0);
 }
