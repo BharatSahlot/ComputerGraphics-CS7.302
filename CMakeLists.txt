@@ -6,7 +6,7 @@ project(app)
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/")
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Libraries")
 set(INC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/")
-file(GLOB_RECURSE SOURCES "${SRC_DIR}/app.cpp" "${SRC_DIR}/Engine/*.cpp")
+file(GLOB_RECURSE SOURCES "${SRC_DIR}/app.cpp" "${SRC_DIR}/Engine/*.cpp" "${SRC_DIR}/Game/**.cpp")
 
 # Executable definition and properties
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -30,6 +30,13 @@ add_library("glad" "${GLAD_DIR}/src/glad.c")
 target_include_directories("glad" PRIVATE "${GLAD_DIR}/include")
 target_include_directories(${PROJECT_NAME} PRIVATE "${GLAD_DIR}/include")
 target_link_libraries(${PROJECT_NAME} "glad" "${CMAKE_DL_LIBS}")
+
+# stb
+set(STB_DIR "${LIB_DIR}/stb")
+add_library("stb" "${STB_DIR}/stb_image.cpp")
+target_include_directories("stb" PRIVATE "${STB_DIR}/include")
+target_include_directories(${PROJECT_NAME} PRIVATE "${STB_DIR}/include")
+target_link_libraries(${PROJECT_NAME} "stb")
 
 # glm
 set(GLM_DIR "${LIB_DIR}/glm")

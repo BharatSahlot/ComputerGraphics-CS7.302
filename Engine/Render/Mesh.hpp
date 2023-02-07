@@ -14,17 +14,13 @@ class Mesh
     using vector = std::vector<T>;
 
     public:
-        glm::mat4 mMat;
-
-        Mesh(vector<float> vertices, vector<int> indices, std::shared_ptr<Material> material);
-        void Render(const glm::mat4& vpMat);
+        Mesh(vector<float> vertices, vector<int> indices, bool hasNormals);
+        void Render();
 
     private:
         // opengl objects for vertices, attributes and indices
         unsigned int VBO, VAO, EBO;
         int indices;
-
-        std::shared_ptr<Material> material;
 
         // no need to store in ram for now
         // vector<float> vertices;

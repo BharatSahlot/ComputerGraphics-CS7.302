@@ -1,13 +1,24 @@
 #include "Camera.hpp"
-#include "glm/ext/matrix_clip_space.hpp"
+#include "glm/fwd.hpp"
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
 
 void Camera::SetPerspective(float fov, float aspect)
 {
-    this->proj = glm::perspective(glm::radians(fov), aspect, 0.1f, 100.f);
-    this->vp = this->proj * this->viewMat;
+    proj = glm::perspective(glm::radians(fov), aspect, 0.1f, 100.f);
 }
 
-const glm::mat4& Camera::ViewProj() const
+// match height orthographic projection
+void Camera::SetOrthographic(float width, float height)
 {
-    return this->vp;
+    float aspect = width / height;
+    float hh = 10;
+    float hw = aspect * hh;
+    proj = glm::ortho(0.f, hw, 0.f, hh);
+}
+
+glm::mat4 Camera::ViewProj() const
+{
+    return proj * view;
 }

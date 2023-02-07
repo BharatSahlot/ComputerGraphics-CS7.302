@@ -49,7 +49,19 @@ void Material::SetFloat(const std::string &name, float value) const
     glUniform1f(glGetUniformLocation(this->shaderProgram, name.c_str()), value);
 }
 
-void Material::SetUniformMat4(const std::string &name, const glm::mat4 &mat)
+void Material::SetVec2(const std::string &name, const glm::vec2& vec) const
+{
+    int loc = glGetUniformLocation(this->shaderProgram, name.c_str());
+    glUniform2f(loc, vec.x, vec.y);
+}
+
+void Material::SetVec3(const std::string &name, const glm::vec3& vec) const
+{
+    int loc = glGetUniformLocation(this->shaderProgram, name.c_str());
+    glUniform3f(loc, vec.x, vec.y, vec.z);
+}
+
+void Material::SetUniformMat4(const std::string &name, const glm::mat4 &mat) const
 {
     int loc = glGetUniformLocation(this->shaderProgram, name.c_str());
     glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(mat));

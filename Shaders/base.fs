@@ -1,13 +1,14 @@
 #version 330 core
 
-in vec3 oNormal;
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 BrightColor;
 
-out vec4 FragColor;
+uniform vec3 col;
 
 void main()
 {
-    float diff = (2.0 + dot(oNormal, normalize(vec3(1, 1, 1)))) / 2.0;
-
-    FragColor = vec4(normalize(vec3(2, 2, 2) + oNormal), 1.0f) * diff;
-    // FragColor = vec4(oNormal.x, 0.25f, oNormal.z, 1.0f) * diff;
+    FragColor = vec4(col, 1.0f);
+    float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+    if(brightness > 1.0) BrightColor = FragColor;
+    else BrightColor = vec4(0);
 }
