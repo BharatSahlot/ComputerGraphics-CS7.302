@@ -20,6 +20,7 @@ Window* Window::Create(int width, int height, const char* title)
 {
     Window* window = new Window;
 
+    glfwWindowHint(GLFW_VISIBLE, GL_TRUE);
     window->glfwWindow = glfwCreateWindow(width, height, title, NULL, NULL);
     if(window->glfwWindow == NULL)
     {
@@ -35,6 +36,7 @@ Window* Window::Create(int width, int height, const char* title)
 
     glfwMakeContextCurrent(window->glfwWindow);
     glfwSetFramebufferSizeCallback(window->glfwWindow, Window::FramebufferSizeCallback);
+    glfwSwapInterval(1);
     return window;
 }
 
@@ -118,7 +120,7 @@ void Window::MakeCurrent()
     glfwMakeContextCurrent(this->glfwWindow);
 }
 
-void Window::Render()
+void Window::Render(World* world)
 {
     if(!this->cb) return;
 
@@ -163,7 +165,7 @@ void Window::Render()
         glClearColor(0, 0, 0, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        if(this->cb(*this))
+        if(this->cb(world))
         {
             break;
         }

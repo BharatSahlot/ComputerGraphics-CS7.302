@@ -11,7 +11,17 @@ file(GLOB_RECURSE SOURCES "${SRC_DIR}/app.cpp" "${SRC_DIR}/Engine/*.cpp" "${SRC_
 # Executable definition and properties
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE "${INC_DIR}")
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
+
+# Assimp
+set(ASSIMP_DIR "${LIB_DIR}/assimp")
+set(ASSIMP_BUILD_TESTS OFF CACHE INTERNAL "")
+set(ASSIMP_INSTALL OFF CACHE INTERNAL "")
+set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+add_subdirectory("${ASSIMP_DIR}")
+target_include_directories("${PROJECT_NAME}" PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/Libraries/assimp/include")
+target_include_directories(${PROJECT_NAME} PRIVATE "${ASSIMP_DIR}/include")
+target_link_libraries("${PROJECT_NAME}" "${ASSIMP_LIBRARIES}")
 
 # GLFW
 set(GLFW_DIR "${LIB_DIR}/glfw")
