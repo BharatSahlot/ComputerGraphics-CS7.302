@@ -10,10 +10,24 @@
 #include <memory>
 #include <thread>
 
-struct MaterialData
+template<typename T>
+struct ResourceLoadData;
+
+template<>
+struct ResourceLoadData<Material>
 {
     std::string vertexShaderFile;
     std::string fragmentShaderFile;
+    std::shared_ptr<Material> ptr;
+};
+
+template<>
+struct ResourceLoadData<Texture>
+{
+    std::string file;
+    int filtering;
+
+    std::shared_ptr<Texture> ptr;
 };
 
 class ResourceManager
@@ -22,8 +36,8 @@ class ResourceManager
         static ResourceManager* CreateResourceManager(GLFWwindow* window);
         ~ResourceManager();
 
-        template<typename T, typename U>
-        void AddInResourceQueue(const std::string& name, const U& data);
+        template<typename T>
+        std::shared_ptr<T> AddInResourceQueue(const std::string& name, ResourceLoadData<T> data);
         
         void StartLoading();
         std::string GetLoadStatus() const;
@@ -42,11 +56,12 @@ class ResourceManager
         std::thread loaderThread;
         GLFWwindow* context;
 
+        bool finished = false;
         int totalTextures, totalMaterials;
         int texturesLoaded, materialsLoaded;
 
-        std::queue<std::pair<std::string, std::string>> textureQueue;
-        std::queue<std::pair<std::string, MaterialData>> materialQueue;
+        std::queue<std::pair<std::string, ResourceLoadData<Texture>>> textureQueue;
+        std::queue<std::pair<std::string, ResourceLoadData<Material>>> materialQueue;
 
         std::unordered_map<std::string, std::shared_ptr<Texture>> textureMap;
         std::unordered_map<std::string, std::shared_ptr<Material>> materialMap;

@@ -162,9 +162,10 @@ void Window::Render(World* world)
 
         // glViewport(0, 0, this->width, this->height);
 
-        glClearColor(0, 0, 0, 1.0f);
+        glClearColor(0.f, 0.f, 0.f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         if(this->cb(world))
         {
             break;
@@ -191,7 +192,8 @@ void Window::Render(World* world)
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glDisable(GL_DEPTH_TEST);
 
-        glClearColor(0.8, 0.8, 0.8, 1);
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glClearColor(0.0, 0.0, 0.0, 1);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glActiveTexture(GL_TEXTURE0);
@@ -233,8 +235,8 @@ void Window::FramebufferSizeCallback(GLFWwindow* win, int width, int height)
     window->width = width;
     if(window->camera)
     {
-        // window->camera->SetPerspective(60.0f, window->Aspect());
-        window->camera->SetOrthographic(width, height);
+        window->camera->SetPerspective(60.0f, window->Aspect());
+        // window->camera->SetOrthographic(width, height);
     }
 
     glViewport(0, 0, width, height);

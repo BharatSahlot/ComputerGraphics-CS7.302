@@ -29,6 +29,25 @@ Material* Material::MakeMaterial(const Shader* vertexShader, const Shader* fragm
     return material;
 }
 
+int Material::Load(const Shader *vertexShader, const Shader *fragmentShader)
+{
+    int id = glCreateProgram();
+    glAttachShader(id, vertexShader->Opengl_ID());
+    glAttachShader(id, fragmentShader->Opengl_ID());
+    glLinkProgram (id);
+
+    glGetProgramiv(id, GL_LINK_STATUS, &success);
+
+    if(!success)
+    {
+        glGetProgramInfoLog(id, 512, NULL, infoLog);
+        std::cerr << "error linking program\n" << infoLog << std::endl;
+        return -1;
+    }
+    shaderProgram = id;
+    return 0;
+}
+
 void Material::Use()
 {
     glUseProgram(this->shaderProgram);

@@ -1,6 +1,7 @@
 #include "ResourceManager.hpp"
 #include "Engine/Render/Material.hpp"
 #include "GLFW/glfw3.h"
+#include <cstring>
 #include <iostream>
 #include <sstream>
 
@@ -51,7 +52,7 @@ std::string ResourceManager::GetLoadStatus() const
     return "Loading complete";
 }
 
-bool ResourceManager::HasLoadingFinished() const { return texturesLoaded == totalTextures && materialsLoaded == totalMaterials; }
+bool ResourceManager::HasLoadingFinished() const { return finished; }
 
 void ResourceManager::Load()
 {
@@ -67,7 +68,7 @@ void ResourceManager::Loader()
 
     while(!textureQueue.empty())
     {
-        auto [name, file] = textureQueue.front();
+        auto [name, data] = textureQueue.front();
         textureQueue.pop();
 
         if(textureMap.count(name))
@@ -76,8 +77,8 @@ void ResourceManager::Loader()
             continue;
         }
 
-        std::shared_ptr<Texture> texture(Texture::MakeTexture(file));
-        textureMap[name] = texture;
+        data.ptr->Load(data.file, data.filtering);
+        textureMap[name] = data.ptr;
         texturesLoaded++;
     }
 
@@ -102,22 +103,31 @@ void ResourceManager::Loader()
             shaderMap[data.fragmentShaderFile] = Shader::MakeShader(data.fragmentShaderFile.c_str(), GL_FRAGMENT_SHADER);
         }
 
-        std::shared_ptr<Material> material(Material::MakeMaterial(shaderMap.at(data.vertexShaderFile), shaderMap.at(data.fragmentShaderFile)));
-        materialMap[name] = material;
+        data.ptr->Load(shaderMap.at(data.vertexShaderFile), shaderMap.at(data.fragmentShaderFile));
+        materialMap[name] = data.ptr;
         materialsLoaded++;
     }
+    // flush the command queue
+    glFinish();
+    finished = true;
 }
 
 template<>
-void ResourceManager::AddInResourceQueue<Texture>(const std::string& name, const std::string &file)
+std::shared_ptr<Texture> ResourceManager::AddInResourceQueue<Texture>(const std::string& name, ResourceLoadData<Texture> data)
 {
-    textureQueue.push(std::make_pair(name, file));
+    std::shared_ptr<Texture> ptr(new Texture);
+    data.ptr = ptr;
+    textureQueue.push(std::make_pair(name, data));
+    return ptr;
 }
 
 template<>
-void ResourceManager::AddInResourceQueue<Material>(const std::string& name, const MaterialData& data)
+std::shared_ptr<Material> ResourceManager::AddInResourceQueue<Material>(const std::string& name, ResourceLoadData<Material> data)
 {
+    std::shared_ptr<Material> ptr(new Material);
+    data.ptr = ptr;
     materialQueue.push(std::make_pair(name, data));
+    return ptr;
 }
 
 template<>

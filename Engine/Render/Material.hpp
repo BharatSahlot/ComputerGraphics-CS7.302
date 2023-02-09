@@ -10,6 +10,7 @@ class Material
 {
     public:
         static Material* MakeMaterial(const Shader* vertexShader, const Shader* fragmentShader);
+        int Load(const Shader* vertexShader, const Shader* fragmentShader);
 
         void Use();
 
