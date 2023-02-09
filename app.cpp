@@ -52,25 +52,9 @@ int main(int argc, const char** argv)
         "Shaders/text.vs", "Shaders/text.fs"
     });
 
-    auto baseTex = world->GetResourceManager().AddInResourceQueue<Texture>("texture1", ResourceLoadData<Texture> {
-        "bg.png", GL_NEAREST
+    auto backpack = world->GetResourceManager().AddInResourceQueue("mesh", ResourceLoadData<Model> {
+        "backpack/backpack.obj"
     });
-
-    std::vector<float> vertices({
-            0.5f,  0.5f, 0.0f, 1.f, 1.f,  // top right
-            0.5f, -0.5f, 0.0f, 1.f, 0.f, // bottom right
-            -0.5f, -0.5f, 0.0f, 0.f, 0.f, // bottom left
-            -0.5f,  0.5f, 0.0f, 0.f, 1.f
-    });
-
-    std::vector<int> indices({
-            0, 1, 3,   // first triangle
-            1, 2, 3    // second triangle
-    });
-
-    std::shared_ptr<Mesh> plane(new Mesh(vertices, indices, false));
-    Object object("o", plane, baseMat);
-    object.UseTexture(baseTex);
 
     world->GetResourceManager().StartLoading();
 
@@ -93,8 +77,7 @@ int main(int argc, const char** argv)
             return false;
         }
 
-        object.Render(camera->view, camera->Proj());
-
+        backpack->Render(*baseMat, camera->view, camera->Proj());
         return false;
     });
 

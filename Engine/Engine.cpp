@@ -69,7 +69,7 @@ int EngineInit()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
 
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+    // glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);

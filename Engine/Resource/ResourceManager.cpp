@@ -5,7 +5,7 @@
 #include <iostream>
 #include <sstream>
 
-ResourceManager* ResourceManager::CreateResourceManager(GLFWwindow* window)
+ResourceManager* ResourceManager::CreateResourceManager(GLFWwindow* window, World* world)
 {
     ResourceManager* manager = new ResourceManager;
 
@@ -20,6 +20,7 @@ ResourceManager* ResourceManager::CreateResourceManager(GLFWwindow* window)
     }
 
     manager->context = context;
+    manager->world = world;
     return manager;
 }
 
@@ -30,6 +31,7 @@ ResourceManager::~ResourceManager()
 
 void ResourceManager::StartLoading()
 {
+    modelsLoaded = texturesLoaded = materialsLoaded = 0;
     loaderThread = std::thread([&]() {
         Loader();
     });
@@ -38,6 +40,12 @@ void ResourceManager::StartLoading()
 std::string ResourceManager::GetLoadStatus() const
 {
     std::stringstream ss;
+    if(modelsLoaded < totalModels)
+    {
+        ss << "Loading models (" << modelsLoaded << "/" << totalModels << ")";
+        return ss.str();
+    }
+
     if(texturesLoaded < totalTextures)
     {
         ss << "Loading textures (" << texturesLoaded << "/" << totalTextures << ")";
@@ -57,15 +65,35 @@ bool ResourceManager::HasLoadingFinished() const { return finished; }
 void ResourceManager::Load()
 {
     loaderThread.join();
+    for(auto& [name, model] : modelMap)
+    {
+        model->Setup();
+    }
 }
 
 void ResourceManager::Loader()
 {
     glfwMakeContextCurrent(context);
 
+    totalModels = modelQueue.size();
+    while(!modelQueue.empty())
+    {
+        auto [name, data] = modelQueue.front();
+        modelQueue.pop();
+
+        if(modelMap.count(name))
+        {
+            modelsLoaded++;
+            continue;
+        }
+
+        data.ptr->Load(data.file);
+        modelMap[name] = data.ptr;
+        modelsLoaded++;
+    }
+
     totalTextures = textureQueue.size();
     totalMaterials = materialQueue.size();
-
     while(!textureQueue.empty())
     {
         auto [name, data] = textureQueue.front();
@@ -115,6 +143,7 @@ void ResourceManager::Loader()
 template<>
 std::shared_ptr<Texture> ResourceManager::AddInResourceQueue<Texture>(const std::string& name, ResourceLoadData<Texture> data)
 {
+    std::cout << "to load texture " << name << std::endl;
     std::shared_ptr<Texture> ptr(new Texture);
     data.ptr = ptr;
     textureQueue.push(std::make_pair(name, data));
@@ -131,7 +160,19 @@ std::shared_ptr<Material> ResourceManager::AddInResourceQueue<Material>(const st
 }
 
 template<>
+std::shared_ptr<Model> ResourceManager::AddInResourceQueue<Model>(const std::string& name, ResourceLoadData<Model> data)
+{
+    std::shared_ptr<Model> ptr(new Model(world));
+    data.ptr = ptr;
+    modelQueue.push(std::make_pair(name, data));
+    return ptr;
+}
+
+template<>
 std::shared_ptr<Texture> ResourceManager::Get<>(const std::string &name) const { return textureMap.at(name); }
 
 template<>
 std::shared_ptr<Material> ResourceManager::Get<>(const std::string &name) const { return materialMap.at(name); }
+
+template<>
+std::shared_ptr<Model> ResourceManager::Get<>(const std::string &name) const { return modelMap.at(name); }

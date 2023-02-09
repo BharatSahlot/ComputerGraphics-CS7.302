@@ -48,7 +48,7 @@ int Material::Load(const Shader *vertexShader, const Shader *fragmentShader)
     return 0;
 }
 
-void Material::Use()
+void Material::Use() const
 {
     glUseProgram(this->shaderProgram);
 }

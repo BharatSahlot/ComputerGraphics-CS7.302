@@ -2,6 +2,7 @@
 #define RESOURCE_MANAGER_H
 
 #include "Engine/Render/Material.hpp"
+#include "Engine/Render/Model.hpp"
 #include "Engine/Render/Texture.hpp"
 #include "GLFW/glfw3.h"
 
@@ -9,6 +10,8 @@
 #include <queue>
 #include <memory>
 #include <thread>
+
+class World;
 
 template<typename T>
 struct ResourceLoadData;
@@ -30,10 +33,18 @@ struct ResourceLoadData<Texture>
     std::shared_ptr<Texture> ptr;
 };
 
+template<>
+struct ResourceLoadData<Model>
+{
+    std::string file;
+
+    std::shared_ptr<Model> ptr;
+};
+
 class ResourceManager
 {
     public:
-        static ResourceManager* CreateResourceManager(GLFWwindow* window);
+        static ResourceManager* CreateResourceManager(GLFWwindow* window, World* world);
         ~ResourceManager();
 
         template<typename T>
@@ -50,6 +61,8 @@ class ResourceManager
         std::shared_ptr<T> Get(const std::string& name) const;
 
     private:
+        World* world;
+
         // function running on a separate thread loading resources
         void Loader();
 
@@ -57,15 +70,17 @@ class ResourceManager
         GLFWwindow* context;
 
         bool finished = false;
-        int totalTextures, totalMaterials;
-        int texturesLoaded, materialsLoaded;
+        int totalTextures, totalMaterials, totalModels;
+        int texturesLoaded, materialsLoaded, modelsLoaded;
 
         std::queue<std::pair<std::string, ResourceLoadData<Texture>>> textureQueue;
         std::queue<std::pair<std::string, ResourceLoadData<Material>>> materialQueue;
+        std::queue<std::pair<std::string, ResourceLoadData<Model>>> modelQueue;
 
+        std::unordered_map<std::string, Shader*> shaderMap;
         std::unordered_map<std::string, std::shared_ptr<Texture>> textureMap;
         std::unordered_map<std::string, std::shared_ptr<Material>> materialMap;
-        std::unordered_map<std::string, Shader*> shaderMap;
+        std::unordered_map<std::string, std::shared_ptr<Model>> modelMap;
 };
 
 #endif

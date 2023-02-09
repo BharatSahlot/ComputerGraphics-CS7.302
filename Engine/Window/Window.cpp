@@ -137,10 +137,10 @@ void Window::Render(World* world)
         1, -1, 0, 1, 0,
         -1, -1, 0, 0, 0,
         -1, 1, 0, 0, 1
-    }), std::vector<int>({
+    }), std::vector<unsigned int>({
         0, 1, 2,
         0, 3, 2
-    }), false);
+    }));
 
     Shader* vs = Shader::MakeShader("Shaders/fb.vs", GL_VERTEX_SHADER);
     Shader* fs = Shader::MakeShader("Shaders/fb.fs", GL_FRAGMENT_SHADER);
