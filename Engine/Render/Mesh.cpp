@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 #include <memory>
 
-Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices, std::shared_ptr<Texture> texture)
+Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices, std::shared_ptr<Texture> texture, std::shared_ptr<Material> material)
 {
     glGenBuffers(1, &this->VBO);
     glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
@@ -22,6 +22,7 @@ Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices, std::shared_ptr
 
     this->indices = indices.size();
     this->texture = texture;
+    this->material = material;
 }
 
 Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices)
@@ -73,6 +74,28 @@ void Mesh::Setup()
 
 void Mesh::Render() const
 {
+    if(material)
+    {
+        material->Use();
+    }
+    if(texture)
+    {
+        texture->Use(0);
+    }
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0);
+}
+
+void Mesh::Render(glm::mat4 model, glm::mat4 view, glm::mat4 proj) const
+{
+    if(material)
+    {
+        material->Use();
+        material->SetUniformMat4("model", model);
+        material->SetUniformMat4("view", view);
+        material->SetUniformMat4("proj", proj);
+        material->SetInt("texture1", 0);
+    }
     if(texture)
     {
         texture->Use(0);

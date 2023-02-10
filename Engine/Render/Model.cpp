@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "Engine/World.hpp"
+#include "glm/ext/matrix_transform.hpp"
 
 #include <assimp/postprocess.h>
 #include <assimp/Importer.hpp>
@@ -26,6 +27,7 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
     std::shared_ptr<Texture> texture;
+    std::shared_ptr<Material> material;
 
     for(size_t i = 0; i < mesh->mNumVertices; i++)
     {
@@ -59,12 +61,22 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 
     if(mesh->mMaterialIndex >= 0)
     {
-        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+        aiMaterial* mat = scene->mMaterials[mesh->mMaterialIndex];
+        aiString matName;
+        mat->Get(AI_MATKEY_NAME, matName);
+
+        std::string shaderPath = "Shaders/";
+        shaderPath += matName.C_Str();
+        shaderPath += ".fs";
+
+        material = world->GetResourceManager().AddInResourceQueue<Material>(shaderPath, ResourceLoadData<Material> {
+            "Shaders/base.vs", shaderPath
+        });
         // only one texture
-        if(material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+        if(mat->GetTextureCount(aiTextureType_DIFFUSE) > 0)
         {
             aiString file;
-            material->GetTexture(aiTextureType_DIFFUSE, 0, &file);
+            mat->GetTexture(aiTextureType_DIFFUSE, 0, &file);
 
             std::string path = directory;
             path += '/';
@@ -75,14 +87,20 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
             texture = tex;
         }
     }
-    return Mesh(vertices, indices, texture);
+    return Mesh(vertices, indices, texture, material);
 }
 
 int Model::Load(const std::string &path)
 {
     Assimp::Importer importer;
 
-    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenNormals);
+    const aiScene* scene = importer.ReadFile(path, 
+            aiProcess_Triangulate
+            // | aiProcess_FlipUVs
+            | aiProcess_GenNormals
+            | aiProcess_PreTransformVertices
+            | aiProcess_FixInfacingNormals
+        );
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
@@ -113,15 +131,10 @@ int Model::Load(const std::string &path)
     return 0;
 }
 
-void Model::Render(const Material &material, const glm::mat4& view, const glm::mat4& proj)
+void Model::Render(const glm::mat4& view, const glm::mat4& proj)
 {
-    material.Use();
-    material.SetUniformMat4("proj", proj);
-    material.SetUniformMat4("view", view);
-    material.SetUniformMat4("model", glm::mat4(1));
-    material.SetInt("texture1", 0);
     for(const Mesh& mesh: meshes)
     {
-        mesh.Render();
+        mesh.Render(glm::mat4(1), view, proj);
     }
 }

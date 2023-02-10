@@ -30,7 +30,7 @@ int main(int argc, const char** argv)
     Random::Init();
 
     std::shared_ptr<Camera> camera = std::shared_ptr<Camera>(new Camera);
-    camera->view = glm::lookAt(glm::vec3(0, 2.f, -3.f),
+    camera->view = glm::lookAt(glm::vec3(0, 20.f, -35.f),
             glm::vec3(0, 0, 0),
             glm::vec3(0, 1, 0));
 
@@ -53,7 +53,7 @@ int main(int argc, const char** argv)
     });
 
     auto backpack = world->GetResourceManager().AddInResourceQueue("mesh", ResourceLoadData<Model> {
-        "backpack/backpack.obj"
+        "Car/p6.obj"
     });
 
     world->GetResourceManager().StartLoading();
@@ -77,7 +77,7 @@ int main(int argc, const char** argv)
             return false;
         }
 
-        backpack->Render(*baseMat, camera->view, camera->Proj());
+        backpack->Render(camera->view, camera->Proj());
         return false;
     });
 

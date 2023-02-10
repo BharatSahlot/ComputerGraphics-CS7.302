@@ -15,7 +15,7 @@ class Model
         Model(World* world);
         int Load(const std::string& path);
         void Setup();
-        void Render(const Material &material, const glm::mat4& view, const glm::mat4& proj);
+        void Render(const glm::mat4& view, const glm::mat4& proj);
 
     private:
         Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);

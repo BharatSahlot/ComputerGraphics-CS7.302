@@ -5,6 +5,14 @@
 #include <iostream>
 #include <sstream>
 
+extern void APIENTRY glDebugOutput(GLenum source, 
+                            GLenum type, 
+                            unsigned int id, 
+                            GLenum severity, 
+                            GLsizei length, 
+                            const char *message, 
+                            const void *userParam);
+
 ResourceManager* ResourceManager::CreateResourceManager(GLFWwindow* window, World* world)
 {
     ResourceManager* manager = new ResourceManager;
@@ -18,6 +26,15 @@ ResourceManager* ResourceManager::CreateResourceManager(GLFWwindow* window, Worl
         delete(manager);
         return nullptr;
     }
+
+    int flags; glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+    if (flags & GL_CONTEXT_FLAG_DEBUG_BIT)
+    {
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
+        glDebugMessageCallback(glDebugOutput, nullptr);
+        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+    } 
 
     manager->context = context;
     manager->world = world;
@@ -87,7 +104,10 @@ void ResourceManager::Loader()
             continue;
         }
 
-        data.ptr->Load(data.file);
+        if(data.ptr->Load(data.file) == -1)
+        {
+            std::cerr << "Unable to load model " << data.file << std::endl;
+        }
         modelMap[name] = data.ptr;
         modelsLoaded++;
     }
@@ -105,7 +125,10 @@ void ResourceManager::Loader()
             continue;
         }
 
-        data.ptr->Load(data.file, data.filtering);
+        if(data.ptr->Load(data.file, data.filtering) == -1)
+        {
+            std::cerr << "Unable to load texture " << data.file << std::endl;
+        }
         textureMap[name] = data.ptr;
         texturesLoaded++;
     }
@@ -143,7 +166,6 @@ void ResourceManager::Loader()
 template<>
 std::shared_ptr<Texture> ResourceManager::AddInResourceQueue<Texture>(const std::string& name, ResourceLoadData<Texture> data)
 {
-    std::cout << "to load texture " << name << std::endl;
     std::shared_ptr<Texture> ptr(new Texture);
     data.ptr = ptr;
     textureQueue.push(std::make_pair(name, data));

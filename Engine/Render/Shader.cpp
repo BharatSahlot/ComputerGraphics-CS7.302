@@ -27,7 +27,7 @@ Shader* Shader::MakeShader(const char *path, int shaderType)
         code = ss.str();
     } catch(std::ifstream::failure e)
     {
-        std::cerr << "error reading shader file" << std::endl;
+        std::cerr << "error reading shader file " << path << std::endl;
         return nullptr;
     }
 
