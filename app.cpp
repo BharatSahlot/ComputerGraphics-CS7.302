@@ -26,16 +26,9 @@
 int main(int argc, const char** argv)
 {
     if(EngineInit() == -1) return -1;
-    srand(time(0));
     Random::Init();
 
-    std::shared_ptr<Camera> camera = std::shared_ptr<Camera>(new Camera("camera"));
-    camera->view = glm::lookAt(glm::vec3(0, 20.f, -35.f),
-            glm::vec3(0, 0, 0),
-            glm::vec3(0, 1, 0));
-
     std::shared_ptr<Window> window(Window::Create(800, 600, "Racing game"));
-    window->SetCamera(camera);
     window->MakeCurrent();
 
     EngineInitGLAD();
@@ -43,7 +36,6 @@ int main(int argc, const char** argv)
     window->Init();
 
     World* world = new World(window);
-    camera->world = world;
 
     auto baseMat = world->GetResourceManager().AddInResourceQueue<Material>("baseMat", ResourceLoadData<Material> {
         "Shaders/base.vs", "Shaders/base.fs"
@@ -53,12 +45,17 @@ int main(int argc, const char** argv)
         "Shaders/text.vs", "Shaders/text.fs"
     });
 
-    auto backpack = world->GetResourceManager().AddInResourceQueue("mesh", ResourceLoadData<Model> {
+    auto carModel = world->GetResourceManager().AddInResourceQueue("mesh", ResourceLoadData<Model> {
         "Car/p6.obj"
     });
 
     world->GetResourceManager().StartLoading();
 
+    auto car = world->Instantiate<Object>("Car", carModel);
+    auto camera = world->Instantiate<Camera>("Camera");
+    window->SetCamera(camera);
+
+    camera->Start();
     windowFade = 1.f;
     bool loaded = false;
     Timer timer;
@@ -78,7 +75,11 @@ int main(int argc, const char** argv)
             return false;
         }
 
-        backpack->Render(camera->view, camera->Proj());
+        world->Tick(delta);
+        world->Render();
+
+        // std::cout << window->GetCursorDelta().x << ' ' << window->GetCursorDelta().y << std::endl;
+
         return false;
     });
 

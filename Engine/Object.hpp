@@ -19,7 +19,8 @@ class Object
 
         Transform* transform;
 
-        Object(std::string name);
+        Object(std::string name) : name(name), transform(new Transform) {}
+        Object(World* world, std::string name) : world(world), name(name), transform(new Transform) {}
         Object(World* world, std::string name, std::shared_ptr<Model> model);
         Object(World* world, std::string name, const std::string& model);
 

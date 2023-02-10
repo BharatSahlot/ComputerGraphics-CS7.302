@@ -100,6 +100,7 @@ int Model::Load(const std::string &path)
             | aiProcess_GenNormals
             | aiProcess_PreTransformVertices
             | aiProcess_FixInfacingNormals
+            | aiProcess_FlipWindingOrder
         );
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)

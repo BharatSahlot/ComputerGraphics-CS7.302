@@ -15,6 +15,7 @@ extern float windowFade;
 class Window
 {
     public:
+        std::shared_ptr<Camera> camera;
         using RenderCallback = std::function<bool(World* world)>;
 
         static Window* Create(int width, int height, const char* title);
@@ -41,21 +42,28 @@ class Window
         glm::vec3 WorldToViewportPoint(glm::vec2 point) const;
 
         int GetKey(int key) const { return glfwGetKey(this->glfwWindow, key); }
+        int GetKeyDown(int key) const { return GetKey(key) == GLFW_PRESS; }
+
+        glm::vec2 GetCursorDelta() const { return cursorDelta; }
+
+
         GLFWwindow* GetGLFWwindow() const { return glfwWindow; }
 
         ~Window();
 
     private:
-        std::shared_ptr<Camera> camera;
-
         int width;
         int height;
+
+        glm::vec2 cursorPos;
+        glm::vec2 cursorDelta;
         
         GLFWwindow* glfwWindow;
 
         RenderCallback cb;
 
         static void FramebufferSizeCallback(GLFWwindow* win, int width, int height);
+        static void CursorMoveCallback(GLFWwindow* win, double x, double y);
 };
 
 #endif

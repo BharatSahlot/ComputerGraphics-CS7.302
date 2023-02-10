@@ -6,8 +6,6 @@
 #include <string>
 #include <vector>
 
-Object::Object(std::string name) : name(name) {}
-
 Object::Object(World* world, std::string name, std::shared_ptr<Model> model)
 {
     this->world = world;
@@ -26,5 +24,6 @@ Object::Object(World* world, std::string name, const std::string& model)
 
 void Object::Render(const glm::mat4& viewMat, const glm::mat4& projMat)
 {
+    if(!model) return;
     model->Render(viewMat, projMat);
 }

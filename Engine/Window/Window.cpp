@@ -36,6 +36,7 @@ Window* Window::Create(int width, int height, const char* title)
 
     glfwMakeContextCurrent(window->glfwWindow);
     glfwSetFramebufferSizeCallback(window->glfwWindow, Window::FramebufferSizeCallback);
+    glfwSetCursorPosCallback(window->glfwWindow, Window::CursorMoveCallback);
     glfwSwapInterval(1);
     return window;
 }
@@ -75,6 +76,8 @@ void Window::Render(World* world)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -89,6 +92,7 @@ void Window::Render(World* world)
             break;
         }
 
+        cursorDelta = glm::vec2(0);
         glfwSwapBuffers(this->glfwWindow);
         glfwPollEvents();
     }
@@ -124,4 +128,19 @@ void Window::FramebufferSizeCallback(GLFWwindow* win, int width, int height)
     glViewport(0, 0, width, height);
 
     window->Init();
+}
+
+void Window::CursorMoveCallback(GLFWwindow* win, double x, double y)
+{
+    glm::vec2 pos(x, y);
+
+    Window* window = glfwToWindow[win];
+
+    glm::vec2 delta = window->cursorPos - pos;
+    // delta.x /= window->width;
+    // delta.y /= window->height;
+    window->cursorDelta = delta;
+    glfwSetCursorPos(win, (float)window->width / 2, (float)window->height / 2);
+
+    window->cursorPos = pos;
 }
