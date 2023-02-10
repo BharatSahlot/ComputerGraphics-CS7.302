@@ -1,12 +1,15 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include "Engine/Object.hpp"
 #include <glm/glm.hpp>
 
 // TODO: add transform component to camera
-class Camera
+class Camera : public Object
 {
     public:
+        using Object::Object;
+
         glm::mat4 view;
         void SetPerspective(float fov, float aspect);
 

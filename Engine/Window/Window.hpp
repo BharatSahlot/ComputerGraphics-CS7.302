@@ -51,13 +51,6 @@ class Window
         int width;
         int height;
         
-        unsigned int framebuffer;
-        unsigned int fbColBuffers[2];
-        unsigned int rbo;
-
-        unsigned int ppFbos[2];
-        unsigned int ppBufs[2];
-
         GLFWwindow* glfwWindow;
 
         RenderCallback cb;

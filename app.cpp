@@ -29,7 +29,7 @@ int main(int argc, const char** argv)
     srand(time(0));
     Random::Init();
 
-    std::shared_ptr<Camera> camera = std::shared_ptr<Camera>(new Camera);
+    std::shared_ptr<Camera> camera = std::shared_ptr<Camera>(new Camera("camera"));
     camera->view = glm::lookAt(glm::vec3(0, 20.f, -35.f),
             glm::vec3(0, 0, 0),
             glm::vec3(0, 1, 0));
@@ -43,6 +43,7 @@ int main(int argc, const char** argv)
     window->Init();
 
     World* world = new World(window);
+    camera->world = world;
 
     auto baseMat = world->GetResourceManager().AddInResourceQueue<Material>("baseMat", ResourceLoadData<Material> {
         "Shaders/base.vs", "Shaders/base.fs"
