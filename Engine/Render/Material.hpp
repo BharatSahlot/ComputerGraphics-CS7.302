@@ -10,8 +10,9 @@ class Material
 {
     public:
         static Material* MakeMaterial(const Shader* vertexShader, const Shader* fragmentShader);
+        int Load(const Shader* vertexShader, const Shader* fragmentShader);
 
-        void Use();
+        void Use() const;
 
         void SetBool(const std::string& name, bool value) const;
         void SetInt(const std::string& name, int value) const;

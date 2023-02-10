@@ -3,32 +3,34 @@
 
 #include "Engine/Components/Transform.hpp"
 #include "Engine/Render/Mesh.hpp"
+#include "Engine/Render/Model.hpp"
 #include "Engine/Render/Texture.hpp"
-#include "Engine/Window/Window.hpp"
 
 #include <memory>
 #include <vector>
 
+class World;
+
 class Object
 {
     public:
+        World* world;
         std::string name;
 
         Transform* transform;
-        std::shared_ptr<Mesh> mesh;
-        std::shared_ptr<Material> material;
 
-        Object(std::string name, std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material);
-
-        void UseTexture(std::shared_ptr<Texture> tex);
+        Object(std::string name) : name(name), transform(new Transform) {}
+        Object(World* world, std::string name) : world(world), name(name), transform(new Transform) {}
+        Object(World* world, std::string name, std::shared_ptr<Model> model);
+        Object(World* world, std::string name, const std::string& model);
 
         virtual void Render(const glm::mat4& viewMat, const glm::mat4& projMat);
 
         virtual void Start() {}
-        virtual void Tick(const Window& window, float deltaTime) {}
+        virtual void Tick(float deltaTime) {}
 
     protected:
-        std::vector<std::shared_ptr<Texture>> textures;
+        std::shared_ptr<Model> model;
 };
 
 #endif

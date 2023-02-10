@@ -1,47 +1,29 @@
 #include "Object.hpp"
+#include "Engine/Render/Texture.hpp"
 #include "Engine/Utils/Util.hpp"
+#include "Engine/World.hpp"
 #include <iostream>
 #include <string>
+#include <vector>
 
-Object::Object(std::string name, std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material)
+Object::Object(World* world, std::string name, std::shared_ptr<Model> model)
 {
+    this->world = world;
     this->name = name;
-    this->mesh = mesh;
-    this->material = material;
-
+    this->model = model;
     this->transform = new Transform();
 }
 
-void Object::UseTexture(std::shared_ptr<Texture> tex)
+Object::Object(World* world, std::string name, const std::string& model)
 {
-    this->textures.push_back(tex);
+    this->world = world;
+    this->name = name;
+    this->model = world->GetResourceManager().Get<Model>(model);
+    this->transform = new Transform();
 }
 
 void Object::Render(const glm::mat4& viewMat, const glm::mat4& projMat)
 {
-    if(!this->material)
-    {
-        std::cerr << "No material assigned to object" << std::endl;
-        return;
-    }
-
-    for(size_t i = 0; i < this->textures.size(); i++)
-    {
-        this->textures[i]->Use(i);
-    }
-
-    this->material->Use();
-
-    for(size_t i = 0; i < this->textures.size(); i++)
-    {
-        std::string tex = "texture";
-        tex.append(std::to_string(i + 1));
-        this->material->SetInt(tex, i);
-    }
-
-    this->material->SetUniformMat4("view", viewMat);
-    this->material->SetUniformMat4("proj", projMat);
-    this->material->SetUniformMat4("model", this->transform->GetModelMatrix());
-
-    this->mesh->Render();
+    if(!model) return;
+    model->Render(viewMat, projMat);
 }

@@ -10,6 +10,7 @@ class Texture
 {
     public:
         static Texture* MakeTexture(const std::string& file, int filtering = GL_NEAREST);
+        int Load(const std::string& file, int filtering = GL_NEAREST);
 
         void Use(int unit);
         glm::vec2 GetDims() const { return dims; }

@@ -4,7 +4,28 @@
 #include <glad/glad.h>
 #include <memory>
 
-Mesh::Mesh(vector<float> vertices, vector<int> indices, bool hasNormals)
+Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices, std::shared_ptr<Texture> texture, std::shared_ptr<Material> material)
+{
+    glGenBuffers(1, &this->VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
+    glBufferData(GL_ARRAY_BUFFER,
+            vertices.size() * sizeof(float),
+            vertices.data(),
+            GL_STATIC_DRAW);
+
+    glGenBuffers(1, &this->EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+            indices.size() * sizeof(unsigned int),
+            indices.data(),
+            GL_STATIC_DRAW);
+
+    this->indices = indices.size();
+    this->texture = texture;
+    this->material = material;
+}
+
+Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices)
 {
     glGenVertexArrays(1, &this->VAO);
     glBindVertexArray(this->VAO);
@@ -32,8 +53,53 @@ Mesh::Mesh(vector<float> vertices, vector<int> indices, bool hasNormals)
     this->indices = indices.size();
 }
 
-void Mesh::Render()
+void Mesh::Setup()
 {
-    glBindVertexArray(this->VAO);
-    glDrawElements(GL_TRIANGLES, this->indices, GL_UNSIGNED_INT, 0);
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBindVertexArray(0);
+}
+
+void Mesh::Render() const
+{
+    if(material)
+    {
+        material->Use();
+    }
+    if(texture)
+    {
+        texture->Use(0);
+    }
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0);
+}
+
+void Mesh::Render(glm::mat4 model, glm::mat4 view, glm::mat4 proj) const
+{
+    if(material)
+    {
+        material->Use();
+        material->SetUniformMat4("model", model);
+        material->SetUniformMat4("view", view);
+        material->SetUniformMat4("proj", proj);
+        material->SetInt("texture1", 0);
+    }
+    if(texture)
+    {
+        texture->Use(0);
+    }
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0);
 }

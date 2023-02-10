@@ -6,6 +6,17 @@
 
 Texture* Texture::MakeTexture(const std::string& file, int filtering)
 {
+    Texture* texture = new Texture;
+    if(texture->Load(file, filtering) == -1)
+    {
+        delete texture;
+        return nullptr;
+    }
+    return texture;
+}
+
+int Texture::Load(const std::string &file, int filtering)
+{
     stbi_set_flip_vertically_on_load(true);
 
     int width, height, nChannels;
@@ -14,7 +25,7 @@ Texture* Texture::MakeTexture(const std::string& file, int filtering)
     if(!data)
     {
         // somehow get the error
-        return nullptr;
+        return -1;
     }
 
     unsigned int tex;
@@ -33,10 +44,9 @@ Texture* Texture::MakeTexture(const std::string& file, int filtering)
 
     stbi_image_free(data);
 
-    Texture* texture = new Texture;
-    texture->texture = tex;
-    texture->dims = glm::vec2(width, height);
-    return texture;
+    texture = tex;
+    dims = glm::vec2(width, height);
+    return 0;
 }
 
 void Texture::Use(int unit)

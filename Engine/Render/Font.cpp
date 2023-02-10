@@ -69,10 +69,12 @@ Font* Font::LoadFont(const std::string& file, int size)
 
 void Font::RenderText(std::string text, float x, float y, float scale, glm::mat4 proj, glm::vec3 col)
 {
-    TextMat->Use();
-    TextMat->SetUniformMat4("proj", proj);
-    TextMat->SetVec3("textColor", col);
-    TextMat->SetInt("text", 0);
+    // TODO: use new resource manager for font shader
+
+    // TextMat->Use();
+    // TextMat->SetUniformMat4("proj", proj);
+    // TextMat->SetVec3("textColor", col);
+    // TextMat->SetInt("text", 0);
 
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
