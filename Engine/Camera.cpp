@@ -44,9 +44,6 @@ void Camera::Tick(float deltaTime)
     front.z = -std::sin(glm::radians(rot.y)) * std::cos(glm::radians(rot.x));
     front = glm::normalize(front);
 
-    std::cout << front.x << ' ' << front.y << ' ' << front.z << std::endl;
-    // std::cout << rot.x << ' ' << rot.y << std::endl;
-
     right   = glm::normalize(glm::cross(front, glm::vec3(0, 1, 0)));
     up      = glm::normalize(glm::cross(right, front));
 
@@ -55,16 +52,11 @@ void Camera::Tick(float deltaTime)
     if(world->GetWindow().GetKeyDown(GLFW_KEY_S)) offset -= front;
     if(world->GetWindow().GetKeyDown(GLFW_KEY_A)) offset -= right;
     if(world->GetWindow().GetKeyDown(GLFW_KEY_D)) offset += right;
-    // std::cout << offset.x << ' ' << offset.y << ' ' << offset.z << std::endl;
-    // offset = normalize(offset);
 
     offset *= 10 * deltaTime;
     pos += offset;
 
     view = glm::lookAt(pos, pos + front, up);
-    // view = glm::lookAt(pos, glm::vec3(0), glm::vec3(0, 1, 0));
-
-    // transform->SetWorldRotation(transform->GetWorldRotation() + offset);
 }
 
 glm::mat4 Camera::ViewProj() const

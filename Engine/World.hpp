@@ -4,6 +4,7 @@
 #include "Engine/Object.hpp"
 #include "Engine/Resource/ResourceManager.hpp"
 #include <memory>
+#include <optional>
 
 class Window;
 
@@ -26,10 +27,22 @@ class World
             return ptr;
         }
 
+        // returns first object with the name name
+        template<typename T>
+        const T* GetObjectByName(std::string name)
+        {
+            for(auto x: objects)
+            {
+                if(x->name == name) return static_cast<const T*>(x.get());
+            }
+            return nullptr;
+        }
+
     private:
         std::unique_ptr<ResourceManager> resourceManager;
         std::shared_ptr<Window> window;
 
+        // should really be unique ptr
         std::vector<std::shared_ptr<Object>> objects;
 };
 
