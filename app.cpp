@@ -46,20 +46,18 @@ int main(int argc, const char** argv)
     });
 
     auto carModel = world->GetResourceManager().AddInResourceQueue("mesh", ResourceLoadData<Model> {
-        "Car/p6.obj"
+        // "Car/p6.obj"
+        "Car/sportste.obj"
     });
 
     world->GetResourceManager().StartLoading();
 
-    // auto car = world->Instantiate<Object>("Car", carModel);
     world->Instantiate<Object>("Car", carModel);
 
-    auto car = world->GetObjectByName<Object>("Car");
     auto camera = world->Instantiate<Camera>("Camera");
-
     window->SetCamera(camera);
-
     camera->Start();
+
     windowFade = 1.f;
     bool loaded = false;
     Timer timer;
@@ -81,8 +79,6 @@ int main(int argc, const char** argv)
 
         world->Tick(delta);
         world->Render();
-
-        // std::cout << window->GetCursorDelta().x << ' ' << window->GetCursorDelta().y << std::endl;
 
         return false;
     });
