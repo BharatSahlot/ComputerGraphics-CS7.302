@@ -3,6 +3,7 @@
 
 #include <glad/glad.h>
 #include <memory>
+#include <iostream>
 
 Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices, std::shared_ptr<Texture> texture, std::shared_ptr<Material> material)
 {
@@ -84,13 +85,17 @@ void Mesh::Render() const
     }
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0);
+    Material::Unuse();
 }
 
 void Mesh::Render(glm::mat4 model, glm::mat4 view, glm::mat4 proj) const
 {
     if(material)
     {
-        material->Use();
+        if(material->Use() == -1)
+        {
+            // std::cerr << "Error rendering mesh " << name << std::endl;
+        }
         material->SetUniformMat4("model", model);
         material->SetUniformMat4("view", view);
         material->SetUniformMat4("proj", proj);

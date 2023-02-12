@@ -1,5 +1,6 @@
 #include "Shader.hpp"
 
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -10,7 +11,7 @@
 static int success;
 static char infoLog[512];
 
-Shader* Shader::MakeShader(const char *path, int shaderType)
+Shader* Shader::MakeShader(const std::string& path, int shaderType)
 {
     std::string code;
     try
@@ -46,6 +47,8 @@ Shader* Shader::MakeShader(const char *path, int shaderType)
         delete(shader);
         return nullptr;
     }
+
+    shader->isTransparent = path == "Shaders/glass.fs";
     
     return shader;
 }

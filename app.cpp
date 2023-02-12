@@ -46,18 +46,20 @@ int main(int argc, const char** argv)
     });
 
     auto carModel = world->GetResourceManager().AddInResourceQueue("mesh", ResourceLoadData<Model> {
-        // "Car/p6.obj"
-        "Car/sportste.obj"
+        "Car/sportste.fbx"
     });
 
     world->GetResourceManager().StartLoading();
 
-    world->Instantiate<Object>("Car", carModel);
+    // auto car = world->Instantiate<Object>("Car", carModel);
+    std::shared_ptr<Object> car;
+    const Object* wheel = nullptr;
 
     auto camera = world->Instantiate<Camera>("Camera");
     window->SetCamera(camera);
     camera->Start();
 
+    float angle = 0.f;
     windowFade = 1.f;
     bool loaded = false;
     Timer timer;
@@ -69,6 +71,8 @@ int main(int argc, const char** argv)
         {
             world->GetResourceManager().Load();
             loaded = true;
+            car = world->Instantiate<Object>("Car", carModel);
+            wheel = world->GetObjectByName<Object>("WheelFL");
         }
 
         if(!loaded)
@@ -77,6 +81,11 @@ int main(int argc, const char** argv)
             return false;
         }
 
+        if(window->GetKeyDown(GLFW_KEY_LEFT)) angle += delta * 70.f;
+        if(window->GetKeyDown(GLFW_KEY_RIGHT)) angle -= delta * 70.f;
+
+        angle = glm::clamp(angle, -30.f, 30.f);
+        wheel->transform->SetLocalRotation(glm::vec3(0, 0, glm::radians(angle)));
         world->Tick(delta);
         world->Render();
 

@@ -19,10 +19,11 @@ Model::Model(World* world)
 
 void Model::Setup()
 {
-    for(auto& mesh: meshes) mesh.Setup();
+    for(auto& mesh: meshes) mesh->Setup();
+    for(auto model: children) model->Setup();
 }
 
-Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
+Mesh* Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 {
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
@@ -69,9 +70,11 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
         shaderPath += matName.C_Str();
         shaderPath += ".fs";
 
+        // std::cerr << "Adding shader to queue " << shaderPath << std::endl;
         material = world->GetResourceManager().AddInResourceQueue<Material>(shaderPath, ResourceLoadData<Material> {
             "Shaders/base.vs", shaderPath
         });
+
         // only one texture
         if(mat->GetTextureCount(aiTextureType_DIFFUSE) > 0)
         {
@@ -87,7 +90,7 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
             texture = tex;
         }
     }
-    return Mesh(vertices, indices, texture, material);
+    return new Mesh(vertices, indices, texture, material);
 }
 
 int Model::Load(const std::string &path)
@@ -97,8 +100,8 @@ int Model::Load(const std::string &path)
     const aiScene* scene = importer.ReadFile(path, 
             aiProcess_Triangulate
             | aiProcess_GenNormals
-            | aiProcess_PreTransformVertices
-            | aiProcess_FixInfacingNormals
+            // | aiProcess_PreTransformVertices
+            // | aiProcess_FixInfacingNormals
         );
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -109,31 +112,61 @@ int Model::Load(const std::string &path)
 
     directory = path.substr(0, path.find_last_of('/'));
 
-    std::queue<aiNode*> q({ scene->mRootNode });
-
+    bool first = true;
+    std::queue<std::pair<aiNode*, Model*>> q({ { scene->mRootNode, nullptr } });
     while(!q.empty())
     {
-        aiNode* node = q.front();
+        auto [node, par] = q.front();
         q.pop();
+
+        auto md = this;
+        if(!first) 
+        {
+            md = new Model(world);
+            par->children.push_back(std::shared_ptr<Model>(md));
+        }
+        first = false;
+
+        md->name = node->mName.C_Str();
+
+        aiVector3t<float> pos, rot, scale;
+        node->mTransformation.Decompose(scale, rot, pos);
+
+        md->transform.SetLocalScale(glm::vec3(scale.x, scale.y, scale.z));
+        md->transform.SetLocalRotation(glm::vec3(rot.x, rot.y, rot.z));
+        md->transform.SetLocalPosition(glm::vec3(pos.x, pos.y, pos.z));
+
+        if(par) md->transform.SetParent(&par->transform);
+
+        std::cout << md->name << std::endl;
+        std::cout << pos.x << ' ' << pos.y << ' ' << pos.z << std::endl;
+        std::cout << rot.x << ' ' << rot.y << ' ' << rot.z << std::endl;
+        std::cout << scale.x << ' ' << scale.y << ' ' << scale.z << std::endl;
+        std::cout << std::endl;
 
         for(size_t i = 0; i < node->mNumMeshes; i++)
         {
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-            meshes.push_back(ProcessMesh(mesh, scene));
+            auto mesh1 = std::shared_ptr<Mesh>(ProcessMesh(mesh, scene));
+            mesh1->name = md->name + '.' + std::to_string(i);
+            md->meshes.push_back(mesh1);
         }
 
         for(size_t i = 0; i < node->mNumChildren; i++)
         {
-            q.push(node->mChildren[i]);
+            q.push({node->mChildren[i], md});
         }
     }
+    transform.SetLocalScale(glm::vec3(0.1, 0.1, 0.1));
     return 0;
 }
 
-void Model::Render(const glm::mat4& view, const glm::mat4& proj)
+void Model::Render(const glm::mat4& proj, const glm::mat4& view, const glm::mat4& model)
 {
-    for(const Mesh& mesh: meshes)
+    for(const auto& mesh: meshes)
     {
-        mesh.Render(glm::mat4(1), view, proj);
+        mesh->Render(model, view, proj);
     }
+
+    for(auto model: children) model->Render(view, proj);
 }

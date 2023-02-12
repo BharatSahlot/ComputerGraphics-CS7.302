@@ -8,6 +8,11 @@
 static char infoLog[512];
 static int success;
 
+void Material::Unuse() 
+{
+    glUseProgram(0);
+}
+
 Material* Material::MakeMaterial(const Shader* vertexShader, const Shader* fragmentShader)
 {
     int id = glCreateProgram();
@@ -26,6 +31,8 @@ Material* Material::MakeMaterial(const Shader* vertexShader, const Shader* fragm
 
     Material* material = new Material;
     material->shaderProgram = id;
+    material->loaded = true;
+    material->isTransparent = fragmentShader->IsTransparent();
     return material;
 }
 
@@ -42,15 +49,20 @@ int Material::Load(const Shader *vertexShader, const Shader *fragmentShader)
     {
         glGetProgramInfoLog(id, 512, NULL, infoLog);
         std::cerr << "error linking program\n" << infoLog << std::endl;
+        loaded = false;
         return -1;
     }
     shaderProgram = id;
+    loaded = true;
+    isTransparent = fragmentShader->IsTransparent();
     return 0;
 }
 
-void Material::Use() const
+int Material::Use() const
 {
+    if(!loaded) return -1;
     glUseProgram(this->shaderProgram);
+    return 0;
 }
 
 void Material::SetBool(const std::string &name, bool value) const

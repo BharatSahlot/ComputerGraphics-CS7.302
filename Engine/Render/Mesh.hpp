@@ -24,6 +24,8 @@ class Mesh
         void Render() const;
         void Render(glm::mat4 model, glm::mat4 view, glm::mat4 proj) const;
 
+        const Material& GetMaterial() const { return *material; }
+
     private:
         std::shared_ptr<Material> material;
 
