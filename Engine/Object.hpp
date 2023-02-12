@@ -24,13 +24,22 @@ class Object
         Object(World* world, std::string name, std::shared_ptr<Model> model);
         Object(World* world, std::string name, const std::string& model);
 
+        void SetParent(const Object& obj);
+        bool IsTransparent() const { return isTransparent; }
+
         virtual void Render(const glm::mat4& viewMat, const glm::mat4& projMat);
+        virtual void Render(const glm::mat4& model, const glm::mat4& viewMat, const glm::mat4& projMat);
 
         virtual void Start() {}
         virtual void Tick(float deltaTime) {}
 
     protected:
-        std::shared_ptr<Model> model;
+        std::vector<std::shared_ptr<Mesh>> meshes;
+        std::vector<std::shared_ptr<Object>> children;
+
+    private:
+        bool isTransparent;
+        void ModelToHeirarchy(std::shared_ptr<Model> model);
 };
 
 #endif

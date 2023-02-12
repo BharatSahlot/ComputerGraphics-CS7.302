@@ -9,10 +9,11 @@
 class Material
 {
     public:
+        static void Unuse();
         static Material* MakeMaterial(const Shader* vertexShader, const Shader* fragmentShader);
         int Load(const Shader* vertexShader, const Shader* fragmentShader);
 
-        void Use() const;
+        int Use() const;
 
         void SetBool(const std::string& name, bool value) const;
         void SetInt(const std::string& name, int value) const;
@@ -22,9 +23,13 @@ class Material
 
         void SetUniformMat4(const std::string& name, const glm::mat4& mat) const;
 
+        bool IsTransparent() const { return isTransparent; }
+
         ~Material();
 
     private:
+        bool loaded = false;
+        bool isTransparent = false;
         unsigned int shaderProgram;
 };
 

@@ -9,9 +9,11 @@ class Transform
 {
     public:
         Transform();
+        Transform(const Transform& trans);
 
-        void SetParent(Transform* parent);
+        void SetParent(const Transform* parent);
         glm::mat4 GetModelMatrix() const;
+        glm::mat4 GetLocalModelMatrix() const { return model; }
 
         glm::vec3 GetLocalPosition() const;
         void SetLocalPosition(glm::vec3 position);
@@ -23,9 +25,6 @@ class Transform
         glm::vec3 GetLocalRotation() const;
         void SetLocalRotation(glm::vec3 rotation);
 
-        glm::vec3 GetWorldRotation() const;
-        void SetWorldRotation(glm::vec3 rotation);
-
         glm::vec3 GetLocalScale() const;
         void SetLocalScale(glm::vec3 scale);
 
@@ -35,7 +34,7 @@ class Transform
         glm::vec3 localScale;
         glm::mat4 model;
 
-        Transform* parent;
+        const Transform* parent;
         std::vector<std::weak_ptr<Transform>> children;
 };
 

@@ -73,9 +73,9 @@ class ResourceManager
         int totalTextures, totalMaterials, totalModels;
         int texturesLoaded, materialsLoaded, modelsLoaded;
 
-        std::queue<std::pair<std::string, ResourceLoadData<Texture>>> textureQueue;
-        std::queue<std::pair<std::string, ResourceLoadData<Material>>> materialQueue;
-        std::queue<std::pair<std::string, ResourceLoadData<Model>>> modelQueue;
+        std::vector<std::pair<std::string, ResourceLoadData<Texture>>> textureQueue;
+        std::vector<std::pair<std::string, ResourceLoadData<Material>>> materialQueue;
+        std::vector<std::pair<std::string, ResourceLoadData<Model>>> modelQueue;
 
         std::unordered_map<std::string, Shader*> shaderMap;
         std::unordered_map<std::string, std::shared_ptr<Texture>> textureMap;

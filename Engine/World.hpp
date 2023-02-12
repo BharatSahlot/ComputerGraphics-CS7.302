@@ -17,7 +17,7 @@ class World
         Window& GetWindow() const { return *window; }
 
         void Tick(float deltaTime) const;
-        void Render() const;
+        void Render();
 
         template<typename T, class... Us>
         std::shared_ptr<T> Instantiate(std::string name, Us... args)

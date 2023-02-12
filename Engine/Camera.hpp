@@ -23,6 +23,8 @@ class Camera : public Object
         glm::mat4 Proj() const { return proj; }
         glm::mat4 View() const { return view; }
 
+        glm::vec3 Position() const { return pos; }
+
     private:
         glm::vec3 pos;
         glm::vec3 front;

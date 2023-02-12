@@ -38,6 +38,7 @@ ResourceManager* ResourceManager::CreateResourceManager(GLFWwindow* window, Worl
 
     manager->context = context;
     manager->world = world;
+    manager->finished = false;
     return manager;
 }
 
@@ -95,14 +96,8 @@ void ResourceManager::Loader()
     totalModels = modelQueue.size();
     while(!modelQueue.empty())
     {
-        auto [name, data] = modelQueue.front();
-        modelQueue.pop();
-
-        if(modelMap.count(name))
-        {
-            modelsLoaded++;
-            continue;
-        }
+        auto [name, data] = modelQueue.back();
+        modelQueue.pop_back();
 
         if(data.ptr->Load(data.file) == -1)
         {
@@ -116,14 +111,8 @@ void ResourceManager::Loader()
     totalMaterials = materialQueue.size();
     while(!textureQueue.empty())
     {
-        auto [name, data] = textureQueue.front();
-        textureQueue.pop();
-
-        if(textureMap.count(name))
-        {
-            texturesLoaded++;
-            continue;
-        }
+        auto [name, data] = textureQueue.back();
+        textureQueue.pop_back();
 
         if(data.ptr->Load(data.file, data.filtering) == -1)
         {
@@ -135,14 +124,8 @@ void ResourceManager::Loader()
 
     while(!materialQueue.empty())
     {
-        auto [name, data] = materialQueue.front();
-        materialQueue.pop();
-
-        if(materialMap.count(name))
-        {
-            materialsLoaded++;
-            continue;
-        }
+        auto [name, data] = materialQueue.back();
+        materialQueue.pop_back();
 
         if(!shaderMap.count(data.vertexShaderFile))
         {
@@ -166,27 +149,42 @@ void ResourceManager::Loader()
 template<>
 std::shared_ptr<Texture> ResourceManager::AddInResourceQueue<Texture>(const std::string& name, ResourceLoadData<Texture> data)
 {
+    for(auto& [tname, tdata]: textureQueue)
+    {
+        if(tname == name) return tdata.ptr;
+    }
+
     std::shared_ptr<Texture> ptr(new Texture);
     data.ptr = ptr;
-    textureQueue.push(std::make_pair(name, data));
+    textureQueue.push_back(std::make_pair(name, data));
     return ptr;
 }
 
 template<>
 std::shared_ptr<Material> ResourceManager::AddInResourceQueue<Material>(const std::string& name, ResourceLoadData<Material> data)
 {
+    for(auto& [tname, tdata]: materialQueue)
+    {
+        if(tname == name) return tdata.ptr;
+    }
+
     std::shared_ptr<Material> ptr(new Material);
     data.ptr = ptr;
-    materialQueue.push(std::make_pair(name, data));
+    materialQueue.push_back(std::make_pair(name, data));
     return ptr;
 }
 
 template<>
 std::shared_ptr<Model> ResourceManager::AddInResourceQueue<Model>(const std::string& name, ResourceLoadData<Model> data)
 {
+    for(auto& [tname, tdata]: modelQueue)
+    {
+        if(tname == name) return tdata.ptr;
+    }
+
     std::shared_ptr<Model> ptr(new Model(world));
     data.ptr = ptr;
-    modelQueue.push(std::make_pair(name, data));
+    modelQueue.push_back(std::make_pair(name, data));
     return ptr;
 }
 

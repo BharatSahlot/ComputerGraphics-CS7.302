@@ -11,7 +11,16 @@ Transform::Transform()
     parent = nullptr;
 }
 
-void Transform::SetParent(Transform* parent)
+Transform::Transform(const Transform& trans)
+{
+    position = trans.position;
+    rotation = trans.rotation;
+    localScale = trans.localScale;
+    model = trans.model;
+    parent = nullptr;
+}
+
+void Transform::SetParent(const Transform* parent)
 {
     // TODO:keep world position when changing parent
     this->parent = parent;
@@ -20,8 +29,8 @@ void Transform::SetParent(Transform* parent)
 // TODO: save this on update, we dont want it to recurse over the whole heirarchy again and again
 glm::mat4 Transform::GetModelMatrix() const 
 {
-    if(parent == nullptr) return this->model;
-    return parent->GetModelMatrix() * this->model;
+    if(parent == nullptr) return model;
+    return parent->GetModelMatrix() * model;
 }
 
 glm::vec3 Transform::GetLocalPosition() const
@@ -39,18 +48,7 @@ void Transform::SetLocalPosition(glm::vec3 position)
     auto rY = glm::rotate(glm::mat4(1), rotation.y, glm::vec3(0, 1, 0));
     auto rZ = glm::rotate(glm::mat4(1), rotation.z, glm::vec3(0, 0, 1));
 
-    model = rZ * rX * rY * translate * glm::scale(glm::mat4(1), localScale);
-
-    // model = glm::mat4(1);
-    // // model = glm::translate(glm::mat4(1), position);
-    //
-    // model = glm::rotate(model, rotation.x, glm::vec3(1, 0, 0));
-    // model = glm::rotate(model, rotation.y, glm::vec3(0, 1, 0));
-    // model = glm::rotate(model, rotation.z, glm::vec3(0, 0, 1));
-    //
-    // model = glm::scale(model, localScale);
-
-    // model = translate * rZ * rY * rX * glm::scale(glm::mat4(1), localScale);
+    model = translate * rZ * rY * rX * glm::scale(glm::mat4(1), localScale);
 }
 
 glm::vec3 Transform::GetWorldPosition() const
@@ -85,23 +83,6 @@ void Transform::SetLocalRotation(glm::vec3 rotation)
 {
     this->rotation = rotation;
     SetLocalPosition(GetLocalPosition());
-}
-
-glm::vec3 Transform::GetWorldRotation() const
-{
-    if(parent == nullptr) return rotation;
-    return parent->model * glm::vec4(rotation, 1);
-}
-
-void Transform::SetWorldRotation(glm::vec3 rotation)
-{
-    if(parent == nullptr)
-    {
-        SetLocalRotation(rotation);
-        return;
-    }
-    glm::mat4 inv = glm::inverse(parent->model);
-    SetLocalRotation(inv * glm::vec4(rotation, 1));
 }
 
 glm::vec3 Transform::GetLocalScale() const
