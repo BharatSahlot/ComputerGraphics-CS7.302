@@ -26,6 +26,8 @@ void Object::ModelToHeirarchy(std::shared_ptr<Model> model)
     transform = new Transform(model->GetTransform());
     meshes = model->GetMeshes();
 
+    modelBounds = model->GetModelBounds(*model);
+
     isTransparent = false;
     for(const auto& x: meshes)
     {
@@ -44,6 +46,11 @@ void Object::ModelToHeirarchy(std::shared_ptr<Model> model)
 void Object::SetParent(const Object& obj)
 {
     transform->SetParent(obj.transform);
+}
+
+Bounds Object::GetBounds() const
+{
+    return modelBounds;
 }
 
 void Object::Render(const glm::mat4& viewMat, const glm::mat4& projMat)

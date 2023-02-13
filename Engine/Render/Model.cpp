@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "Engine/World.hpp"
+#include "assimp/vector3.h"
 #include "glm/ext/matrix_transform.hpp"
 
 #include <assimp/postprocess.h>
@@ -12,7 +13,7 @@
 #include <assimp/scene.h>
 #include <queue>
 
-Model::Model(World* world)
+Model::Model(World* world) : hasModelBounds(false)
 {
     this->world = world;
 }
@@ -29,6 +30,10 @@ Mesh* Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
     std::vector<unsigned int> indices;
     std::shared_ptr<Texture> texture;
     std::shared_ptr<Material> material;
+
+    auto bmn = mesh->mAABB.mMin;
+    auto bmx = mesh->mAABB.mMax;
+    Bounds b = Bounds::FromMinMax(glm::vec3(bmn.x, bmn.y, bmn.z), glm::vec3(bmx.x, bmx.y, bmx.z));
 
     for(size_t i = 0; i < mesh->mNumVertices; i++)
     {
@@ -90,7 +95,27 @@ Mesh* Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
             texture = tex;
         }
     }
-    return new Mesh(vertices, indices, texture, material);
+    return new Mesh(vertices, indices, texture, material, b);
+}
+
+Bounds Model::GetModelBounds(Model& model)
+{
+    if(model.hasModelBounds) return model.modelBounds;
+
+    Bounds mb = model.meshBounds;
+    for(auto x: model.children)
+    {
+        Bounds b = GetModelBounds(*x);
+        glm::vec3 p1 = x->transform.GetLocalModelMatrix() * glm::vec4(b.min, 1);
+        glm::vec3 p2 = x->transform.GetLocalModelMatrix() * glm::vec4(b.max, 1);
+
+        glm::vec3 mn(std::min(p1.x, p2.x), std::min(p1.y, p2.y), std::min(p1.z, p2.z));
+        glm::vec3 mx(std::max(p1.x, p2.x), std::max(p1.y, p2.y), std::max(p1.z, p2.z));
+        mb.Join(Bounds::FromMinMax(mn, mx));
+    }
+    model.modelBounds = mb;
+    model.hasModelBounds = true;
+    return mb;
 }
 
 int Model::Load(const std::string &path)
@@ -100,8 +125,7 @@ int Model::Load(const std::string &path)
     const aiScene* scene = importer.ReadFile(path, 
             aiProcess_Triangulate
             | aiProcess_GenNormals
-            // | aiProcess_PreTransformVertices
-            // | aiProcess_FixInfacingNormals
+            | aiProcess_GenBoundingBoxes
         );
 
     if(!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -128,6 +152,7 @@ int Model::Load(const std::string &path)
         first = false;
 
         md->name = node->mName.C_Str();
+        md->meshBounds = Bounds::FromExtents(glm::vec3(0), glm::vec3(0));
 
         aiVector3t<float> pos, rot, scale;
         node->mTransformation.Decompose(scale, rot, pos);
@@ -150,6 +175,9 @@ int Model::Load(const std::string &path)
             auto mesh1 = std::shared_ptr<Mesh>(ProcessMesh(mesh, scene));
             mesh1->name = md->name + '.' + std::to_string(i);
             md->meshes.push_back(mesh1);
+
+            if(i == 0) md->meshBounds = mesh1->GetBounds();
+            else md->meshBounds.Join(mesh1->GetBounds());
         }
 
         for(size_t i = 0; i < node->mNumChildren; i++)

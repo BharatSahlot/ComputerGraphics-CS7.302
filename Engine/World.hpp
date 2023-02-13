@@ -3,6 +3,7 @@
 
 #include "Engine/Camera.hpp"
 #include "Engine/Object.hpp"
+#include "Engine/Render/Primitive/Primitive.hpp"
 #include "Engine/Resource/ResourceManager.hpp"
 #include <memory>
 #include <optional>
@@ -40,7 +41,15 @@ class World
             return nullptr;
         }
 
+        void DrawBox(glm::vec3 center, glm::vec3 extents, glm::vec3 color = glm::vec3(1, 1, 1)) const
+        {
+            primitive->DrawBox(center, extents, color);
+        }
+
+        void DrawRotatedBox(std::vector<glm::vec3> points) const;
+
     private:
+        Primitive* primitive = nullptr;
         std::unique_ptr<ResourceManager> resourceManager;
         std::shared_ptr<Window> window;
 

@@ -2,6 +2,7 @@
 #define MESH_H
 
 #include "Engine/Render/Texture.hpp"
+#include "Engine/Utils/Bounds.hpp"
 #include "Material.hpp"
 
 #include <glm/glm.hpp>
@@ -19,6 +20,7 @@ class Mesh
 
         Mesh(vector<float> vertices, vector<unsigned int> indices);
         Mesh(vector<float> vertices, vector<unsigned int> indices, std::shared_ptr<Texture> texture, std::shared_ptr<Material> material);
+        Mesh(vector<float> vertices, vector<unsigned int> indices, std::shared_ptr<Texture> texture, std::shared_ptr<Material> material, Bounds bounds);
 
         void Setup();
         void Render() const;
@@ -26,7 +28,10 @@ class Mesh
 
         const Material& GetMaterial() const { return *material; }
 
+        Bounds GetBounds() const { return bounds; }
+
     private:
+        void GenBuffers(vector<float> vertices, vector<unsigned int> indices);
         std::shared_ptr<Material> material;
 
         // opengl objects for vertices, attributes and indices
@@ -34,6 +39,7 @@ class Mesh
         int indices;
 
         std::shared_ptr<Texture> texture;
+        Bounds bounds;
 };
 
 #endif

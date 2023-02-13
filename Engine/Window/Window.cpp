@@ -80,6 +80,9 @@ void Window::Render(World* world)
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
+    // glEnable(GL_LINE_SMOOTH);
+    // glHint(GL_LINE_SMOOTH_HINT,  GL_NICEST);
+
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     while(!glfwWindowShouldClose(this->glfwWindow))
