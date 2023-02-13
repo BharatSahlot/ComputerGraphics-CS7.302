@@ -10,7 +10,7 @@
 
 void Camera::SetPerspective(float fov, float aspect)
 {
-    proj = glm::perspective(glm::radians(fov), aspect, 0.1f, 100.f);
+    proj = glm::perspective(glm::radians(fov), aspect, 0.1f, 10000.f);
 }
 
 // match height orthographic projection

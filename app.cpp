@@ -49,11 +49,16 @@ int main(int argc, const char** argv)
         "Car/sportste.fbx"
     });
 
+    // auto roadsModel = world->GetResourceManager().AddInResourceQueue("roads", ResourceLoadData<Model> {
+    //     "Car/Low Poly Road Pack.obj"
+    // });
+
     world->GetResourceManager().StartLoading();
 
     // auto car = world->Instantiate<Object>("Car", carModel);
     std::shared_ptr<Object> car;
-    const Object* wheel = nullptr;
+    const Object* wheelFL = nullptr;
+    const Object* wheelFR = nullptr;
 
     auto camera = world->Instantiate<Camera>("Camera");
     window->SetCamera(camera);
@@ -72,7 +77,10 @@ int main(int argc, const char** argv)
             world->GetResourceManager().Load();
             loaded = true;
             car = world->Instantiate<Object>("Car", carModel);
-            wheel = world->GetObjectByName<Object>("WheelFL");
+            wheelFL = world->GetObjectByName<Object>("WheelFL");
+            wheelFR = world->GetObjectByName<Object>("WheelFR");
+
+            // world->Instantiate<Object>("Roads", roadsModel);
         }
 
         if(!loaded)
@@ -85,7 +93,9 @@ int main(int argc, const char** argv)
         if(window->GetKeyDown(GLFW_KEY_RIGHT)) angle -= delta * 70.f;
 
         angle = glm::clamp(angle, -30.f, 30.f);
-        wheel->transform->SetLocalRotation(glm::vec3(0, 0, glm::radians(angle)));
+        wheelFL->transform->SetLocalRotation(glm::vec3(0, 0, glm::radians(angle)));
+        wheelFR->transform->SetLocalRotation(glm::vec3(0, 0, glm::radians(angle)));
+        car->transform->SetLocalRotation(glm::vec3(0, glm::radians(angle), 0));
         world->Tick(delta);
         world->Render();
 

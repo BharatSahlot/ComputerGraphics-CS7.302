@@ -85,7 +85,7 @@ Mesh* Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
             path += '/';
             path += file.C_Str();
             auto tex = world->GetResourceManager().AddInResourceQueue<Texture>(path, ResourceLoadData<Texture> {
-                path, GL_LINEAR
+                path, GL_NEAREST
             });
             texture = tex;
         }
@@ -138,11 +138,11 @@ int Model::Load(const std::string &path)
 
         if(par) md->transform.SetParent(&par->transform);
 
-        std::cout << md->name << std::endl;
-        std::cout << pos.x << ' ' << pos.y << ' ' << pos.z << std::endl;
-        std::cout << rot.x << ' ' << rot.y << ' ' << rot.z << std::endl;
-        std::cout << scale.x << ' ' << scale.y << ' ' << scale.z << std::endl;
-        std::cout << std::endl;
+        // std::cout << md->name << std::endl;
+        // std::cout << pos.x << ' ' << pos.y << ' ' << pos.z << std::endl;
+        // std::cout << rot.x << ' ' << rot.y << ' ' << rot.z << std::endl;
+        // std::cout << scale.x << ' ' << scale.y << ' ' << scale.z << std::endl;
+        // std::cout << std::endl;
 
         for(size_t i = 0; i < node->mNumMeshes; i++)
         {
