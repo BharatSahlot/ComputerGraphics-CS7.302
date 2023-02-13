@@ -9,6 +9,10 @@ class Camera : public Object
 {
     public:
         using Object::Object;
+        
+        bool canMove = true;
+
+        Camera(World* world, std::string name, glm::vec3 pos, glm::vec3 look);
 
         void SetPerspective(float fov, float aspect);
 
@@ -18,6 +22,8 @@ class Camera : public Object
         void Start() override;
         void Tick(float deltaTime) override;
         void Render(const glm::mat4 &viewMat, const glm::mat4 &projMat) override {}
+
+        void Use(glm::vec2 windowDims, glm::vec3 viewport = glm::vec3(0, 0, 0.1)) const;
 
         glm::mat4 ViewProj() const;
         glm::mat4 Proj() const { return proj; }

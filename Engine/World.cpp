@@ -35,3 +35,8 @@ void World::Render()
     });
     for(auto x: objects) x->Render(window->camera->View(), window->camera->Proj());
 }
+
+void World::Render(const Camera& camera)
+{
+    for(auto x: objects) x->Render(camera.View(), camera.Proj());
+}

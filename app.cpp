@@ -64,6 +64,10 @@ int main(int argc, const char** argv)
     window->SetCamera(camera);
     camera->Start();
 
+    auto mapCamera = world->Instantiate<Camera>("MapCamera", glm::vec3(0, 50, -5), glm::vec3(0, 0, 0));
+    mapCamera->canMove = false;
+    mapCamera->Start();
+
     float angle = 0.f;
     windowFade = 1.f;
     bool loaded = false;
@@ -97,8 +101,16 @@ int main(int argc, const char** argv)
         wheelFR->transform->SetLocalRotation(glm::vec3(0, 0, glm::radians(angle)));
         car->transform->SetLocalRotation(glm::vec3(0, glm::radians(angle), 0));
         world->Tick(delta);
+
+        camera->Use(glm::vec2(window->Width(), window->Height()), glm::vec3(0, 0, 1.f));
         world->Render();
 
+        float h = window->Height() * 0.2f;
+        float w = h * (1920.f / 1080.f);
+
+        mapCamera->SetPerspective(60.f, window->Aspect());
+        mapCamera->Use(glm::vec2(window->Width(), window->Height()), glm::vec3(15, -15, 0.2f));
+        world->Render(*mapCamera);
         return false;
     });
 
