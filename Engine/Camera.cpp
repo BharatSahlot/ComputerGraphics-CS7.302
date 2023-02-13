@@ -4,9 +4,24 @@
 
 #include "World.hpp"
 #include "Engine/Window/Window.hpp"
+#include "glm/geometric.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+
+Camera::Camera(World* world, std::string name, glm::vec3 pos, glm::vec3 look) : Object(world, name)
+{
+    this->pos = pos;
+
+    front = glm::normalize(look - pos);
+    right   = glm::normalize(glm::cross(front, glm::vec3(0, 1, 0)));
+    up      = glm::normalize(glm::cross(right, front));
+
+    std::cout << "Front: " << front.x << ' ' << front.y << ' ' << front.z << std::endl;
+    std::cout << "Up: " << up.x << ' ' << up.y << ' ' << up.z << std::endl;
+    view = glm::lookAt(pos, pos + front, up);
+    canMove = false;
+}
 
 void Camera::SetPerspective(float fov, float aspect)
 {
@@ -24,6 +39,7 @@ void Camera::SetOrthographic(float width, float height)
 
 void Camera::Start()
 {
+    if(!canMove) return;
     pos = glm::vec3(0, 0, -35);
     up = glm::vec3(0, 1, 0);
     front = glm::vec3(0, 0, 1);
@@ -32,6 +48,7 @@ void Camera::Start()
 
 void Camera::Tick(float deltaTime)
 {
+    if(!canMove) return;
     auto delta = world->GetWindow().GetCursorDelta() * 0.2f;
 
     rot.x += delta.y;
@@ -57,6 +74,17 @@ void Camera::Tick(float deltaTime)
     pos += offset;
 
     view = glm::lookAt(pos, pos + front, up);
+}
+
+void Camera::Use(glm::vec2 windowDims, glm::vec3 viewport) const 
+{
+    float h = windowDims.y * viewport.z;
+    float w = h * (windowDims.x / windowDims.y);
+
+    glScissor(viewport.x, viewport.y + windowDims.y - h, w, h);
+    glViewport(viewport.x, viewport.y + windowDims.y - h, w, h);
+    glClearColor(0.f, 0.f, 0.f, 1.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 glm::mat4 Camera::ViewProj() const

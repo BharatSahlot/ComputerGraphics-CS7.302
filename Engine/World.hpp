@@ -1,6 +1,7 @@
 #ifndef WORLD_H
 #define WORLD_H
 
+#include "Engine/Camera.hpp"
 #include "Engine/Object.hpp"
 #include "Engine/Resource/ResourceManager.hpp"
 #include <memory>
@@ -18,6 +19,7 @@ class World
 
         void Tick(float deltaTime) const;
         void Render();
+        void Render(const Camera& camera);
 
         template<typename T, class... Us>
         std::shared_ptr<T> Instantiate(std::string name, Us... args)
