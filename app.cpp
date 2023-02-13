@@ -103,7 +103,9 @@ int main(int argc, const char** argv)
         world->Tick(delta);
 
         camera->Use(glm::vec2(window->Width(), window->Height()), glm::vec3(0, 0, 1.f));
+        Bounds b = car->GetBounds();
         world->Render();
+        world->DrawRotatedBox(b.GetRotatedBox(car->transform->GetModelMatrix()));
 
         float h = window->Height() * 0.2f;
         float w = h * (1920.f / 1080.f);

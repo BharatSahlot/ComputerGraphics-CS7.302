@@ -3,11 +3,14 @@
 #include "Engine/Window/Window.hpp"
 #include <algorithm>
 #include <cmath>
+#include <iostream>
 
 World::World(std::shared_ptr<Window> window)
 {
     this->window = window;
     resourceManager = std::unique_ptr<ResourceManager>(ResourceManager::CreateResourceManager(window->GetGLFWwindow(), this));
+
+    primitive = new Primitive(this);
 }
 
 void World::Tick(float deltaTime) const
@@ -39,4 +42,31 @@ void World::Render()
 void World::Render(const Camera& camera)
 {
     for(auto x: objects) x->Render(camera.View(), camera.Proj());
+}
+
+void World::DrawRotatedBox(std::vector<glm::vec3> points) const
+{
+    static bool once = true;
+    if(once)
+    {
+        for(auto x: points)
+        {
+            std::cout << x.x << ' ' << x.y << ' ' << x.z << std::endl;
+        }
+    }
+    once = false;
+    primitive->DrawLine(points[0], points[1]);
+    primitive->DrawLine(points[1], points[2]);
+    primitive->DrawLine(points[2], points[3]);
+    primitive->DrawLine(points[3], points[0]);
+
+    primitive->DrawLine(points[4], points[5]);
+    primitive->DrawLine(points[5], points[6]);
+    primitive->DrawLine(points[6], points[7]);
+    primitive->DrawLine(points[7], points[4]);
+
+    primitive->DrawLine(points[0], points[4]);
+    primitive->DrawLine(points[1], points[5]);
+    primitive->DrawLine(points[2], points[6]);
+    primitive->DrawLine(points[3], points[7]);
 }

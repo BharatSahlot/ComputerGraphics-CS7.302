@@ -7,23 +7,17 @@
 
 Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices, std::shared_ptr<Texture> texture, std::shared_ptr<Material> material)
 {
-    glGenBuffers(1, &this->VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-    glBufferData(GL_ARRAY_BUFFER,
-            vertices.size() * sizeof(float),
-            vertices.data(),
-            GL_STATIC_DRAW);
-
-    glGenBuffers(1, &this->EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-            indices.size() * sizeof(unsigned int),
-            indices.data(),
-            GL_STATIC_DRAW);
-
-    this->indices = indices.size();
+    GenBuffers(vertices, indices);
     this->texture = texture;
     this->material = material;
+}
+
+Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices, std::shared_ptr<Texture> texture, std::shared_ptr<Material> material, Bounds bounds)
+{
+    GenBuffers(vertices, indices);
+    this->texture = texture;
+    this->material = material;
+    this->bounds = bounds;
 }
 
 Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices)
@@ -48,6 +42,25 @@ Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
             indices.size() * sizeof(int),
+            indices.data(),
+            GL_STATIC_DRAW);
+
+    this->indices = indices.size();
+}
+
+void Mesh::GenBuffers(vector<float> vertices, vector<unsigned int> indices)
+{
+    glGenBuffers(1, &this->VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
+    glBufferData(GL_ARRAY_BUFFER,
+            vertices.size() * sizeof(float),
+            vertices.data(),
+            GL_STATIC_DRAW);
+
+    glGenBuffers(1, &this->EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+            indices.size() * sizeof(unsigned int),
             indices.data(),
             GL_STATIC_DRAW);
 

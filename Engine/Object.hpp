@@ -27,6 +27,8 @@ class Object
         void SetParent(const Object& obj);
         bool IsTransparent() const { return isTransparent; }
 
+        Bounds GetBounds() const;
+
         virtual void Render(const glm::mat4& viewMat, const glm::mat4& projMat);
         virtual void Render(const glm::mat4& model, const glm::mat4& viewMat, const glm::mat4& projMat);
 
@@ -38,6 +40,7 @@ class Object
         std::vector<std::shared_ptr<Object>> children;
 
     private:
+        Bounds modelBounds;
         bool isTransparent;
         void ModelToHeirarchy(std::shared_ptr<Model> model);
 };
