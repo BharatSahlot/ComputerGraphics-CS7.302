@@ -3,7 +3,7 @@
 #include <iostream>
 #include <glad/glad.h>
 
-Font* Font::LoadFont(const std::string& file, int size)
+Font* Font::LoadFont(const std::string& file, int size, std::shared_ptr<Material> mat)
 {
     FT_Face face;
     if(FT_New_Face(ft, file.c_str(), 0, &face))
@@ -64,17 +64,17 @@ Font* Font::LoadFont(const std::string& file, int size)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    font->mat = mat;
+
     return font;
 }
 
 void Font::RenderText(std::string text, float x, float y, float scale, glm::mat4 proj, glm::vec3 col)
 {
-    // TODO: use new resource manager for font shader
-
-    // TextMat->Use();
-    // TextMat->SetUniformMat4("proj", proj);
-    // TextMat->SetVec3("textColor", col);
-    // TextMat->SetInt("text", 0);
+    mat->Use();
+    mat->SetUniformMat4("proj", proj);
+    mat->SetVec3("textColor", col);
+    mat->SetInt("text", 0);
 
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
