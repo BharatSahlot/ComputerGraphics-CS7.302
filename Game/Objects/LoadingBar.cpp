@@ -6,6 +6,7 @@
 LoadingBar::LoadingBar(World* world, std::string name, std::function<float(std::string* status)> statusFunc) : UIObject(world, name)
 {
     this->statusFunc = statusFunc;
+    fillAmount = 0;
 
     bar = world->InstantiateUIObject<Bar>(name + ":loadingBar", Anchor {
         AnchorType::CenterBottom,
@@ -20,9 +21,17 @@ LoadingBar::LoadingBar(World* world, std::string name, std::function<float(std::
     });
 }
 
-void LoadingBar::Render()
+void LoadingBar::Tick(float deltaTime)
 {
     std::string str;
-    bar->SetFillAmount(statusFunc(&str));
+    float a = statusFunc(&str);
+
+    fillAmount = std::clamp(fillAmount + deltaTime, 0.f, a);
+
+    bar->SetFillAmount(fillAmount);
     text->SetText(str);
 }
+
+// void LoadingBar::Render()
+// {
+// }

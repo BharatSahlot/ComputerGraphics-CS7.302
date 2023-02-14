@@ -9,7 +9,6 @@ uniform vec3 col;
 
 void main()
 {
-    float a = 1 - smoothstep(fillAmount, fillAmount + 0.05, TexCoords.x);
-    // float a = 1 - step(fillAmount, TexCoords.x);
-    FragColor = vec4(col * a, 1);
+    float a = 1 - smoothstep(fillAmount, fillAmount + 0.1, TexCoords.x);
+    FragColor = vec4(col, a);
 } 

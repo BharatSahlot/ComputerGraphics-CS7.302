@@ -3,6 +3,7 @@
 
 #include "Engine/World.hpp"
 #include "Game/Game.hpp"
+#include "Game/Objects/LoadingBar.hpp"
 
 class LoadingWorld : public World
 {
@@ -13,6 +14,7 @@ class LoadingWorld : public World
         void Tick(float deltaTime) const override;
 
     private:
+        std::shared_ptr<LoadingBar> bar;
         Game* game;
 };
 

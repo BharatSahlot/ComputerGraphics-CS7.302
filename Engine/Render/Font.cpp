@@ -23,6 +23,7 @@ Font* Font::LoadFont(const std::string& file, int size, std::shared_ptr<Material
     glBindVertexArray(0);
 
     font->mat = mat;
+    font->hasShadow = false;
 
     return font;
 }
@@ -77,7 +78,9 @@ int Font::Load(const std::string& file, int size, std::shared_ptr<Material> mat)
     glBindTexture(GL_TEXTURE_2D, 0);
     FT_Done_Face(face);
 
+    hasShadow = false;
     this->mat = mat;
+    this->size = size;
     return 0;
 }
 
@@ -100,6 +103,16 @@ void Font::RenderText(std::string text, float x, float y, float scale, glm::mat4
     mat->SetUniformMat4("proj", proj);
     mat->SetVec3("textColor", col);
     mat->SetInt("text", 0);
+
+    if(!hasShadow)
+    {
+        mat->SetVec4("shadowColor", glm::vec4(0, 0, 0, 0));
+        mat->SetFloat("shadowDistance", 0);
+    } else 
+    {
+        mat->SetVec4("shadowColor", shadowColor);
+        mat->SetFloat("shadowDistance", shadowDistance);
+    }
 
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);

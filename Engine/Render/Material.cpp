@@ -92,6 +92,12 @@ void Material::SetVec3(const std::string &name, const glm::vec3& vec) const
     glUniform3f(loc, vec.x, vec.y, vec.z);
 }
 
+void Material::SetVec4(const std::string &name, const glm::vec4& vec) const
+{
+    int loc = glGetUniformLocation(this->shaderProgram, name.c_str());
+    glUniform4f(loc, vec.x, vec.y, vec.z, vec.w);
+}
+
 void Material::SetUniformMat4(const std::string &name, const glm::mat4 &mat) const
 {
     int loc = glGetUniformLocation(this->shaderProgram, name.c_str());

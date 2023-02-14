@@ -7,8 +7,15 @@ in vec2 TexCoords;
 uniform sampler2D text;
 uniform vec3 textColor;
 
+uniform float shadowDistance;
+uniform vec4 shadowColor;
+
 void main()
-{    
-    vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);
-    FragColor = vec4(textColor, 1.0) * sampled;
+{
+    float ta = texture(text, TexCoords).r;
+    float sa = texture(text, TexCoords + vec2(1, -1) * shadowDistance).r;
+
+    FragColor = mix(shadowColor * sa, vec4(textColor, ta), ta);
+
+    if(FragColor.a <= 0.1) discard;
 } 

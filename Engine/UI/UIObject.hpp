@@ -34,6 +34,8 @@ class UIObject
         virtual void Render() {}
 
     protected:
+        const float REF_HEIGHT = 520.f;
+        const float REF_WIDTH = 956.f;
         UIObject(World* world, std::string name) : world(world), name(name) {}
 
         glm::vec2 CalculatePosition(Anchor anchor, glm::vec2 dims);

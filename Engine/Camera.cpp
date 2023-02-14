@@ -21,6 +21,8 @@ Camera::Camera(World* world, std::string name, glm::vec3 pos, glm::vec3 look) : 
     // std::cout << "Up: " << up.x << ' ' << up.y << ' ' << up.z << std::endl;
     view = glm::lookAt(pos, pos + front, up);
     canMove = false;
+
+    clearColor = glm::vec3(0, 0, 0);
 }
 
 void Camera::SetPerspective(float fov, float aspect)
@@ -83,7 +85,7 @@ void Camera::Use(glm::vec2 windowDims, glm::vec3 viewport) const
 
     glScissor(viewport.x, viewport.y + windowDims.y - h, w, h);
     glViewport(viewport.x, viewport.y + windowDims.y - h, w, h);
-    glClearColor(0.f, 0.f, 0.f, 1.f);
+    glClearColor(clearColor.x, clearColor.y, clearColor.z, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

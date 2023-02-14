@@ -19,7 +19,9 @@ static std::map<GLFWwindow*, Window*> glfwToWindow;
 Window* Window::Create(int width, int height, const char* title)
 {
     Window* window = new Window;
+    window->clearColor = glm::vec3(0, 0, 0);
 
+    glfwWindowHint(GLFW_SAMPLES, 4);
     glfwWindowHint(GLFW_VISIBLE, GL_TRUE);
     window->glfwWindow = glfwCreateWindow(width, height, title, NULL, NULL);
     if(window->glfwWindow == NULL)
@@ -73,6 +75,7 @@ void Window::Render()
 
     glViewport(0, 0, this->width, this->height);
 
+    glEnable(GL_MULTISAMPLE);
     glEnable(GL_SCISSOR_TEST);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -87,7 +90,7 @@ void Window::Render()
 
     while(!glfwWindowShouldClose(this->glfwWindow))
     {
-        glClearColor(0.f, 0.f, 0.f, 1.f);
+        glClearColor(clearColor.x, clearColor.y, clearColor.z, 1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

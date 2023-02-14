@@ -12,6 +12,8 @@
 class Window
 {
     public:
+        glm::vec3 clearColor;
+
         std::shared_ptr<Camera> camera;
         using RenderCallback = std::function<bool()>;
 

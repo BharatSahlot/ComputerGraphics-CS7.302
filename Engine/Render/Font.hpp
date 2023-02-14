@@ -30,13 +30,26 @@ class Font
 
         glm::vec2 GetTextDims(std::string text, float scale) const;
 
+        void EnableShadow() { hasShadow = true; }
+        void DisableShadow() { hasShadow = false; }
+        void SetShadow(float distance, glm::vec4 col)
+        {
+            shadowDistance = distance;
+            shadowColor = col;
+        }
+
     private:
+        float size;
         bool loaded = false;
         std::shared_ptr<Material> mat;
         FT_Face face;
         unsigned int VAO;
         unsigned int VBO;
         std::map<char, Character> characters;
+
+        bool hasShadow;
+        float shadowDistance;
+        glm::vec4 shadowColor;
 };
 
 #endif

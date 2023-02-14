@@ -8,14 +8,18 @@ Text::Text(World* world, std::string name, std::shared_ptr<Font> font, Anchor an
     anchor(anchor),
     font(font),
     col(glm::vec3(1, 1, 1)),
-    str("")
+    str(""),
+    hasShadow(false),
+    shadowDistance(0)
 {
 }
 
 Text::Text(World* world, std::string name, std::string font, Anchor anchor) : UIObject(world, name),
     anchor(anchor),
     col(glm::vec3(1, 1, 1)),
-    str("")
+    str(""),
+    hasShadow(false),
+    shadowDistance(0)
 {
     this->font = world->GetResourceManager().Get<Font>(font);
 }
@@ -23,10 +27,10 @@ Text::Text(World* world, std::string name, std::string font, Anchor anchor) : UI
 void Text::Render()
 {
     glm::vec2 screenDims(world->GetWindow().Width(), world->GetWindow().Height());
-    glm::vec2 textDims = font->GetTextDims(str, anchor.scale);
+    glm::vec2 textDims = font->GetTextDims(str, anchor.scale * (screenDims.y / REF_HEIGHT));
 
-    float x = anchor.padding.x;
-    float y = anchor.padding.y;
+    float x = anchor.padding.x * (screenDims.x / REF_WIDTH);
+    float y = anchor.padding.y * (screenDims.y / REF_HEIGHT);
     switch (anchor.anchorType) {
         case BottomLeft:
             break;
@@ -54,5 +58,15 @@ void Text::Render()
     }
 
     glm::mat4 proj = glm::ortho(0.f, screenDims.x, 0.f, screenDims.y);
-    font->RenderText(str, x, y, anchor.scale, proj, col);
+
+    if(hasShadow)
+    {
+        font->EnableShadow();
+        font->SetShadow(shadowDistance, shadowColor);
+    } else 
+    {
+        font->DisableShadow();
+    }
+    font->RenderText(str, x, y, anchor.scale * (screenDims.y / REF_HEIGHT), proj, col);
+    font->DisableShadow();
 }

@@ -47,6 +47,7 @@ ResourceManager* ResourceManager::CreateResourceManager(GLFWwindow* window, Worl
 ResourceManager::~ResourceManager()
 {
     if(context) glfwDestroyWindow(context);
+    if(loaderThread.joinable()) loaderThread.join();
 }
 
 void ResourceManager::StartLoading()
@@ -82,8 +83,11 @@ float ResourceManager::GetLoadStatus(std::string* str) const
         ss << "Loading Finished";
         *str = ss.str();
     }
-    return  (float)(modelsLoaded + texturesLoaded + materialsLoaded + fontsLoaded) / 
-        (totalModels + totalTextures + totalMaterials + totalFonts);
+    int d = totalModels + totalTextures + totalMaterials + totalFonts;
+    if(d == 0) return 1;
+
+    float r = (float)(modelsLoaded + texturesLoaded + materialsLoaded + fontsLoaded) / d;
+    return r;
 }
 
 bool ResourceManager::HasLoadingFinished() const { return finished; }

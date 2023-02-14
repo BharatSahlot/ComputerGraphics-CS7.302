@@ -5,15 +5,15 @@
 #include "Engine/Window/Window.hpp"
 #include "Game/Objects/LoadingBar.hpp"
 #include "Game/Worlds/LoadingWorld.hpp"
+#include "Game/Worlds/StartMenuWorld.hpp"
 
-Game::Game(std::shared_ptr<Window> window) : state(GameState::Loading)
+Game::Game(std::shared_ptr<Window> window) : state(GameState::None)
 {
     loadingWorld = new LoadingWorld(window, this);
-    startMenuWorld = new World(window);
+    startMenuWorld = new StartMenuWorld(window, this);
     gameWorld = new World(window);
 
-    activeWorld = loadingWorld;
-    loadingWorld->Start();
+    SetGameState(GameState::Loading);
 }
 
 void Game::Tick(float deltaTime)
@@ -36,17 +36,21 @@ void Game::SetGameState(GameState state)
 
     this->state = state;
     switch (state) {
-    case Loading:
-        SetActiveWorld(loadingWorld);
-        return;
-    case InMenu:
-        SetActiveWorld(startMenuWorld);
-        return;
-    case InGame:
-    case Paused:
-    case Ended:
-        SetActiveWorld(gameWorld);
-      break;
+        case Loading:
+            startMenuWorld->GetResourceManager().StartLoading();
+            SetActiveWorld(loadingWorld);
+            return;
+        case InMenu:
+            gameWorld->GetResourceManager().StartLoading();
+            SetActiveWorld(startMenuWorld);
+            return;
+        case InGame:
+        case Paused:
+        case Ended:
+            SetActiveWorld(gameWorld);
+            break;
+        case None:
+            break;
     }
 }
 

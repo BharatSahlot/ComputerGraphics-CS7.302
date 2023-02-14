@@ -5,9 +5,11 @@
 #include "Engine/World.hpp"
 
 class LoadingWorld;
+class StartMenuWorld;
 
 enum GameState
 {
+    None,
     Loading,
     InMenu,
     InGame,
@@ -26,7 +28,8 @@ class Game
 
         void SetGameState(GameState state);
 
-        World& GetStartMenuWorld() const { return *startMenuWorld; }
+        StartMenuWorld& GetStartMenuWorld() const { return *startMenuWorld; }
+        World& GetGameWorld() const { return *gameWorld; }
 
         GameState GetState() const { return state; }
 
@@ -37,7 +40,7 @@ class Game
 
         World* activeWorld;
         LoadingWorld* loadingWorld;
-        World* startMenuWorld;
+        StartMenuWorld* startMenuWorld;
         World* gameWorld;
 };
 

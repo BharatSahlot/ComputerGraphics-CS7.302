@@ -11,13 +11,17 @@ class LoadingBar : public UIObject
     public:
         LoadingBar(World* world, std::string name, std::function<float(std::string* status)> statusFunc);
         
-        void Render() override;
+        bool IsDone() const { return fillAmount >= 0.99f; }
+        void Tick(float deltaTime) override;
+        // void Render() override;
 
     private:
         std::function<float(std::string* status)> statusFunc;
 
         std::shared_ptr<Bar> bar;
         std::shared_ptr<Text> text;
+
+        float fillAmount;
 };
 
 #endif

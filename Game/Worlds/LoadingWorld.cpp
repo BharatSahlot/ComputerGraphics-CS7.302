@@ -1,6 +1,7 @@
 #include "LoadingWorld.hpp"
 #include "Game/Objects/LoadingBar.hpp"
 #include "Engine/Window/Window.hpp"
+#include "Game/Worlds/StartMenuWorld.hpp"
 
 LoadingWorld::LoadingWorld(std::shared_ptr<Window> window, Game* game)
     : World(window), game(game)
@@ -24,7 +25,7 @@ void LoadingWorld::Start()
     GetResourceManager().StartLoading();
     GetResourceManager().Load();
 
-    InstantiateUIObject<LoadingBar>("LoadingBar", [=](std::string* str) -> float {
+    bar = InstantiateUIObject<LoadingBar>("LoadingBar", [=](std::string* str) -> float {
         return game->GetStartMenuWorld().GetResourceManager().GetLoadStatus(str);
     });
 
@@ -34,9 +35,10 @@ void LoadingWorld::Start()
 
 void LoadingWorld::Tick(float deltaTime) const
 {
-    if(game->GetStartMenuWorld().GetResourceManager().HasLoadingFinished())
+    if(bar->IsDone())
     {
         game->SetGameState(GameState::InMenu);
         return;
     }
+    World::Tick(deltaTime);
 }

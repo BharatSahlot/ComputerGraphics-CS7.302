@@ -9,6 +9,7 @@ class Camera : public Object
 {
     public:
         using Object::Object;
+        glm::vec3 clearColor;
         
         bool canMove = true;
 
