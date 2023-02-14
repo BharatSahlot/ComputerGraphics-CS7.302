@@ -3,31 +3,11 @@
 
 #include "Engine/Object.hpp"
 #include "Engine/Render/Font.hpp"
+#include "Engine/UI/UIObject.hpp"
 
-enum AnchorType
-{
-    BottomLeft,
-    BottomRight,
-    TopLeft,
-    TopRight,
-    Center,
-    CenterTop,
-    CenterBottom,
-};
-
-struct Anchor
-{
-    AnchorType anchorType;
-    glm::vec2 padding;
-    float scale;
-};
-
-class Text
+class Text : public UIObject
 {
     public:
-        World* world;
-        std::string name;
-
         Text(World* world, std::string name, std::shared_ptr<Font> font, Anchor anchor);
         Text(World* world, std::string name, std::string font, Anchor anchor);
 

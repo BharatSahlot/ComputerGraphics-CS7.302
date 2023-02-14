@@ -67,7 +67,7 @@ void Window::MakeCurrent()
     glfwMakeContextCurrent(this->glfwWindow);
 }
 
-void Window::Render(World* world)
+void Window::Render()
 {
     if(!this->cb) return;
 
@@ -80,8 +80,8 @@ void Window::Render(World* world)
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-    // glEnable(GL_LINE_SMOOTH);
-    // glHint(GL_LINE_SMOOTH_HINT,  GL_NICEST);
+    glEnable(GL_LINE_SMOOTH);
+    glHint(GL_LINE_SMOOTH_HINT,  GL_NICEST);
 
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -91,7 +91,7 @@ void Window::Render(World* world)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        if(this->cb(world))
+        if(this->cb())
         {
             break;
         }
@@ -126,7 +126,6 @@ void Window::FramebufferSizeCallback(GLFWwindow* win, int width, int height)
     if(window->camera)
     {
         window->camera->SetPerspective(60.0f, window->Aspect());
-        // window->camera->SetOrthographic(width, height);
     }
 
     glViewport(0, 0, width, height);
@@ -141,8 +140,6 @@ void Window::CursorMoveCallback(GLFWwindow* win, double x, double y)
     Window* window = glfwToWindow[win];
 
     glm::vec2 delta = window->cursorPos - pos;
-    // delta.x /= window->width;
-    // delta.y /= window->height;
     window->cursorDelta = delta;
     glfwSetCursorPos(win, (float)window->width / 2, (float)window->height / 2);
 

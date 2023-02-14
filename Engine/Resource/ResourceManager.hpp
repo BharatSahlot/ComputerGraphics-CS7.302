@@ -63,7 +63,7 @@ class ResourceManager
         std::shared_ptr<T> AddInResourceQueue(const std::string& name, ResourceLoadData<T> data);
         
         void StartLoading();
-        std::string GetLoadStatus() const;
+        float GetLoadStatus(std::string* str) const;
         bool HasLoadingFinished() const;
 
         // blocking call to finish loading

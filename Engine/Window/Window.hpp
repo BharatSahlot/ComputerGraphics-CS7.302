@@ -9,14 +9,11 @@
 #include <map>
 #include <memory>
 
-// so bad, not so bad
-extern float windowFade;
-
 class Window
 {
     public:
         std::shared_ptr<Camera> camera;
-        using RenderCallback = std::function<bool(World* world)>;
+        using RenderCallback = std::function<bool()>;
 
         static Window* Create(int width, int height, const char* title);
 
@@ -27,7 +24,7 @@ class Window
 
         void MakeCurrent();
         
-        void Render(World* world);
+        void Render();
         
         void SetRenderCallback(RenderCallback callback);
         

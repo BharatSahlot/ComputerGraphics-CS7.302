@@ -5,9 +5,8 @@
 #include <cmath>
 #include <iostream>
 
-World::World(std::shared_ptr<Window> window)
+World::World(std::shared_ptr<Window> window) : window(window)
 {
-    this->window = window;
     resourceManager = std::unique_ptr<ResourceManager>(ResourceManager::CreateResourceManager(window->GetGLFWwindow(), this));
 
     primitive = new Primitive(this);
@@ -16,10 +15,12 @@ World::World(std::shared_ptr<Window> window)
 void World::Tick(float deltaTime) const
 {
     for(auto x: objects) x->Tick(deltaTime);
+    for(auto x: uiObjs) x->Tick(deltaTime);
 }
 
 void World::Render()
 {
+    window->camera->Use(glm::vec2(window->Width(), window->Height()), glm::vec3(0, 0, 1.f));
     float cz = window->camera->Position().z;
     std::sort(objects.begin(), objects.end(), [cz](std::shared_ptr<Object> a, std::shared_ptr<Object> b) -> bool {
         bool ta = a->IsTransparent();
@@ -38,11 +39,12 @@ void World::Render()
     });
     for(auto x: objects) x->Render(window->camera->View(), window->camera->Proj());
 
-    for(auto x: textObjs) x->Render();
+    for(auto x: uiObjs) x->Render();
 }
 
 void World::Render(const Camera& camera)
 {
+    camera.Use(glm::vec2(window->Width(), window->Height()), glm::vec3(0, 0, 1.f));
     for(auto x: objects) x->Render(camera.View(), camera.Proj());
 }
 

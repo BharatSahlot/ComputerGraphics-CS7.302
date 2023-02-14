@@ -14,11 +14,11 @@ Camera::Camera(World* world, std::string name, glm::vec3 pos, glm::vec3 look) : 
     this->pos = pos;
 
     front = glm::normalize(look - pos);
-    right   = glm::normalize(glm::cross(front, glm::vec3(0, 1, 0)));
-    up      = glm::normalize(glm::cross(right, front));
+    right = glm::normalize(glm::cross(front, glm::vec3(0, 1, 0)));
+    up    = glm::normalize(glm::cross(right, front));
 
-    std::cout << "Front: " << front.x << ' ' << front.y << ' ' << front.z << std::endl;
-    std::cout << "Up: " << up.x << ' ' << up.y << ' ' << up.z << std::endl;
+    // std::cout << "Front: " << front.x << ' ' << front.y << ' ' << front.z << std::endl;
+    // std::cout << "Up: " << up.x << ' ' << up.y << ' ' << up.z << std::endl;
     view = glm::lookAt(pos, pos + front, up);
     canMove = false;
 }

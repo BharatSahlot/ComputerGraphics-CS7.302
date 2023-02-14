@@ -39,6 +39,8 @@ ResourceManager* ResourceManager::CreateResourceManager(GLFWwindow* window, Worl
     manager->context = context;
     manager->world = world;
     manager->finished = false;
+    manager->totalModels  = manager->totalTextures  = manager->totalMaterials  = manager->totalFonts = 0;
+    manager->modelsLoaded = manager->texturesLoaded = manager->materialsLoaded = manager->fontsLoaded = 0;
     return manager;
 }
 
@@ -49,33 +51,39 @@ ResourceManager::~ResourceManager()
 
 void ResourceManager::StartLoading()
 {
-    modelsLoaded = texturesLoaded = materialsLoaded = 0;
+    totalModels = totalTextures = totalMaterials = totalFonts = 0;
+    modelsLoaded = texturesLoaded = materialsLoaded = fontsLoaded = 0;
     loaderThread = std::thread([&]() {
         Loader();
     });
 }
 
-std::string ResourceManager::GetLoadStatus() const
+float ResourceManager::GetLoadStatus(std::string* str) const
 {
     std::stringstream ss;
     if(modelsLoaded < totalModels)
     {
         ss << "Loading models (" << modelsLoaded << "/" << totalModels << ")";
-        return ss.str();
-    }
-
-    if(texturesLoaded < totalTextures)
+        *str = ss.str();
+    } else if(texturesLoaded < totalTextures)
     {
         ss << "Loading textures (" << texturesLoaded << "/" << totalTextures << ")";
-        return ss.str();
-    }
-
-    if(materialsLoaded < totalMaterials)
+        *str = ss.str();
+    } else if(materialsLoaded < totalMaterials)
     {
         ss << "Loading materials (" << materialsLoaded << "/" << totalMaterials << ")";
-        return ss.str();
+        *str = ss.str();
+    } else if(fontsLoaded < totalFonts)
+    {
+        ss << "Loading fonts (" << fontsLoaded << "/" << totalFonts << ")";
+        *str = ss.str();
+    } else
+    {
+        ss << "Loading Finished";
+        *str = ss.str();
     }
-    return "Loading complete";
+    return  (float)(modelsLoaded + texturesLoaded + materialsLoaded + fontsLoaded) / 
+        (totalModels + totalTextures + totalMaterials + totalFonts);
 }
 
 bool ResourceManager::HasLoadingFinished() const { return finished; }
@@ -96,9 +104,11 @@ void ResourceManager::Load()
 
 void ResourceManager::Loader()
 {
+    totalModels = totalTextures = totalMaterials = totalFonts = 0;
     glfwMakeContextCurrent(context);
 
     totalModels = modelQueue.size();
+    totalFonts = fontQueue.size();
     while(!modelQueue.empty())
     {
         auto [name, data] = modelQueue.back();

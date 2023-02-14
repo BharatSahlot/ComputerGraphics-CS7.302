@@ -1,7 +1,6 @@
 #version 330 core
 
 layout (location = 0) out vec4 FragColor;
-layout (location = 1) out vec4 BrightColor;
 
 in vec2 TexCoords;
 
@@ -12,5 +11,4 @@ void main()
 {    
     vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, TexCoords).r);
     FragColor = vec4(textColor, 1.0) * sampled;
-    BrightColor = vec4(0);
 } 

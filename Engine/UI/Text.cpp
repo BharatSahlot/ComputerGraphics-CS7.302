@@ -4,8 +4,7 @@
 #include "Engine/World.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 
-Text::Text(World* world, std::string name, std::shared_ptr<Font> font, Anchor anchor) : world(world), 
-    name(name), 
+Text::Text(World* world, std::string name, std::shared_ptr<Font> font, Anchor anchor) : UIObject(world, name),
     anchor(anchor),
     font(font),
     col(glm::vec3(1, 1, 1)),
@@ -13,8 +12,7 @@ Text::Text(World* world, std::string name, std::shared_ptr<Font> font, Anchor an
 {
 }
 
-Text::Text(World* world, std::string name, std::string font, Anchor anchor) : world(world), 
-    name(name), 
+Text::Text(World* world, std::string name, std::string font, Anchor anchor) : UIObject(world, name),
     anchor(anchor),
     col(glm::vec3(1, 1, 1)),
     str("")
