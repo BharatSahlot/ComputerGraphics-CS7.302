@@ -87,6 +87,11 @@ void ResourceManager::Load()
     {
         model->Setup();
     }
+
+    for(auto& [name, font] : fontMap)
+    {
+        font->Setup();
+    }
 }
 
 void ResourceManager::Loader()
@@ -141,6 +146,25 @@ void ResourceManager::Loader()
         materialMap[name] = data.ptr;
         materialsLoaded++;
     }
+
+    while(!fontQueue.empty())
+    {
+        auto [name, data] = fontQueue.back();
+        fontQueue.pop_back();
+
+        if(!materialMap.count(data.mat))
+        {
+            std::cerr << "Material (" << data.mat << ") for font " << name << " does not exist" << std::endl;
+        }
+
+        if(data.ptr->Load(data.file, data.size, materialMap[data.mat]) == -1)
+        {
+            std::cerr << "Unable to load texture " << data.file << std::endl;
+        }
+        fontMap[name] = data.ptr;
+        fontsLoaded++;
+    }
+
     // flush the command queue
     glFinish();
     finished = true;
@@ -189,6 +213,20 @@ std::shared_ptr<Model> ResourceManager::AddInResourceQueue<Model>(const std::str
 }
 
 template<>
+std::shared_ptr<Font> ResourceManager::AddInResourceQueue<Font>(const std::string& name, ResourceLoadData<Font> data)
+{
+    for(auto& [tname, tdata]: fontQueue)
+    {
+        if(tname == name) return tdata.ptr;
+    }
+
+    std::shared_ptr<Font> ptr(new Font());
+    data.ptr = ptr;
+    fontQueue.push_back(std::make_pair(name, data));
+    return ptr;
+}
+
+template<>
 std::shared_ptr<Texture> ResourceManager::Get<>(const std::string &name) const { return textureMap.at(name); }
 
 template<>
@@ -196,3 +234,6 @@ std::shared_ptr<Material> ResourceManager::Get<>(const std::string &name) const 
 
 template<>
 std::shared_ptr<Model> ResourceManager::Get<>(const std::string &name) const { return modelMap.at(name); }
+
+template<>
+std::shared_ptr<Font> ResourceManager::Get<>(const std::string &name) const { return fontMap.at(name); }

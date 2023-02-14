@@ -47,6 +47,10 @@ int main(int argc, const char** argv)
         "Shaders/text.vs", "Shaders/text.fs"
     });
 
+    auto font = world->GetResourceManager().AddInResourceQueue<Font>("font", ResourceLoadData<Font>{
+        "Assets/font.ttf", 48, "fontMat"
+    });
+
     world->GetResourceManager().AddInResourceQueue<Material>("textMat", ResourceLoadData<Material> {
         "Shaders/text.vs", "Shaders/text.fs"
     });
@@ -55,11 +59,6 @@ int main(int argc, const char** argv)
         "Car/sportste.fbx"
     });
 
-    // auto roadsModel = world->GetResourceManager().AddInResourceQueue("roads", ResourceLoadData<Model> {
-    //     "Car/Low Poly Road Pack.obj"
-    // });
-
-    std::shared_ptr<Font> font(Font::LoadFont("Assets/font.ttf", 48, fontMat));
     world->GetResourceManager().StartLoading();
 
     // auto car = world->Instantiate<Object>("Car", carModel);
@@ -93,13 +92,11 @@ int main(int argc, const char** argv)
             wheelFL = world->GetObjectByName<Object>("WheelFL");
             wheelFR = world->GetObjectByName<Object>("WheelFR");
 
-
             text = world->InstantiateText("text", font, Anchor {
                 AnchorType::CenterTop,
                 glm::vec2(0, 0),
                 0.5f
             });
-            // world->Instantiate<Object>("Roads", roadsModel);
         }
 
         if(!loaded)

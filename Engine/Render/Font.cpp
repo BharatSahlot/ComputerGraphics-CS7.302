@@ -5,15 +5,38 @@
 
 Font* Font::LoadFont(const std::string& file, int size, std::shared_ptr<Material> mat)
 {
+    Font* font = new Font;
+    if(font->Load(file, size, mat) == -1)
+    {
+        delete font;
+        return nullptr;
+    }
+
+    glGenVertexArrays(1, &font->VAO);
+    glGenBuffers(1, &font->VBO);
+    glBindVertexArray(font->VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, font->VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    font->mat = mat;
+
+    return font;
+}
+
+int Font::Load(const std::string& file, int size, std::shared_ptr<Material> mat)
+{
     FT_Face face;
     if(FT_New_Face(ft, file.c_str(), 0, &face))
     {
         std::cerr << "Failed to load font " << file << std::endl;
-        return nullptr;
+        return -1;
     }
 
-    Font* font = new Font;
-    font->face = face;
+    this->face = face;
     FT_Set_Pixel_Sizes(face, 0, size);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // remove byte alignment requirement
@@ -49,24 +72,26 @@ Font* Font::LoadFont(const std::string& file, int size, std::shared_ptr<Material
             glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
             static_cast<unsigned int>(face->glyph->advance.x)
         };
-        font->characters[c] = character;
+        characters[c] = character;
     }
     glBindTexture(GL_TEXTURE_2D, 0);
     FT_Done_Face(face);
 
-    glGenVertexArrays(1, &font->VAO);
-    glGenBuffers(1, &font->VBO);
-    glBindVertexArray(font->VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, font->VBO);
+    this->mat = mat;
+    return 0;
+}
+
+void Font::Setup()
+{
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-
-    font->mat = mat;
-
-    return font;
 }
 
 void Font::RenderText(std::string text, float x, float y, float scale, glm::mat4 proj, glm::vec3 col)

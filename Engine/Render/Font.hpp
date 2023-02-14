@@ -22,11 +22,16 @@ class Font
 {
     public:
         static Font* LoadFont(const std::string& file, int size, std::shared_ptr<Material> mat);
+
+        int Load(const std::string& file, int size, std::shared_ptr<Material> mat);
+        void Setup();
+
         void RenderText(std::string text, float x, float y, float scale, glm::mat4 proj, glm::vec3 col);
 
         glm::vec2 GetTextDims(std::string text, float scale) const;
 
     private:
+        bool loaded = false;
         std::shared_ptr<Material> mat;
         FT_Face face;
         unsigned int VAO;

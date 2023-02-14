@@ -29,7 +29,7 @@ class Text
         std::string name;
 
         Text(World* world, std::string name, std::shared_ptr<Font> font, Anchor anchor);
-        // Text(World* world, std::string name, std::string font, Anchor anchor);
+        Text(World* world, std::string name, std::string font, Anchor anchor);
 
         void Render();
 

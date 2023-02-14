@@ -13,14 +13,14 @@ Text::Text(World* world, std::string name, std::shared_ptr<Font> font, Anchor an
 {
 }
 
-// Text::Text(World* world, std::string name, std::string font, Anchor anchor) : world(world), 
-//     name(name), 
-//     anchor(anchor),
-//     col(glm::vec3(1, 1, 1)),
-//     str("")
-// {
-//     this->font = world->GetResourceManager().Get<Font>(font);
-// }
+Text::Text(World* world, std::string name, std::string font, Anchor anchor) : world(world), 
+    name(name), 
+    anchor(anchor),
+    col(glm::vec3(1, 1, 1)),
+    str("")
+{
+    this->font = world->GetResourceManager().Get<Font>(font);
+}
 
 void Text::Render()
 {
