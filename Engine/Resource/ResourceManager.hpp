@@ -21,6 +21,7 @@ struct ResourceLoadData<Material>
 {
     std::string vertexShaderFile;
     std::string fragmentShaderFile;
+
     std::shared_ptr<Material> ptr;
 };
 

@@ -109,3 +109,25 @@ void Font::RenderText(std::string text, float x, float y, float scale, glm::mat4
         x += (ch.advance >> 6) * scale;
     }
 }
+
+glm::vec2 Font::GetTextDims(std::string text, float scale) const
+{
+    glm::vec2 res(0, 0);
+    float x = 0, y = 0;
+    for(char c: text)
+    {
+        auto ch = characters.at(c);
+
+        float xpos = x + ch.bearing.x * scale;
+        float ypos = y - (ch.size.y - ch.bearing.y) * scale;
+
+        float w = ch.size.x * scale;
+        float h = ch.size.y * scale;
+
+        res.x = xpos + w;
+        res.y = std::max(res.y, ypos + h);
+
+        x += (ch.advance >> 6) * scale;
+    }
+    return res;
+}

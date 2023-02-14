@@ -37,6 +37,8 @@ void World::Render()
         return az < bz;
     });
     for(auto x: objects) x->Render(window->camera->View(), window->camera->Proj());
+
+    for(auto x: textObjs) x->Render();
 }
 
 void World::Render(const Camera& camera)
