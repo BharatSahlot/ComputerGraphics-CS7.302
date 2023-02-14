@@ -6,12 +6,13 @@
 #include "Game/Objects/LoadingBar.hpp"
 #include "Game/Worlds/LoadingWorld.hpp"
 #include "Game/Worlds/StartMenuWorld.hpp"
+#include "Game/Worlds/GameWorld.hpp"
 
 Game::Game(std::shared_ptr<Window> window) : state(GameState::None)
 {
     loadingWorld = new LoadingWorld(window, this);
     startMenuWorld = new StartMenuWorld(window, this);
-    gameWorld = new World(window);
+    gameWorld = new GameWorld(window, this);
 
     SetGameState(GameState::Loading);
 }

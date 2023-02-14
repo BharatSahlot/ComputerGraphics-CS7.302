@@ -13,7 +13,6 @@ void main()
 {
     float br = clamp(dot(Normal, normalize(vec3(-0.5, 1, 0))), 0.1, 1) * 3;
     vec3 tex = texture(texture1, TexCoords).rgb * br;
-    // tex = vec3(TexCoords, 0);
     FragColor = vec4(tex, 1);
     float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
     if(brightness > 1.0) BrightColor = FragColor;

@@ -72,7 +72,7 @@ void Camera::Tick(float deltaTime)
     if(world->GetWindow().GetKeyDown(GLFW_KEY_A)) offset -= right;
     if(world->GetWindow().GetKeyDown(GLFW_KEY_D)) offset += right;
 
-    offset *= 10 * deltaTime;
+    offset *= 100 * deltaTime;
     pos += offset;
 
     view = glm::lookAt(pos, pos + front, up);

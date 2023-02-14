@@ -10,10 +10,11 @@ class GameWorld : public World
         GameWorld(std::shared_ptr<Window> window, Game* game);
 
         void Start() override;
-        void Tick(float deltaTime) const override;
+        // void Tick(float deltaTime) const override;
 
     private:
         Game* game;
+        std::shared_ptr<Camera> camera;
 };
 
 #endif

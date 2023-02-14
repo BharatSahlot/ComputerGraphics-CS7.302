@@ -6,6 +6,7 @@
 
 class LoadingWorld;
 class StartMenuWorld;
+class GameWorld;
 
 enum GameState
 {
@@ -29,7 +30,7 @@ class Game
         void SetGameState(GameState state);
 
         StartMenuWorld& GetStartMenuWorld() const { return *startMenuWorld; }
-        World& GetGameWorld() const { return *gameWorld; }
+        GameWorld& GetGameWorld() const { return *gameWorld; }
 
         GameState GetState() const { return state; }
 
@@ -41,7 +42,7 @@ class Game
         World* activeWorld;
         LoadingWorld* loadingWorld;
         StartMenuWorld* startMenuWorld;
-        World* gameWorld;
+        GameWorld* gameWorld;
 };
 
 #endif

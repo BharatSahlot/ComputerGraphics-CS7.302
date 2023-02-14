@@ -2,7 +2,9 @@
 #include "Engine/UI/Text.hpp"
 #include "Engine/UI/UIObject.hpp"
 #include "Engine/Window/Window.hpp"
+#include "GLFW/glfw3.h"
 #include "Game/Objects/LoadingBar.hpp"
+#include "Game/Worlds/GameWorld.hpp"
 
 StartMenuWorld::StartMenuWorld(std::shared_ptr<Window> window, Game* game) : World(window), game(game)
 {
@@ -71,5 +73,11 @@ void StartMenuWorld::Tick(float deltaTime) const
 {
     float y = glm::degrees(car->transform->GetLocalRotation().y) + deltaTime * 50.f;
     car->transform->SetLocalRotation(glm::vec3(0, glm::radians(y), 0));
+
+    if(window->GetKeyDown(GLFW_KEY_ENTER))
+    {
+        game->SetGameState(GameState::InGame);
+    }
+
     World::Tick(deltaTime);
 }
