@@ -1,10 +1,12 @@
 #include "Engine/Camera.hpp"
 #include "Engine/Engine.hpp"
 #include "Engine/Object.hpp"
+#include "Engine/Render/Font.hpp"
 #include "Engine/Render/Material.hpp"
 #include "Engine/Render/Mesh.hpp"
 #include "Engine/Render/Texture.hpp"
 #include "Engine/Resource/ResourceManager.hpp"
+#include "Engine/UI/Text.hpp"
 #include "Engine/Utils/Timer.hpp"
 #include "Engine/Utils/Util.hpp"
 #include "Engine/Window/Window.hpp"
@@ -41,6 +43,14 @@ int main(int argc, const char** argv)
         "Shaders/base.vs", "Shaders/base.fs"
     });
 
+    auto fontMat = world->GetResourceManager().AddInResourceQueue<Material>("fontMat", ResourceLoadData<Material> {
+        "Shaders/text.vs", "Shaders/text.fs"
+    });
+
+    auto font = world->GetResourceManager().AddInResourceQueue<Font>("font", ResourceLoadData<Font>{
+        "Assets/font.ttf", 48, "fontMat"
+    });
+
     world->GetResourceManager().AddInResourceQueue<Material>("textMat", ResourceLoadData<Material> {
         "Shaders/text.vs", "Shaders/text.fs"
     });
@@ -49,16 +59,14 @@ int main(int argc, const char** argv)
         "Car/sportste.fbx"
     });
 
-    // auto roadsModel = world->GetResourceManager().AddInResourceQueue("roads", ResourceLoadData<Model> {
-    //     "Car/Low Poly Road Pack.obj"
-    // });
-
     world->GetResourceManager().StartLoading();
 
     // auto car = world->Instantiate<Object>("Car", carModel);
     std::shared_ptr<Object> car;
     const Object* wheelFL = nullptr;
     const Object* wheelFR = nullptr;
+
+    std::shared_ptr<Text> text;
 
     auto camera = world->Instantiate<Camera>("Camera");
     window->SetCamera(camera);
@@ -84,7 +92,11 @@ int main(int argc, const char** argv)
             wheelFL = world->GetObjectByName<Object>("WheelFL");
             wheelFR = world->GetObjectByName<Object>("WheelFR");
 
-            // world->Instantiate<Object>("Roads", roadsModel);
+            text = world->InstantiateText("text", font, Anchor {
+                AnchorType::CenterTop,
+                glm::vec2(0, 0),
+                0.5f
+            });
         }
 
         if(!loaded)
@@ -92,6 +104,12 @@ int main(int argc, const char** argv)
             std::cout << world->GetResourceManager().GetLoadStatus() << std::endl;
             return false;
         }
+
+        int fps = (int)std::round(1.f / delta);
+        text->SetText("FPS:" + std::to_string(fps));
+
+        if(fps >= 59) text->SetColor(glm::vec3(0.2, 1, 0.2));
+        else text->SetColor(glm::vec3(1, 0.2, 0.2));
 
         if(window->GetKeyDown(GLFW_KEY_LEFT)) angle += delta * 70.f;
         if(window->GetKeyDown(GLFW_KEY_RIGHT)) angle -= delta * 70.f;
@@ -113,6 +131,7 @@ int main(int argc, const char** argv)
         mapCamera->SetPerspective(60.f, window->Aspect());
         mapCamera->Use(glm::vec2(window->Width(), window->Height()), glm::vec3(15, -15, 0.2f));
         world->Render(*mapCamera);
+
         return false;
     });
 

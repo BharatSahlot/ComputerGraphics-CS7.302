@@ -5,6 +5,7 @@
 #include "Engine/Object.hpp"
 #include "Engine/Render/Primitive/Primitive.hpp"
 #include "Engine/Resource/ResourceManager.hpp"
+#include "Engine/UI/Text.hpp"
 #include <memory>
 #include <optional>
 
@@ -27,6 +28,14 @@ class World
         {
             std::shared_ptr<T> ptr(new T(this, name, args...));
             objects.push_back(ptr);
+            return ptr;
+        }
+
+        template<class... Us>
+        std::shared_ptr<Text> InstantiateText(std::string name, Us... args)
+        {
+            std::shared_ptr<Text> ptr(new Text(this, name, args...));
+            textObjs.push_back(ptr);
             return ptr;
         }
 
@@ -55,6 +64,8 @@ class World
 
         // should really be unique ptr
         std::vector<std::shared_ptr<Object>> objects;
+
+        std::vector<std::shared_ptr<Text>> textObjs;
 };
 
 #endif
