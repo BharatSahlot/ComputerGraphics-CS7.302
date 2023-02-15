@@ -16,6 +16,7 @@ class GameWorld : public World
     private:
         Game* game;
         std::shared_ptr<Camera> camera;
+        std::shared_ptr<Camera> mapCamera;
         std::shared_ptr<Sky> sky;
 };
 

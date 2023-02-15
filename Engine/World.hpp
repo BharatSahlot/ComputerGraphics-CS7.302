@@ -76,12 +76,11 @@ class World
     protected:
         std::shared_ptr<Window> window;
 
-    private:
-        Primitive* primitive = nullptr;
-        std::unique_ptr<ResourceManager> resourceManager;
-
         // should really be unique ptr
         std::vector<std::shared_ptr<Object>> objects;
+
+        Primitive* primitive = nullptr;
+        std::unique_ptr<ResourceManager> resourceManager;
 
         std::vector<std::shared_ptr<UIObject>> uiObjs;
 };
