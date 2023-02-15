@@ -4,6 +4,7 @@
 #include "Engine/Render/Font.hpp"
 #include "Engine/Render/Material.hpp"
 #include "Engine/Render/Model.hpp"
+#include "Engine/Render/Sky.hpp"
 #include "Engine/Render/Texture.hpp"
 #include "GLFW/glfw3.h"
 
@@ -41,6 +42,14 @@ struct ResourceLoadData<Model>
     std::string file;
 
     std::shared_ptr<Model> ptr;
+};
+
+template<>
+struct ResourceLoadData<Sky>
+{
+    std::vector<std::string> faces;
+
+    std::shared_ptr<Sky> ptr;
 };
 
 template<>
@@ -85,16 +94,20 @@ class ResourceManager
         int totalTextures, totalMaterials, totalModels, totalFonts;
         int texturesLoaded, materialsLoaded, modelsLoaded, fontsLoaded;
 
+        // somehow make this just one queue
         std::vector<std::pair<std::string, ResourceLoadData<Texture>>> textureQueue;
         std::vector<std::pair<std::string, ResourceLoadData<Material>>> materialQueue;
         std::vector<std::pair<std::string, ResourceLoadData<Model>>> modelQueue;
         std::vector<std::pair<std::string, ResourceLoadData<Font>>> fontQueue;
+        std::vector<std::pair<std::string, ResourceLoadData<Sky>>> skyQueue;
 
+        // make this just one map
         std::unordered_map<std::string, Shader*> shaderMap;
         std::unordered_map<std::string, std::shared_ptr<Texture>> textureMap;
         std::unordered_map<std::string, std::shared_ptr<Material>> materialMap;
         std::unordered_map<std::string, std::shared_ptr<Model>> modelMap;
         std::unordered_map<std::string, std::shared_ptr<Font>> fontMap;
+        std::unordered_map<std::string, std::shared_ptr<Sky>> skyMap;
 };
 
 #endif

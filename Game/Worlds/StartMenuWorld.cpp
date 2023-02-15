@@ -82,3 +82,8 @@ void StartMenuWorld::Tick(float deltaTime) const
 
     World::Tick(deltaTime);
 }
+
+void StartMenuWorld::Render()
+{
+    World::Render();
+}

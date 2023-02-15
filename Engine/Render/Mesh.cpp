@@ -107,7 +107,7 @@ void Mesh::Render(glm::mat4 model, glm::mat4 view, glm::mat4 proj) const
     {
         if(material->Use() == -1)
         {
-            // std::cerr << "Error rendering mesh " << name << std::endl;
+            std::cerr << "Error rendering mesh " << name << std::endl;
         }
         material->SetUniformMat4("model", model);
         material->SetUniformMat4("view", view);

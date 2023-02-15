@@ -26,8 +26,8 @@ class World
 
         virtual void Start() {};
         virtual void Tick(float deltaTime) const;
-        void Render();
-        void Render(const Camera& camera);
+        virtual void Render();
+        virtual void Render(const Camera& camera);
 
         template<typename T, typename... Us>
         std::shared_ptr<T> Instantiate(std::string name, Us... args)

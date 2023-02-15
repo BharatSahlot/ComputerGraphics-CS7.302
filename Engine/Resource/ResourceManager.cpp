@@ -104,6 +104,11 @@ void ResourceManager::Load()
     {
         font->Setup();
     }
+
+    for(auto& [name, font] : skyMap)
+    {
+        font->Setup();
+    }
 }
 
 void ResourceManager::Loader()
@@ -126,7 +131,7 @@ void ResourceManager::Loader()
         modelsLoaded++;
     }
 
-    totalTextures = textureQueue.size();
+    totalTextures = textureQueue.size() + skyQueue.size();
     totalMaterials = materialQueue.size();
     while(!textureQueue.empty())
     {
@@ -138,6 +143,19 @@ void ResourceManager::Loader()
             std::cerr << "Unable to load texture " << data.file << std::endl;
         }
         textureMap[name] = data.ptr;
+        texturesLoaded++;
+    }
+
+    while(!skyQueue.empty())
+    {
+        auto [name, data] = skyQueue.back();
+        skyQueue.pop_back();
+
+        if(data.ptr->Load(data.faces) == -1)
+        {
+            std::cerr << "Unable to load sky " << name << std::endl;
+        }
+        skyMap[name] = data.ptr;
         texturesLoaded++;
     }
 
@@ -153,14 +171,12 @@ void ResourceManager::Loader()
             Shader* shader = Shader::MakeShader(data.vertexShaderFile.c_str(), GL_VERTEX_SHADER);
             if(shader == nullptr) shader = shaderMap.at("Shaders/base.vs");
             shaderMap[data.vertexShaderFile] = shader;
-            // shaderMap[data.vertexShaderFile] = Shader::MakeShader(data.vertexShaderFile.c_str(), GL_VERTEX_SHADER);
         }
 
         if(!shaderMap.count(data.fragmentShaderFile))
         {
             Shader* shader = Shader::MakeShader(data.fragmentShaderFile.c_str(), GL_FRAGMENT_SHADER);
             if(shader == nullptr) shader = shaderMap.at("Shaders/base.fs");
-            // shaderMap[data.fragmentShaderFile] = Shader::MakeShader(data.fragmentShaderFile.c_str(), GL_FRAGMENT_SHADER);
             shaderMap[data.fragmentShaderFile] = shader;
         }
 
@@ -249,6 +265,20 @@ std::shared_ptr<Font> ResourceManager::AddInResourceQueue<Font>(const std::strin
 }
 
 template<>
+std::shared_ptr<Sky> ResourceManager::AddInResourceQueue<Sky>(const std::string& name, ResourceLoadData<Sky> data)
+{
+    for(auto& [tname, tdata]: skyQueue)
+    {
+        if(tname == name) return tdata.ptr;
+    }
+
+    std::shared_ptr<Sky> ptr(new Sky(world));
+    data.ptr = ptr;
+    skyQueue.push_back(std::make_pair(name, data));
+    return ptr;
+}
+
+template<>
 std::shared_ptr<Texture> ResourceManager::Get<>(const std::string &name) const { return textureMap.at(name); }
 
 template<>
@@ -259,3 +289,6 @@ std::shared_ptr<Model> ResourceManager::Get<>(const std::string &name) const { r
 
 template<>
 std::shared_ptr<Font> ResourceManager::Get<>(const std::string &name) const { return fontMap.at(name); }
+
+template<>
+std::shared_ptr<Sky> ResourceManager::Get<>(const std::string &name) const { return skyMap.at(name); }

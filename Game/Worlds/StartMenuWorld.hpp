@@ -11,6 +11,7 @@ class StartMenuWorld : public World
 
         void Start() override;
         void Tick(float deltaTime) const override;
+        void Render() override;
 
     private:
         std::shared_ptr<Camera> camera;

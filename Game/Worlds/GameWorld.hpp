@@ -11,10 +11,12 @@ class GameWorld : public World
 
         void Start() override;
         // void Tick(float deltaTime) const override;
+        void Render() override;
 
     private:
         Game* game;
         std::shared_ptr<Camera> camera;
+        std::shared_ptr<Sky> sky;
 };
 
 #endif

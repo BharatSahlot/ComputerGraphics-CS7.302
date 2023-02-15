@@ -8,8 +8,18 @@ GameWorld::GameWorld(std::shared_ptr<Window> window, Game* game) : World(window)
     });
 
     GetResourceManager().AddInResourceQueue("car", ResourceLoadData<Model> {
-        // "Car/sportste.fbx"
         "Assets/Car.fbx"
+    });
+
+    sky = GetResourceManager().AddInResourceQueue("sky", ResourceLoadData<Sky> {
+        {
+            "Assets/skybox/right.png",
+            "Assets/skybox/left.png",
+            "Assets/skybox/top.png",
+            "Assets/skybox/bottom.png",
+            "Assets/skybox/front.png",
+            "Assets/skybox/back.png",
+        }
     });
 
     camera = Instantiate<Camera>("camera", glm::vec3(0, 15, -50), glm::vec3(0, 0, 0));
@@ -27,4 +37,10 @@ void GameWorld::Start()
     Object* obj = GetObjectByName<Object>("Start");
     auto car = Instantiate<Object>("playerCar", "car");
     car->transform->SetLocalPosition(obj->transform->GetWorldPosition());
+}
+
+void GameWorld::Render()
+{
+    World::Render();
+    sky->Render(camera->View(), camera->Proj());
 }
