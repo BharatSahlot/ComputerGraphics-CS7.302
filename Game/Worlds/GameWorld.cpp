@@ -4,11 +4,12 @@
 GameWorld::GameWorld(std::shared_ptr<Window> window, Game* game) : World(window)
 {
     GetResourceManager().AddInResourceQueue("RaceTrack", ResourceLoadData<Model> {
-        "Assets/race_track.fbx"
+        "Assets/race_track_1.fbx"
     });
 
     GetResourceManager().AddInResourceQueue("car", ResourceLoadData<Model> {
-        "Car/sportste.fbx"
+        // "Car/sportste.fbx"
+        "Assets/Car.fbx"
     });
 
     camera = Instantiate<Camera>("camera", glm::vec3(0, 15, -50), glm::vec3(0, 0, 0));

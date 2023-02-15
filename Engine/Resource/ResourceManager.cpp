@@ -34,7 +34,7 @@ ResourceManager* ResourceManager::CreateResourceManager(GLFWwindow* window, Worl
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
         glDebugMessageCallback(glDebugOutput, nullptr);
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-    } 
+    }
 
     manager->context = context;
     manager->world = world;
@@ -141,6 +141,8 @@ void ResourceManager::Loader()
         texturesLoaded++;
     }
 
+    shaderMap["Shaders/base.vs"] = Shader::MakeShader("Shaders/base.vs", GL_VERTEX_SHADER);
+    shaderMap["Shaders/base.fs"] = Shader::MakeShader("Shaders/base.fs", GL_FRAGMENT_SHADER);
     while(!materialQueue.empty())
     {
         auto [name, data] = materialQueue.back();
@@ -148,12 +150,18 @@ void ResourceManager::Loader()
 
         if(!shaderMap.count(data.vertexShaderFile))
         {
-            shaderMap[data.vertexShaderFile] = Shader::MakeShader(data.vertexShaderFile.c_str(), GL_VERTEX_SHADER);
+            Shader* shader = Shader::MakeShader(data.vertexShaderFile.c_str(), GL_VERTEX_SHADER);
+            if(shader == nullptr) shader = shaderMap.at("Shaders/base.vs");
+            shaderMap[data.vertexShaderFile] = shader;
+            // shaderMap[data.vertexShaderFile] = Shader::MakeShader(data.vertexShaderFile.c_str(), GL_VERTEX_SHADER);
         }
 
         if(!shaderMap.count(data.fragmentShaderFile))
         {
-            shaderMap[data.fragmentShaderFile] = Shader::MakeShader(data.fragmentShaderFile.c_str(), GL_FRAGMENT_SHADER);
+            Shader* shader = Shader::MakeShader(data.fragmentShaderFile.c_str(), GL_FRAGMENT_SHADER);
+            if(shader == nullptr) shader = shaderMap.at("Shaders/base.fs");
+            // shaderMap[data.fragmentShaderFile] = Shader::MakeShader(data.fragmentShaderFile.c_str(), GL_FRAGMENT_SHADER);
+            shaderMap[data.fragmentShaderFile] = shader;
         }
 
         data.ptr->Load(shaderMap.at(data.vertexShaderFile), shaderMap.at(data.fragmentShaderFile));
