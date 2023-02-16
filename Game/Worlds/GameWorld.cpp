@@ -81,16 +81,20 @@ void GameWorld::Render()
     for(auto x: objects) x->Render(camera->View(), camera->Proj());
     for(auto x: uiObjs) x->Render();
 
-    glm::vec3 position = GetObjectByName<Object>("playerCar")->transform->GetWorldPosition();
-    glm::vec3 rotation = GetObjectByName<Object>("playerCar")->transform->GetLocalRotation();
-    auto rX = glm::rotate(glm::mat4(1), rotation.x, glm::vec3(1, 0, 0));
-    auto rY = glm::rotate(glm::mat4(1), rotation.y, glm::vec3(0, 1, 0));
-    auto rZ = glm::rotate(glm::mat4(1), rotation.z, glm::vec3(0, 0, 1));
-    auto mat = rZ * rY * rX;
+    // glm::vec3 position = GetObjectByName<Object>("playerCar")->transform->GetWorldPosition();
+    // glm::vec3 rotation = GetObjectByName<Object>("playerCar")->transform->GetLocalRotation();
+    // auto rX = glm::rotate(glm::mat4(1), rotation.x, glm::vec3(1, 0, 0));
+    // auto rY = glm::rotate(glm::mat4(1), rotation.y, glm::vec3(0, 1, 0));
+    // auto rZ = glm::rotate(glm::mat4(1), rotation.z, glm::vec3(0, 0, 1));
+    // auto mat = rZ * rY * rX;
+    //
+    // glm::vec3 forward = glm::normalize(mat * glm::vec4(0, 0, 1, 0));
+    // position.y += 25.f;
+    // primitive->DrawLine(position, position + forward * 30.f, glm::vec3(1, 0, 0));
 
-    glm::vec3 forward = glm::normalize(mat * glm::vec4(0, 0, 1, 0));
-    position.y += 25.f;
-    primitive->DrawLine(position, position + forward * 30.f, glm::vec3(1, 0, 0));
+    auto player = GetObjectByName<Object>("playerCar");
+    auto lines = player->GetBounds().GetRotatedBox(player->transform->GetModelMatrix());
+    DrawRotatedBox(lines);
 
     sky->Render(camera->View(), camera->Proj());
 

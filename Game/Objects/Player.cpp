@@ -27,6 +27,12 @@ glm::vec3 ClampMagnitude(glm::vec3 vec, float minMag, float maxMag)
     return vec;
 }
 
+float AbsMin(float a, float b)
+{
+    if(std::abs(a) < std::abs(b)) return a;
+    return b;
+}
+
 Player::Player(World* world, std::string name, const std::string& model, Game* game, PlayerSettings settings)
     : Object(world, name, model), game(game), settings(settings)
 {
@@ -56,12 +62,15 @@ void Player::Tick(float deltaTime)
     glm::vec3 forward = CalcForward(glm::vec3(0, glm::radians(velRotation), 0));
     velocity += forward * delta * deltaTime;
 
+    float carBodyZAngle = 0.f;
+
     if(glm::epsilonNotEqual(0.f, glm::length(velocity), glm::epsilon<float>()))
     {
         glm::vec3 velNorm = glm::normalize(velocity);
 
         float speed = glm::length(velocity);
-        float angleFV = glm::orientedAngle(forward, velNorm, glm::vec3(0, 1, 0));
+        carBodyZAngle = AbsMin(glm::orientedAngle(forward, velNorm, glm::vec3(0, 1, 0)),
+                glm::orientedAngle(-forward, velNorm, glm::vec3(0, 1, 0))) / 5.f;
 
         float t = 1 - glm::abs(glm::dot(forward, velNorm));
         t = glm::clamp(t * 25, 0.f, 1.f);
@@ -77,8 +86,11 @@ void Player::Tick(float deltaTime)
 
         prevRotation = velRotation;
         transform->SetLocalRotation(glm::vec3(0, glm::radians(bodyRotation), 0));
-        carBody->transform->SetLocalRotation(glm::vec3(0, angleFV / 5.f, 0));
     } else velocity = glm::vec3(0, 0, 0);
+
+
+    float carBodyZCurAngle = carBody->transform->GetLocalRotation().y;
+    carBody->transform->SetLocalRotation(glm::vec3(0, glm::mix(carBodyZCurAngle, carBodyZAngle, 5.f * deltaTime), 0));
 
     transform->SetWorldPosition(transform->GetWorldPosition() + velocity);
 
