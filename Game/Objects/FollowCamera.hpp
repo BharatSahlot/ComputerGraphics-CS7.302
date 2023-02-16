@@ -13,9 +13,11 @@ class FollowCamera : public Camera
 
     private:
         Object* player;
-        glm::vec3 front;
+
+        glm::vec3 front, targetFront;
         glm::vec3 up;
         glm::vec3 offset;
+        glm::vec3 targetPos;
 };
 
 #endif

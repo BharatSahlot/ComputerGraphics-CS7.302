@@ -17,10 +17,10 @@ FollowCamera::FollowCamera(World* world, std::string name, std::string player, g
 
 void FollowCamera::Start()
 {
-    glm::vec3 playerPos = player->transform->GetWorldPosition() + glm::vec3(0, 15, 0);
-    pos = player->transform->GetModelMatrix() * glm::vec4(offset, 1);
+    glm::vec3 playerPos = player->transform->GetWorldPosition() + glm::vec3(0, 25, 0);
+    targetPos = pos = player->transform->GetModelMatrix() * glm::vec4(offset, 1);
 
-    front = glm::normalize(playerPos - pos);
+    targetFront = front = glm::normalize(playerPos - pos);
     glm::vec3 right = glm::normalize(glm::cross(front, glm::vec3(0, 1, 0)));
     up    = glm::normalize(glm::cross(right, front));
 
@@ -29,10 +29,12 @@ void FollowCamera::Start()
 
 void FollowCamera::Tick(float deltaTime)
 {
-    glm::vec3 playerPos = player->transform->GetWorldPosition() + glm::vec3(0, 15, 0);
-    pos = player->transform->GetModelMatrix() * glm::vec4(offset, 1);
+    glm::vec3 playerPos = player->transform->GetWorldPosition() + glm::vec3(0, 25, 0);
+    targetPos = player->transform->GetModelMatrix() * glm::vec4(offset, 1);
+    pos = glm::mix(pos, targetPos, glm::clamp(20.f * deltaTime, 0.f, 1.f));
 
-    front = glm::normalize(playerPos - pos);
+    targetFront = glm::normalize(playerPos - pos);
+    front = glm::mix(front, targetFront, glm::clamp(15.f * deltaTime, 0.f, 1.f));
     glm::vec3 right = glm::normalize(glm::cross(front, glm::vec3(0, 1, 0)));
     up    = glm::normalize(glm::cross(right, front));
 

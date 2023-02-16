@@ -46,7 +46,7 @@ void GameWorld::Start()
     });
     car->transform->SetLocalPosition(obj->transform->GetWorldPosition());
 
-    camera = Instantiate<FollowCamera>("camera", "playerCar", glm::vec3(0, 500, -750));
+    camera = Instantiate<FollowCamera>("camera", "playerCar", glm::vec3(0, 400, -750));
     camera->clearColor = glm::vec3(21.f, 154.f, 198.f) / 255.f;
     camera->canMove = true;
 
