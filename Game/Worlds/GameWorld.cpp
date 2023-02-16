@@ -1,5 +1,6 @@
 #include "GameWorld.hpp"
 #include "Engine/Window/Window.hpp"
+#include "Game/Objects/Player.hpp"
 #include "glm/ext/matrix_transform.hpp"
 
 GameWorld::GameWorld(std::shared_ptr<Window> window, Game* game) : World(window)
@@ -31,7 +32,10 @@ void GameWorld::Start()
     Instantiate<Object>("raceTrack", "RaceTrack");
 
     Object* obj = GetObjectByName<Object>("Start");
-    auto car = Instantiate<Object>("playerCar", "car");
+
+    auto car = Instantiate<Player>("playerCar", "car", game, PlayerSettings {
+        15.f, 7.f, 5.f, 5.f, -3.f, 25.f
+    });
     car->transform->SetLocalPosition(obj->transform->GetWorldPosition());
 
     camera = Instantiate<FollowCamera>("camera", "playerCar", glm::vec3(0, 500, -750));
@@ -75,8 +79,7 @@ void GameWorld::Render()
     auto mat = rZ * rY * rX;
 
     glm::vec3 forward = glm::normalize(mat * glm::vec4(0, 0, 1, 0));
-    position.y += 40.f;
-    // std::cout << position.x << ' ' << position.y << ' ' << position.z << std::endl;
+    position.y += 25.f;
     primitive->DrawLine(position, position + forward * 30.f, glm::vec3(1, 0, 0));
 
     sky->Render(camera->View(), camera->Proj());
