@@ -50,15 +50,6 @@ void World::Render(const Camera& camera)
 
 void World::DrawRotatedBox(std::vector<glm::vec3> points) const
 {
-    static bool once = true;
-    if(once)
-    {
-        for(auto x: points)
-        {
-            std::cout << x.x << ' ' << x.y << ' ' << x.z << std::endl;
-        }
-    }
-    once = false;
     primitive->DrawLine(points[0], points[1]);
     primitive->DrawLine(points[1], points[2]);
     primitive->DrawLine(points[2], points[3]);

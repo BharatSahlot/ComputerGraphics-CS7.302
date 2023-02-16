@@ -3,6 +3,7 @@
 
 #include "Engine/World.hpp"
 #include "Game/Game.hpp"
+#include "Game/Objects/MapCamera.hpp"
 
 class GameWorld : public World
 {
@@ -16,7 +17,7 @@ class GameWorld : public World
     private:
         Game* game;
         std::shared_ptr<Camera> camera;
-        std::shared_ptr<Camera> mapCamera;
+        std::shared_ptr<MapCamera> mapCamera;
         std::shared_ptr<Sky> sky;
 };
 
