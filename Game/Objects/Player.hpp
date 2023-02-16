@@ -8,12 +8,15 @@ struct PlayerSettings
 {
     float accel;
     float brake;
-    float friction;
+    float minFriction;
+    float maxFriction;
 
     float maxSpeed; // forward speed
     float minSpeed; // reverse speed
 
+    float maxTurn;
     float rotSpeed;
+    float bodyRotSpeed;
 };
 
 class Player : public Object
@@ -29,7 +32,12 @@ class Player : public Object
         PlayerSettings settings;
 
         glm::vec3 velocity;
-        glm::vec3 rotation;
+        float velRotation;
+        float bodyRotation;
+        float prevRotation;
+
+        Object* carBody;
+        std::vector<Object*> wheels;
 };
 
 #endif

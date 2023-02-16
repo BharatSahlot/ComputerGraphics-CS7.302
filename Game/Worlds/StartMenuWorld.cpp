@@ -68,6 +68,8 @@ void StartMenuWorld::Start()
     ->SetText("Use WASD to control car. Escape for pause.");
 
     car = Instantiate<Object>("car", "car");
+
+    World::Start();
 }
 
 void StartMenuWorld::Tick(float deltaTime) const

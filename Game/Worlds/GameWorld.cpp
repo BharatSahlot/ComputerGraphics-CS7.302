@@ -34,7 +34,15 @@ void GameWorld::Start()
     Object* obj = GetObjectByName<Object>("Start");
 
     auto car = Instantiate<Player>("playerCar", "car", game, PlayerSettings {
-        15.f, 7.f, 5.f, 5.f, -3.f, 25.f
+        20.f, // accel 
+        10.f, // brake
+        6.f, // min friction
+        22.f, // max fricion
+        6.f, // max speed
+        -3.f, // min speed
+        40.f, // maximum wheel angle
+        70.f, // car wheel rotation speed
+        65.f // car body rotation speed
     });
     car->transform->SetLocalPosition(obj->transform->GetWorldPosition());
 
@@ -46,6 +54,8 @@ void GameWorld::Start()
     mapCamera->clearColor = glm::vec3(0, 0, 0);
 
     window->SetCamera(camera);
+
+    World::Start();
 }
 
 void GameWorld::Render()

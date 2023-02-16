@@ -31,6 +31,8 @@ void LoadingWorld::Start()
 
     auto camera = Instantiate<Camera>("camera", glm::vec3(0, 0, -10), glm::vec3(0, 0, 0));
     window->SetCamera(camera);
+
+    World::Start();
 }
 
 void LoadingWorld::Tick(float deltaTime) const

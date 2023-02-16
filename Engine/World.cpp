@@ -12,6 +12,11 @@ World::World(std::shared_ptr<Window> window) : window(window)
     primitive = new Primitive(this);
 }
 
+void World::Start()
+{
+    for(auto x: objects) x->Start();
+}
+
 void World::Tick(float deltaTime) const
 {
     for(auto x: objects) x->Tick(deltaTime);

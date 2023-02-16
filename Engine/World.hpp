@@ -24,7 +24,7 @@ class World
             return *window;
         }
 
-        virtual void Start() {};
+        virtual void Start();
         virtual void Tick(float deltaTime) const;
         virtual void Render();
         virtual void Render(const Camera& camera);
