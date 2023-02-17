@@ -57,6 +57,17 @@ class World
         }
 
         template<typename T>
+        std::vector<T*> GetObjectsByPrefix(std::string prefix)
+        {
+            std::vector<T*> res;
+            for(auto x: objects)
+            {
+                if(x->name.substr(0, prefix.size()) == prefix) res.push_back(static_cast<T*>(x.get()));
+            }
+            return res;
+        }
+
+        template<typename T>
         T* GetUIObjectByName(std::string name)
         {
             for(auto x: uiObjs)
@@ -66,12 +77,17 @@ class World
             return nullptr;
         }
 
-        void DrawBox(glm::vec3 center, glm::vec3 extents, glm::vec3 color = glm::vec3(1, 1, 1)) const
+        void DrawBox(glm::vec3 center, glm::vec3 extents, glm::vec3 color = glm::vec3(1, 1, 1))
         {
-            primitive->DrawBox(center, extents, color);
+            boxQueue.emplace(center, extents, color);
         }
 
-        void DrawRotatedBox(std::vector<glm::vec3> points) const;
+        void DrawLine(glm::vec3 start, glm::vec3 end, glm::vec3 col = glm::vec3(1, 1, 1))
+        {
+            lineQueue.emplace(start, end, col);
+        }
+
+        void DrawRotatedBox(std::vector<glm::vec3> points);
 
     protected:
         std::shared_ptr<Window> window;
@@ -83,6 +99,9 @@ class World
         std::unique_ptr<ResourceManager> resourceManager;
 
         std::vector<std::shared_ptr<UIObject>> uiObjs;
+
+        std::queue<std::tuple<glm::vec3, glm::vec3, glm::vec3>> lineQueue;
+        std::queue<std::tuple<glm::vec3, glm::vec3, glm::vec3>> boxQueue;
 };
 
 #endif

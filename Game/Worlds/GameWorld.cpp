@@ -6,7 +6,7 @@
 GameWorld::GameWorld(std::shared_ptr<Window> window, Game* game) : World(window)
 {
     GetResourceManager().AddInResourceQueue("RaceTrack", ResourceLoadData<Model> {
-        "Assets/race_track_1.fbx"
+        "Assets/race_track_1-1.fbx"
     });
 
     GetResourceManager().AddInResourceQueue("car", ResourceLoadData<Model> {
@@ -36,7 +36,7 @@ void GameWorld::Start()
     auto car = Instantiate<Player>("playerCar", "car", game, PlayerSettings {
         20.f, // accel 
         10.f, // brake
-        6.f, // min friction
+        9.f, // min friction
         22.f, // max fricion
         6.f, // max speed
         -3.f, // min speed
@@ -79,22 +79,30 @@ void GameWorld::Render()
 
     camera->Use(glm::vec2(window->Width(), window->Height()), glm::vec3(0, 0, 1.f));
     for(auto x: objects) x->Render(camera->View(), camera->Proj());
+
+    while(!lineQueue.empty())
+    {
+        auto [start, end, col] = lineQueue.front();
+        lineQueue.pop();
+
+        primitive->DrawLine(start, end, col);
+    }
+
+    while(!boxQueue.empty())
+    {
+        auto [center, extents, col] = boxQueue.front();
+        boxQueue.pop();
+
+        primitive->DrawBox(center, extents, col);
+    }
+
     for(auto x: uiObjs) x->Render();
 
-    // glm::vec3 position = GetObjectByName<Object>("playerCar")->transform->GetWorldPosition();
-    // glm::vec3 rotation = GetObjectByName<Object>("playerCar")->transform->GetLocalRotation();
-    // auto rX = glm::rotate(glm::mat4(1), rotation.x, glm::vec3(1, 0, 0));
-    // auto rY = glm::rotate(glm::mat4(1), rotation.y, glm::vec3(0, 1, 0));
-    // auto rZ = glm::rotate(glm::mat4(1), rotation.z, glm::vec3(0, 0, 1));
-    // auto mat = rZ * rY * rX;
-    //
-    // glm::vec3 forward = glm::normalize(mat * glm::vec4(0, 0, 1, 0));
-    // position.y += 25.f;
-    // primitive->DrawLine(position, position + forward * 30.f, glm::vec3(1, 0, 0));
-
-    auto player = GetObjectByName<Object>("playerCar");
-    auto lines = player->GetBounds().GetRotatedBox(player->transform->GetModelMatrix());
-    DrawRotatedBox(lines);
+    // for(auto x: objects)
+    // {
+    //     auto lines = x->GetBounds().GetRotatedBox(x->transform->GetModelMatrix());
+    //     DrawRotatedBox(lines);
+    // }
 
     sky->Render(camera->View(), camera->Proj());
 

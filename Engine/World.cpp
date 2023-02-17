@@ -44,6 +44,22 @@ void World::Render()
     });
     for(auto x: objects) x->Render(window->camera->View(), window->camera->Proj());
 
+    while(!lineQueue.empty())
+    {
+        auto [start, end, col] = lineQueue.front();
+        lineQueue.pop();
+
+        primitive->DrawLine(start, end, col);
+    }
+
+    while(!boxQueue.empty())
+    {
+        auto [center, extents, col] = boxQueue.front();
+        boxQueue.pop();
+
+        primitive->DrawBox(center, extents, col);
+    }
+
     for(auto x: uiObjs) x->Render();
 }
 
@@ -53,20 +69,20 @@ void World::Render(const Camera& camera)
     for(auto x: objects) x->Render(camera.View(), camera.Proj());
 }
 
-void World::DrawRotatedBox(std::vector<glm::vec3> points) const
+void World::DrawRotatedBox(std::vector<glm::vec3> points)
 {
-    primitive->DrawLine(points[0], points[1]);
-    primitive->DrawLine(points[1], points[2]);
-    primitive->DrawLine(points[2], points[3]);
-    primitive->DrawLine(points[3], points[0]);
+    lineQueue.emplace(points[0], points[1], glm::vec3(1));
+    lineQueue.emplace(points[1], points[2], glm::vec3(1));
+    lineQueue.emplace(points[2], points[3], glm::vec3(1));
+    lineQueue.emplace(points[3], points[0], glm::vec3(1));
 
-    primitive->DrawLine(points[4], points[5]);
-    primitive->DrawLine(points[5], points[6]);
-    primitive->DrawLine(points[6], points[7]);
-    primitive->DrawLine(points[7], points[4]);
+    lineQueue.emplace(points[4], points[5], glm::vec3(1));
+    lineQueue.emplace(points[5], points[6], glm::vec3(1));
+    lineQueue.emplace(points[6], points[7], glm::vec3(1));
+    lineQueue.emplace(points[7], points[4], glm::vec3(1));
 
-    primitive->DrawLine(points[0], points[4]);
-    primitive->DrawLine(points[1], points[5]);
-    primitive->DrawLine(points[2], points[6]);
-    primitive->DrawLine(points[3], points[7]);
+    lineQueue.emplace(points[0], points[4], glm::vec3(1));
+    lineQueue.emplace(points[1], points[5], glm::vec3(1));
+    lineQueue.emplace(points[2], points[6], glm::vec3(1));
+    lineQueue.emplace(points[3], points[7], glm::vec3(1));
 }

@@ -30,6 +30,9 @@ class Mesh
 
         Bounds GetBounds() const { return bounds; }
 
+        const std::vector<float>& GetVertices() const { return vertices; }
+        const std::vector<unsigned int>& GetFaces() const { return faces; }
+
     private:
         void GenBuffers(vector<float> vertices, vector<unsigned int> indices);
         std::shared_ptr<Material> material;
@@ -40,6 +43,9 @@ class Mesh
 
         std::shared_ptr<Texture> texture;
         Bounds bounds;
+
+        vector<float> vertices;
+        vector<unsigned int> faces;
 };
 
 #endif

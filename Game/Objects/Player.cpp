@@ -1,8 +1,10 @@
 #include "Player.hpp"
 #include "Engine/Window/Window.hpp"
 #include "glm/ext/matrix_transform.hpp"
+#include "glm/geometric.hpp"
 #include "glm/gtc/epsilon.hpp"
 #include "glm/gtx/vector_angle.hpp"
+#include "glm/gtx/intersect.hpp"
 
 glm::vec3 CalcForward(glm::vec3 rotation)
 {
@@ -27,6 +29,37 @@ glm::vec3 ClampMagnitude(glm::vec3 vec, float minMag, float maxMag)
     return vec;
 }
 
+bool TriangleLineIntersection(glm::vec3 t1, glm::vec3 t2, glm::vec3 t3, glm::vec3 l1, glm::vec3 l2, glm::vec3& p)
+{
+    // return glm::intersectLineTriangle(l1, glm::normalize(l2 - l1), t1, t2, t3, p);
+    glm::vec3 dir = glm::normalize(l2 - l1);
+    glm::vec3 norm = glm::normalize(glm::cross(
+                    glm::normalize(t2 - t1),
+                    glm::normalize(t3 - t1)
+                ));
+
+    float d = glm::dot(norm, t1);
+    float na = glm::dot(norm, l1);
+    float nb = glm::dot(norm, dir);
+
+    p = l1 + (((d - na) / nb) * dir);
+
+    // compute barycentric coordiantes of p
+    glm::vec3 u = t2 - t1;
+    glm::vec3 v = t3 - t1;
+    glm::vec3 n = glm::cross(u, v);
+    glm::vec3 w = p - t1;
+    float beta = glm::dot(glm::cross(w, v), n) / glm::dot(n, n);
+    float gamma = glm::dot(glm::cross(u, w), n) / glm::dot(n, n);
+    float alpha = 1 - gamma - beta;
+
+    // point not in triangle
+    if(alpha < 0 || alpha > 1 || beta < 0 || beta > 1 || gamma < 0 || gamma > 1) return false;
+
+    float d2 = distance2(l1, l2);
+    return distance2(l2, p) <= d2 && distance2(l1, p) <= d2;
+}
+
 float AbsMin(float a, float b)
 {
     if(std::abs(a) < std::abs(b)) return a;
@@ -46,6 +79,12 @@ void Player::Start()
     carBody = world->GetObjectByName<Object>("Body");
     wheels.push_back(world->GetObjectByName<Object>("WheelFL"));
     wheels.push_back(world->GetObjectByName<Object>("WheelFR"));
+
+    // boundary = world->GetObjectByName<Object>("Collider");
+    boundaryColliders = world->GetObjectsByPrefix<Object>("Collider");
+
+    // this is very big for some reason, thats why divide by 3
+    collisionRadius = glm::length(GetBounds().extents) / 3.f;
 }
 
 void Player::Tick(float deltaTime)
@@ -97,5 +136,78 @@ void Player::Tick(float deltaTime)
     for(auto wheel : wheels)
     {
         wheel->transform->SetLocalRotation(glm::vec3(0, 0, -transform->GetLocalRotation().y + glm::radians(velRotation)));
+    }
+
+    std::vector<glm::vec3> points = GetBounds().GetRotatedBox(transform->GetModelMatrix());
+    // world->DrawRotatedBox(points);
+
+    for(auto collider: boundaryColliders)
+    {
+        float dist = glm::distance(collider->transform->GetWorldPosition(), transform->GetWorldPosition());
+        if(dist <= collisionRadius)
+        {
+            const auto& meshes = collider->GetMeshes();
+            glm::mat4 mat = collider->transform->GetModelMatrix();
+            for(auto mesh: meshes)
+            {
+                const std::vector<float>& vertices = mesh->GetVertices();
+                const std::vector<unsigned int>& faces = mesh->GetFaces();
+
+                for(size_t i = 0; i < faces.size(); i += 3)
+                {
+                    glm::vec3 a = mat * glm::vec4(vertices[8 * faces[i]], 
+                                            vertices[8 * faces[i] + 1],
+                                            vertices[8 * faces[i] + 2], 1);
+
+                    glm::vec3 b = mat * glm::vec4(vertices[8 * faces[i + 1]],
+                                            vertices[8 * faces[i + 1] + 1],
+                                            vertices[8 * faces[i + 1] + 2], 1);
+
+                    glm::vec3 c = mat * glm::vec4(vertices[8 * faces[i + 2]],
+                                            vertices[8 * faces[i + 2] + 1],
+                                            vertices[8 * faces[i + 2] + 2], 1);
+
+                    std::vector<int> lines({
+                        0, 1,
+                        // 1, 2,
+                        2, 3,
+                        // 3, 0,
+                        4, 5,
+                        // 5, 6,
+                        6, 7,
+                        // 7, 4,
+                        0, 4,
+                        1, 5,
+                        2, 6,
+                        3, 7
+                    });
+
+                    world->DrawLine(a, b);
+                    world->DrawLine(b, c);
+                    world->DrawLine(a, c);
+                    for(int l = 0; l < lines.size() / 2; l++)
+                    {
+                        glm::vec3 p1 = points[lines[2 * l]];
+                        glm::vec3 p2 = points[lines[2 * l + 1]];
+
+                        glm::vec3 dir = glm::normalize(p1 - p2);
+                        glm::vec3 dir2 = glm::normalize(p2 - p1);
+
+                        glm::vec3 tb;
+                        world->DrawBox(p1, glm::vec3(1, 1, 1), glm::vec3(1, 0, 0));
+                        world->DrawBox(p2, glm::vec3(1, 1, 1), glm::vec3(0, 1, 0));
+                        if(TriangleLineIntersection(a, b, c, p1, p2, tb))
+                        {
+                            world->DrawLine(p1, tb, glm::vec3(1, 0, 0));
+                            world->DrawLine(p2, p1, glm::vec3(1, 0, 1));
+                        } else if(TriangleLineIntersection(a, b, c, p2, p1, tb))
+                        {
+                            world->DrawLine(p2, tb, glm::vec3(0, 1, 0));
+                            world->DrawLine(p2, p1, glm::vec3(0, 0, 1));
+                        }
+                    }
+                }
+            }
+        }
     }
 }

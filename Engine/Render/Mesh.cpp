@@ -10,6 +10,9 @@ Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices, std::shared_ptr
     GenBuffers(vertices, indices);
     this->texture = texture;
     this->material = material;
+
+    this->vertices = vertices;
+    faces = indices;
 }
 
 Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices, std::shared_ptr<Texture> texture, std::shared_ptr<Material> material, Bounds bounds)
@@ -18,6 +21,9 @@ Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices, std::shared_ptr
     this->texture = texture;
     this->material = material;
     this->bounds = bounds;
+
+    this->vertices = vertices;
+    faces = indices;
 }
 
 Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices)
@@ -46,6 +52,9 @@ Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices)
             GL_STATIC_DRAW);
 
     this->indices = indices.size();
+
+    this->vertices = vertices;
+    faces = indices;
 }
 
 void Mesh::GenBuffers(vector<float> vertices, vector<unsigned int> indices)

@@ -35,9 +35,13 @@ class Player : public Object
         float velRotation;
         float bodyRotation;
         float prevRotation;
+        
+        // only do collision check on objects in this range
+        float collisionRadius;
 
         Object* carBody;
         std::vector<Object*> wheels;
+        std::vector<Object*> boundaryColliders;
 };
 
 #endif

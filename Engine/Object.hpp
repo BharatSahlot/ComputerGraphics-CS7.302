@@ -35,6 +35,8 @@ class Object
         virtual void Start() {}
         virtual void Tick(float deltaTime) {}
 
+        const std::vector<std::shared_ptr<Mesh>>& GetMeshes() const { return meshes; }
+
     protected:
         std::vector<std::shared_ptr<Mesh>> meshes;
         std::vector<std::shared_ptr<Object>> children;
