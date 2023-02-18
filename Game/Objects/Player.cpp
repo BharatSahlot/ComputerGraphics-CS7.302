@@ -88,6 +88,8 @@ void Player::Start()
 
     // checkpoints
     checkpoints = world->GetObjectsByPrefix<Object>("Checkpoint");
+
+    Respawn();
 }
 
 void Player::Tick(float deltaTime)
@@ -152,19 +154,45 @@ void Player::Respawn()
 
     // TODO: only spawn on already crossed checkpoints
     glm::vec3 position = checkpoints[0]->transform->GetWorldPosition();
+    Object* cpoint = checkpoints[0];
     for(Object* checkpoint: checkpoints)
     {
         if(glm::distance2(transform->GetWorldPosition(), checkpoint->transform->GetWorldPosition())
                 < glm::distance2(transform->GetWorldPosition(), position))
         {
             position = checkpoint->transform->GetWorldPosition();
+            cpoint = checkpoint;
         }
     }
 
     transform->SetWorldPosition(position * glm::vec3(1, 0, 1)); // remove the y component
 
-    // TODO: use surface normal to find spawn direction, keep windin order in mind
-    transform->SetLocalRotation(glm::vec3(0, 0, 0));
+    const std::vector<float>& vertices = cpoint->GetMeshes()[0]->GetVertices();
+    const std::vector<unsigned int>& faces = cpoint->GetMeshes()[0]->GetFaces();
+
+    glm::mat4 mat = cpoint->transform->GetModelMatrix();
+    glm::vec3 a = mat * glm::vec4(vertices[8 * faces[0]], 
+            vertices[8 * faces[0] + 1],
+            vertices[8 * faces[0] + 2], 1);
+
+    glm::vec3 b = mat * glm::vec4(vertices[8 * faces[1]],
+            vertices[8 * faces[1] + 1],
+            vertices[8 * faces[1] + 2], 1);
+
+    glm::vec3 c = mat * glm::vec4(vertices[8 * faces[2]],
+            vertices[8 * faces[2] + 1],
+            vertices[8 * faces[2] + 2], 1);
+
+    glm::vec3 norm = glm::normalize(glm::cross(
+                    glm::normalize(b - a),
+                    glm::normalize(c - a)
+                ));
+
+    float angle = glm::orientedAngle(glm::vec3(0, 0, -1), norm, glm::vec3(0, 1, 0));
+    float angleD = glm::degrees(angle);
+
+    velRotation = bodyRotation = prevRotation = angleD;
+    transform->SetLocalRotation(glm::vec3(0, angle, 0));
 }
 
 bool Player::CheckCollision()
