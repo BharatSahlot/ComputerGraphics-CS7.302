@@ -85,6 +85,9 @@ void Player::Start()
 
     // this is very big for some reason, thats why divide by 3
     collisionRadius = glm::length(GetBounds().extents) / 3.f;
+
+    // checkpoints
+    checkpoints = world->GetObjectsByPrefix<Object>("Checkpoint");
 }
 
 void Player::Tick(float deltaTime)
@@ -138,9 +141,7 @@ void Player::Tick(float deltaTime)
         wheel->transform->SetLocalRotation(glm::vec3(0, 0, -transform->GetLocalRotation().y + glm::radians(velRotation)));
     }
 
-    std::vector<glm::vec3> points = GetBounds().GetRotatedBox(transform->GetModelMatrix());
-    // world->DrawRotatedBox(points);
-
+    std::vector<glm::vec3> points = GetBounds().GetRotatedMeanPlane(transform->GetModelMatrix());
     for(auto collider: boundaryColliders)
     {
         float dist = glm::distance(collider->transform->GetWorldPosition(), transform->GetWorldPosition());
@@ -169,17 +170,9 @@ void Player::Tick(float deltaTime)
 
                     std::vector<int> lines({
                         0, 1,
-                        // 1, 2,
+                        1, 2,
                         2, 3,
-                        // 3, 0,
-                        4, 5,
-                        // 5, 6,
-                        6, 7,
-                        // 7, 4,
-                        0, 4,
-                        1, 5,
-                        2, 6,
-                        3, 7
+                        3, 0,
                     });
 
                     world->DrawLine(a, b);
@@ -195,7 +188,6 @@ void Player::Tick(float deltaTime)
 
                         glm::vec3 tb;
                         world->DrawBox(p1, glm::vec3(1, 1, 1), glm::vec3(1, 0, 0));
-                        world->DrawBox(p2, glm::vec3(1, 1, 1), glm::vec3(0, 1, 0));
                         if(TriangleLineIntersection(a, b, c, p1, p2, tb))
                         {
                             world->DrawLine(p1, tb, glm::vec3(1, 0, 0));

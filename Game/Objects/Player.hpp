@@ -42,6 +42,7 @@ class Player : public Object
         Object* carBody;
         std::vector<Object*> wheels;
         std::vector<Object*> boundaryColliders;
+        std::vector<Object*> checkpoints;
 };
 
 #endif

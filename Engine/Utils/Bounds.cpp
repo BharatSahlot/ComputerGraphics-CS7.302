@@ -48,3 +48,13 @@ std::vector<glm::vec3> Bounds::GetRotatedBox(glm::mat4 model) const
     res.push_back(model * glm::vec4(center - extents * glm::vec3( 1, -1, -1), 1));
     return res;
 }
+
+std::vector<glm::vec3> Bounds::GetRotatedMeanPlane(glm::mat4 model) const
+{
+    std::vector<glm::vec3> res;
+    res.push_back(model * glm::vec4(center - extents * glm::vec3( 1, 0,  1), 1));
+    res.push_back(model * glm::vec4(center - extents * glm::vec3(-1, 0,  1), 1));
+    res.push_back(model * glm::vec4(center - extents * glm::vec3(-1, 0, -1), 1));
+    res.push_back(model * glm::vec4(center - extents * glm::vec3( 1, 0, -1), 1));
+    return res;
+}
