@@ -43,6 +43,9 @@ class Player : public Object
         std::vector<Object*> wheels;
         std::vector<Object*> boundaryColliders;
         std::vector<Object*> checkpoints;
+
+        void Respawn();
+        bool CheckCollision();
 };
 
 #endif

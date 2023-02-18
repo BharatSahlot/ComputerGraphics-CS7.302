@@ -141,6 +141,34 @@ void Player::Tick(float deltaTime)
         wheel->transform->SetLocalRotation(glm::vec3(0, 0, -transform->GetLocalRotation().y + glm::radians(velRotation)));
     }
 
+    if(CheckCollision()) Respawn();
+}
+
+void Player::Respawn()
+{
+    // first reset all variables
+    velocity = glm::vec3(0, 0, 0);
+    velRotation = bodyRotation = prevRotation = 0.f;
+
+    // TODO: only spawn on already crossed checkpoints
+    glm::vec3 position = checkpoints[0]->transform->GetWorldPosition();
+    for(Object* checkpoint: checkpoints)
+    {
+        if(glm::distance2(transform->GetWorldPosition(), checkpoint->transform->GetWorldPosition())
+                < glm::distance2(transform->GetWorldPosition(), position))
+        {
+            position = checkpoint->transform->GetWorldPosition();
+        }
+    }
+
+    transform->SetWorldPosition(position * glm::vec3(1, 0, 1)); // remove the y component
+
+    // TODO: use surface normal to find spawn direction, keep windin order in mind
+    transform->SetLocalRotation(glm::vec3(0, 0, 0));
+}
+
+bool Player::CheckCollision()
+{
     std::vector<glm::vec3> points = GetBounds().GetRotatedMeanPlane(transform->GetModelMatrix());
     for(auto collider: boundaryColliders)
     {
@@ -192,14 +220,17 @@ void Player::Tick(float deltaTime)
                         {
                             world->DrawLine(p1, tb, glm::vec3(1, 0, 0));
                             world->DrawLine(p2, p1, glm::vec3(1, 0, 1));
+                            return true;
                         } else if(TriangleLineIntersection(a, b, c, p2, p1, tb))
                         {
                             world->DrawLine(p2, tb, glm::vec3(0, 1, 0));
                             world->DrawLine(p2, p1, glm::vec3(0, 0, 1));
+                            return true;
                         }
                     }
                 }
             }
         }
     }
+    return false;
 }
