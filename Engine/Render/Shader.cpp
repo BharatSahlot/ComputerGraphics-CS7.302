@@ -48,7 +48,7 @@ Shader* Shader::MakeShader(const std::string& path, int shaderType)
         return nullptr;
     }
 
-    shader->isTransparent = path == "Shaders/glass.fs";
+    shader->isTransparent = path == "Shaders/glass.fs" || path == "Shaders/checkpoint.fs";
     
     return shader;
 }

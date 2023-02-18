@@ -2,6 +2,7 @@
 #include "Engine/Window/Window.hpp"
 #include "Game/Objects/Player.hpp"
 #include "glm/ext/matrix_transform.hpp"
+#include "glm/gtx/norm.hpp"
 
 GameWorld::GameWorld(std::shared_ptr<Window> window, Game* game) : World(window)
 {
@@ -31,7 +32,7 @@ void GameWorld::Start()
 
     Instantiate<Object>("raceTrack", "RaceTrack");
 
-    Object* obj = GetObjectByName<Object>("Start");
+    Object* obj = GetObjectByName<Object>("Checkpoint");
 
     auto car = Instantiate<Player>("playerCar", "car", game, PlayerSettings {
         20.f, // accel 
@@ -44,7 +45,7 @@ void GameWorld::Start()
         70.f, // car wheel rotation speed
         65.f // car body rotation speed
     });
-    car->transform->SetLocalPosition(obj->transform->GetWorldPosition());
+    car->transform->SetLocalPosition(obj->transform->GetWorldPosition() * glm::vec3(1, 0, 1));
 
     camera = Instantiate<FollowCamera>("camera", "playerCar", glm::vec3(0, 400, -750));
     camera->clearColor = glm::vec3(21.f, 154.f, 198.f) / 255.f;
@@ -60,7 +61,7 @@ void GameWorld::Start()
 
 void GameWorld::Render()
 {
-    float cz = camera->Position().z;
+    glm::vec3 cz = camera->Position();
     std::sort(objects.begin(), objects.end(), [cz](std::shared_ptr<Object> a, std::shared_ptr<Object> b) -> bool {
         bool ta = a->IsTransparent();
         bool tb = b->IsTransparent();
@@ -72,13 +73,19 @@ void GameWorld::Render()
         if(!ta && tb) return true;
 
         // a and b both(not)
-        float az = std::abs(cz - a->transform->GetWorldPosition().z);
-        float bz = std::abs(cz - b->transform->GetWorldPosition().z);
+        float az = glm::distance2(cz, a->transform->GetWorldPosition());
+        float bz = glm::distance2(cz, b->transform->GetWorldPosition());
+        if(ta && tb) return az > bz;
         return az < bz;
     });
 
     camera->Use(glm::vec2(window->Width(), window->Height()), glm::vec3(0, 0, 1.f));
-    for(auto x: objects) x->Render(camera->View(), camera->Proj());
+
+    for(auto x: objects)
+    {
+        if(x->IsTransparent()) break;
+        x->Render(camera->View(), camera->Proj());
+    }
 
     while(!lineQueue.empty())
     {
@@ -96,15 +103,15 @@ void GameWorld::Render()
         primitive->DrawBox(center, extents, col);
     }
 
-    for(auto x: uiObjs) x->Render();
-
-    // for(auto x: objects)
-    // {
-    //     auto lines = x->GetBounds().GetRotatedBox(x->transform->GetModelMatrix());
-    //     DrawRotatedBox(lines);
-    // }
-
     sky->Render(camera->View(), camera->Proj());
+
+    for(auto x: objects)
+    {
+        if(!x->IsTransparent()) continue;
+        x->Render(camera->View(), camera->Proj());
+    }
+
+    for(auto x: uiObjs) x->Render();
 
     mapCamera->SetPerspective(90.f, window->Aspect());
     mapCamera->Use(glm::vec2(window->Width(), window->Height()), glm::vec3(15, -15, 0.2f));

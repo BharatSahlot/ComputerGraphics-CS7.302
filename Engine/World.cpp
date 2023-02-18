@@ -1,6 +1,7 @@
 #include "World.hpp"
 #include "Engine/Resource/ResourceManager.hpp"
 #include "Engine/Window/Window.hpp"
+#include "glm/gtx/norm.hpp"
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -26,7 +27,8 @@ void World::Tick(float deltaTime) const
 void World::Render()
 {
     window->camera->Use(glm::vec2(window->Width(), window->Height()), glm::vec3(0, 0, 1.f));
-    float cz = window->camera->Position().z;
+
+    glm::vec3 cz = window->camera->Position();
     std::sort(objects.begin(), objects.end(), [cz](std::shared_ptr<Object> a, std::shared_ptr<Object> b) -> bool {
         bool ta = a->IsTransparent();
         bool tb = b->IsTransparent();
@@ -38,8 +40,9 @@ void World::Render()
         if(!ta && tb) return true;
 
         // a and b both(not)
-        float az = std::abs(cz - a->transform->GetWorldPosition().z);
-        float bz = std::abs(cz - b->transform->GetWorldPosition().z);
+        float az = glm::distance2(cz, a->transform->GetWorldPosition());
+        float bz = glm::distance2(cz, b->transform->GetWorldPosition());
+        if(ta && tb) return az > bz;
         return az < bz;
     });
     for(auto x: objects) x->Render(window->camera->View(), window->camera->Proj());
