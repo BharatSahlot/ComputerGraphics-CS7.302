@@ -15,6 +15,7 @@ class Bar : public UIObject
         void SetHeight(float h) { height = h; }
         void SetFillAmount(float a) { fillAmount = a; }
         void SetColor(glm::vec3 c) { col = c; }
+        void SetBorder(float b) { border = b; }
 
         void Render() override;
 
@@ -26,6 +27,7 @@ class Bar : public UIObject
         float width;
         float height;
         float fillAmount;
+        float border;
         
         glm::vec3 col;
 };

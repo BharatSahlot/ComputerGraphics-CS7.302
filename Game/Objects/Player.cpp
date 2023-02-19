@@ -94,6 +94,8 @@ void Player::Start()
 
     timer.Start();
     checkpointsCleared = lapsDone = 0;
+    fuel = GetMaxFuel();
+    health = 100.f;
     Respawn();
 }
 
@@ -118,8 +120,8 @@ void Player::Tick(float deltaTime)
     }
 
     float delta = 0.f;
-    if(world->GetWindow().GetKeyDown(GLFW_KEY_W)) delta = settings.accel;
-    if(world->GetWindow().GetKeyDown(GLFW_KEY_S)) delta -= settings.brake;
+    if(fuel > 0.f && world->GetWindow().GetKeyDown(GLFW_KEY_W)) delta = settings.accel;
+    if(fuel > 0.f && world->GetWindow().GetKeyDown(GLFW_KEY_S)) delta -= settings.brake;
 
     if(world->GetWindow().GetKeyDown(GLFW_KEY_A)) velRotation += settings.rotSpeed * deltaTime;
     if(world->GetWindow().GetKeyDown(GLFW_KEY_D)) velRotation -= settings.rotSpeed * deltaTime;
@@ -170,6 +172,7 @@ void Player::Tick(float deltaTime)
     {
         collided = true;
         collisionTimer.Start();
+        health -= 30.f;
         Respawn();
     }
 
@@ -182,6 +185,8 @@ void Player::Tick(float deltaTime)
             checkpointsCleared = 0;
         }
     }
+
+    if(delta != 0) fuel -= deltaTime * 2.f;
 }
 
 void Player::Respawn()

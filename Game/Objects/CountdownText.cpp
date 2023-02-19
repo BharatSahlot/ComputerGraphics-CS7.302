@@ -5,7 +5,7 @@
 
 CountdownText::CountdownText(World* world, std::string name, float dur) : UIObject(world, name), dur(dur / 3.f)
 {
-    txt = world->InstantiateUIObject<Text>("countdown_txt", "font", Anchor {
+    txt = world->InstantiateUIObject<Text>("countdown_txt", "zeyada", Anchor {
         AnchorType::Center,
         glm::vec2(0, 0),
         1

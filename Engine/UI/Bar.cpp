@@ -10,7 +10,8 @@ Bar::Bar(World* world, std::string name, Anchor anchor, float width, float heigh
     anchor(anchor),
     width(width),
     height(height),
-    fillAmount(0)
+    fillAmount(0),
+    border(0.1)
 {
     mat = world->GetResourceManager().Get<Material>("barMat");
     if(!mat)
@@ -53,6 +54,7 @@ void Bar::Render()
     mat->SetFloat("fillAmount", fillAmount);
     mat->SetUniformMat4("proj", proj);
     mat->SetVec3("col", col);
+    mat->SetFloat("border", border);
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);

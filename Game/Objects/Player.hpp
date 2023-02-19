@@ -28,7 +28,15 @@ class Player : public Object
         void Start() override;
         void Tick(float deltaTime) override;
 
+        float GetFuel() const { return fuel; }
+        float GetMaxFuel() const { return 20; }
+
+        float GetHealth() const { return health; }
+
     private:
+        float fuel;
+        float health;
+
         int lapsDone;
         int checkpointsCleared;
 

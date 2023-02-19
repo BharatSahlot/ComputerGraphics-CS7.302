@@ -2,6 +2,7 @@
 #include "Engine/Window/Window.hpp"
 #include "Game/Objects/Audience.hpp"
 #include "Game/Objects/CountdownText.hpp"
+#include "Game/Objects/GameUI.hpp"
 #include "Game/Objects/Player.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtx/norm.hpp"
@@ -12,8 +13,16 @@ GameWorld::GameWorld(std::shared_ptr<Window> window, Game* game) : World(window)
         "Shaders/text.vs", "Shaders/text.fs"
     });
 
+    GetResourceManager().AddInResourceQueue("zeyada", ResourceLoadData<Font> {
+        "Assets/zeyada.ttf", 96, "textMat"
+    });
+
     GetResourceManager().AddInResourceQueue("font", ResourceLoadData<Font> {
         "Assets/font.ttf", 96, "textMat"
+    });
+
+    GetResourceManager().AddInResourceQueue<Material>("barMat", ResourceLoadData<Material> {
+        "Shaders/text.vs", "Shaders/UI/bar.fs"
     });
 
     GetResourceManager().AddInResourceQueue("RaceTrack", ResourceLoadData<Model> {
@@ -60,7 +69,6 @@ void GameWorld::Start()
     player->transform->SetLocalPosition(obj->transform->GetWorldPosition() * glm::vec3(1, 0, 1));
 
     camera = Instantiate<FollowCamera>("camera", "playerCar", glm::vec3(0, 400, -750));
-    // camera->clearColor = glm::vec3(21.f, 154.f, 198.f) / 255.f;
     camera->clearColor = glm::vec3(0);
     camera->canMove = true;
 
@@ -70,6 +78,7 @@ void GameWorld::Start()
     window->SetCamera(camera);
 
     InstantiateUIObject<CountdownText>("countdownText", 3.f);
+    InstantiateUIObject<GameUI>("GameUI");
 
     startTimer.Start();
     World::Start();
