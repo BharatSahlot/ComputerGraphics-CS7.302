@@ -1,5 +1,6 @@
 #include "GameWorld.hpp"
 #include "Engine/Window/Window.hpp"
+#include "Game/Objects/Audience.hpp"
 #include "Game/Objects/Player.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtx/norm.hpp"
@@ -24,6 +25,8 @@ GameWorld::GameWorld(std::shared_ptr<Window> window, Game* game) : World(window)
             "Assets/skybox/back.png",
         }
     });
+
+    Instantiate<Audience>("audience", 50, 50);
 }
 
 void GameWorld::Start()

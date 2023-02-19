@@ -107,6 +107,7 @@ void Mesh::Render() const
     }
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
     Material::Unuse();
 }
 
@@ -129,4 +130,5 @@ void Mesh::Render(glm::mat4 model, glm::mat4 view, glm::mat4 proj) const
     }
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }

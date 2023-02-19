@@ -1,11 +1,13 @@
 #include "Random.hpp"
 
+#include <algorithm>
 #include <chrono>
 #include <random>
 
-static std::mt19937 gen;
-
 namespace Random {
+
+    std::mt19937 gen;
+
     void Init()
     {
         unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
