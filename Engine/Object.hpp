@@ -16,6 +16,7 @@ class Object
     public:
         World* world;
         std::string name;
+        bool isActive = true;
 
         Transform* transform;
 

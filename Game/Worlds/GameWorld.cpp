@@ -35,7 +35,7 @@ void GameWorld::Start()
 
     Instantiate<Object>("raceTrack", "RaceTrack");
 
-    Object* obj = GetObjectByName<Object>("Checkpoint.002");
+    Object* obj = GetObjectByName<Object>("Checkpoint");
 
     auto car = Instantiate<Player>("playerCar", "car", game, PlayerSettings {
         20.f, // accel 

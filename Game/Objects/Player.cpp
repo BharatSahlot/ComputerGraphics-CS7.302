@@ -88,7 +88,11 @@ void Player::Start()
 
     // checkpoints
     checkpoints = world->GetObjectsByPrefix<Object>("Checkpoint");
+    std::sort(checkpoints.begin(), checkpoints.end(), [](Object* a, Object* b) {
+        return a->name < b->name;
+    });
 
+    checkpointsCleared = lapsDone = 0;
     Respawn();
 }
 
@@ -143,7 +147,17 @@ void Player::Tick(float deltaTime)
         wheel->transform->SetLocalRotation(glm::vec3(0, 0, -transform->GetLocalRotation().y + glm::radians(velRotation)));
     }
 
-    if(CheckCollision()) Respawn();
+    if(CheckWallCollision()) Respawn();
+
+    if(CheckCheckpointCollision())
+    {
+        checkpointsCleared++;
+        if(checkpointsCleared >= checkpoints.size())
+        {
+            std::cout << "lap done" << std::endl;
+            checkpointsCleared = 0;
+        }
+    }
 }
 
 void Player::Respawn()
@@ -152,18 +166,8 @@ void Player::Respawn()
     velocity = glm::vec3(0, 0, 0);
     velRotation = bodyRotation = prevRotation = 0.f;
 
-    // TODO: only spawn on already crossed checkpoints
-    glm::vec3 position = checkpoints[0]->transform->GetWorldPosition();
-    Object* cpoint = checkpoints[0];
-    for(Object* checkpoint: checkpoints)
-    {
-        if(glm::distance2(transform->GetWorldPosition(), checkpoint->transform->GetWorldPosition())
-                < glm::distance2(transform->GetWorldPosition(), position))
-        {
-            position = checkpoint->transform->GetWorldPosition();
-            cpoint = checkpoint;
-        }
-    }
+    glm::vec3 position = checkpoints[checkpointsCleared]->transform->GetWorldPosition();
+    Object* cpoint = checkpoints[checkpointsCleared];
 
     transform->SetWorldPosition(position * glm::vec3(1, 0, 1)); // remove the y component
 
@@ -195,7 +199,7 @@ void Player::Respawn()
     transform->SetLocalRotation(glm::vec3(0, angle, 0));
 }
 
-bool Player::CheckCollision()
+bool Player::CheckWallCollision()
 {
     std::vector<glm::vec3> points = GetBounds().GetRotatedMeanPlane(transform->GetModelMatrix());
     for(auto collider: boundaryColliders)
@@ -257,6 +261,67 @@ bool Player::CheckCollision()
                         }
                     }
                 }
+            }
+        }
+    }
+    return false;
+}
+
+// only checks collision with the next checkpoint
+bool Player::CheckCheckpointCollision()
+{
+    std::vector<glm::vec3> points = GetBounds().GetRotatedMeanPlane(transform->GetModelMatrix());
+
+    Object* checkpoint = checkpoints[(checkpointsCleared + 1) % checkpoints.size()];
+
+    const std::vector<float>& vertices = checkpoint->GetMeshes()[0]->GetVertices();
+    const std::vector<unsigned int>& faces = checkpoint->GetMeshes()[0]->GetFaces();
+
+    glm::mat4 mat = checkpoint->transform->GetModelMatrix();
+    for(size_t i = 0; i < faces.size(); i += 3)
+    {
+        glm::vec3 a = mat * glm::vec4(vertices[8 * faces[i]], 
+                                vertices[8 * faces[i] + 1],
+                                vertices[8 * faces[i] + 2], 1);
+
+        glm::vec3 b = mat * glm::vec4(vertices[8 * faces[i + 1]],
+                                vertices[8 * faces[i + 1] + 1],
+                                vertices[8 * faces[i + 1] + 2], 1);
+
+        glm::vec3 c = mat * glm::vec4(vertices[8 * faces[i + 2]],
+                                vertices[8 * faces[i + 2] + 1],
+                                vertices[8 * faces[i + 2] + 2], 1);
+
+        std::vector<int> lines({
+            0, 1,
+            1, 2,
+            2, 3,
+            3, 0,
+        });
+
+        world->DrawLine(a, b);
+        world->DrawLine(b, c);
+        world->DrawLine(a, c);
+        for(int l = 0; l < lines.size() / 2; l++)
+        {
+            glm::vec3 p1 = points[lines[2 * l]];
+            glm::vec3 p2 = points[lines[2 * l + 1]];
+
+            glm::vec3 dir = glm::normalize(p1 - p2);
+            glm::vec3 dir2 = glm::normalize(p2 - p1);
+
+            glm::vec3 tb;
+            // world->DrawBox(p1, glm::vec3(1, 1, 1), glm::vec3(1, 0, 0));
+            if(TriangleLineIntersection(a, b, c, p1, p2, tb))
+            {
+                world->DrawLine(p1, tb, glm::vec3(1, 0, 0));
+                world->DrawLine(p2, p1, glm::vec3(1, 0, 1));
+                return true;
+            } else if(TriangleLineIntersection(a, b, c, p2, p1, tb))
+            {
+                world->DrawLine(p2, tb, glm::vec3(0, 1, 0));
+                world->DrawLine(p2, p1, glm::vec3(0, 0, 1));
+                return true;
             }
         }
     }

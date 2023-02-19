@@ -55,12 +55,16 @@ Bounds Object::GetBounds() const
 
 void Object::Render(const glm::mat4& viewMat, const glm::mat4& projMat)
 {
+    if(!isActive) return;
+
     glm::mat4 model = transform->GetModelMatrix();
     for(const auto& x: meshes) x->Render(model, viewMat, projMat);
 }
 
 void Object::Render(const glm::mat4& pModel, const glm::mat4& viewMat, const glm::mat4& projMat)
 {
+    if(!isActive) return;
+
     glm::mat4 model = pModel * transform->GetLocalModelMatrix();
     for(const auto& x: meshes) x->Render(model, viewMat, projMat);
 }

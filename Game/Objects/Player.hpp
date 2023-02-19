@@ -28,6 +28,9 @@ class Player : public Object
         void Tick(float deltaTime) override;
 
     private:
+        int lapsDone;
+        int checkpointsCleared;
+
         Game* game;
         PlayerSettings settings;
 
@@ -45,7 +48,8 @@ class Player : public Object
         std::vector<Object*> checkpoints;
 
         void Respawn();
-        bool CheckCollision();
+        bool CheckWallCollision();
+        bool CheckCheckpointCollision();
 };
 
 #endif
