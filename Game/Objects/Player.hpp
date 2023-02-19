@@ -2,6 +2,7 @@
 #define PLAYER_H
 
 #include "Engine/Object.hpp"
+#include "Engine/Utils/Timer.hpp"
 #include "Game/Game.hpp"
 
 struct PlayerSettings
@@ -46,6 +47,9 @@ class Player : public Object
         std::vector<Object*> wheels;
         std::vector<Object*> boundaryColliders;
         std::vector<Object*> checkpoints;
+
+        bool collided = false;
+        Timer collisionTimer, timer;
 
         void Respawn();
         bool CheckWallCollision();

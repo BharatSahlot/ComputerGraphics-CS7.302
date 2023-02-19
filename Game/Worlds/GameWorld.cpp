@@ -46,7 +46,7 @@ void GameWorld::Start()
 
     Object* obj = GetObjectByName<Object>("Checkpoint");
 
-    auto car = Instantiate<Player>("playerCar", "car", game, PlayerSettings {
+    player = Instantiate<Player>("playerCar", "car", game, PlayerSettings {
         20.f, // accel 
         10.f, // brake
         9.f, // min friction
@@ -57,10 +57,11 @@ void GameWorld::Start()
         70.f, // car wheel rotation speed
         65.f // car body rotation speed
     });
-    car->transform->SetLocalPosition(obj->transform->GetWorldPosition() * glm::vec3(1, 0, 1));
+    player->transform->SetLocalPosition(obj->transform->GetWorldPosition() * glm::vec3(1, 0, 1));
 
     camera = Instantiate<FollowCamera>("camera", "playerCar", glm::vec3(0, 400, -750));
-    camera->clearColor = glm::vec3(21.f, 154.f, 198.f) / 255.f;
+    // camera->clearColor = glm::vec3(21.f, 154.f, 198.f) / 255.f;
+    camera->clearColor = glm::vec3(0);
     camera->canMove = true;
 
     mapCamera = Instantiate<MapCamera>("mapCamera", "playerCar", glm::vec3(5, 100, 5));

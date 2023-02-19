@@ -92,12 +92,31 @@ void Player::Start()
         return a->name < b->name;
     });
 
+    timer.Start();
     checkpointsCleared = lapsDone = 0;
     Respawn();
 }
 
 void Player::Tick(float deltaTime)
 {
+    if(collided)
+    {
+        if(collisionTimer.TimeSinceStart() >= 2.f)
+        {
+            collided = false;
+            auto mat = world->GetResourceManager().Get<Material>("Shaders/base.fs");
+            mat->Use();
+            mat->SetFloat("oneMinusAlpha", 0);
+        } else
+        {
+            auto mat = world->GetResourceManager().Get<Material>("Shaders/base.fs");
+            mat->Use();
+            float t = glm::pow(glm::sin(timer.TimeSinceStart() * 5.f), 4.f);
+            t = glm::round(t);
+            mat->SetFloat("oneMinusAlpha", t);
+        }
+    }
+
     float delta = 0.f;
     if(world->GetWindow().GetKeyDown(GLFW_KEY_W)) delta = settings.accel;
     if(world->GetWindow().GetKeyDown(GLFW_KEY_S)) delta -= settings.brake;
@@ -147,7 +166,12 @@ void Player::Tick(float deltaTime)
         wheel->transform->SetLocalRotation(glm::vec3(0, 0, -transform->GetLocalRotation().y + glm::radians(velRotation)));
     }
 
-    if(CheckWallCollision()) Respawn();
+    if(CheckWallCollision())
+    {
+        collided = true;
+        collisionTimer.Start();
+        Respawn();
+    }
 
     if(CheckCheckpointCollision())
     {

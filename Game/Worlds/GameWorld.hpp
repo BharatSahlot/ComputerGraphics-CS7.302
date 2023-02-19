@@ -6,6 +6,7 @@
 #include "Game/Game.hpp"
 #include "Game/Objects/FollowCamera.hpp"
 #include "Game/Objects/MapCamera.hpp"
+#include "Game/Objects/Player.hpp"
 
 class GameWorld : public World
 {
@@ -21,6 +22,8 @@ class GameWorld : public World
         std::shared_ptr<FollowCamera> camera;
         std::shared_ptr<MapCamera> mapCamera;
         std::shared_ptr<Sky> sky;
+
+        std::shared_ptr<Player> player;
 
         Timer startTimer;
 };
