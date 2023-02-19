@@ -1,12 +1,21 @@
 #include "GameWorld.hpp"
 #include "Engine/Window/Window.hpp"
 #include "Game/Objects/Audience.hpp"
+#include "Game/Objects/CountdownText.hpp"
 #include "Game/Objects/Player.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtx/norm.hpp"
 
 GameWorld::GameWorld(std::shared_ptr<Window> window, Game* game) : World(window)
 {
+    GetResourceManager().AddInResourceQueue("textMat", ResourceLoadData<Material> {
+        "Shaders/text.vs", "Shaders/text.fs"
+    });
+
+    GetResourceManager().AddInResourceQueue("font", ResourceLoadData<Font> {
+        "Assets/font.ttf", 96, "textMat"
+    });
+
     GetResourceManager().AddInResourceQueue("RaceTrack", ResourceLoadData<Model> {
         "Assets/race_track_1-1.fbx"
     });
@@ -59,7 +68,16 @@ void GameWorld::Start()
 
     window->SetCamera(camera);
 
+    InstantiateUIObject<CountdownText>("countdownText", 3.f);
+
+    startTimer.Start();
     World::Start();
+}
+
+void GameWorld::Tick(float deltaTime) const
+{
+    if(startTimer.TimeSinceStart() >= 3.f) for(auto x: objects) x->Tick(deltaTime);
+    for(auto x: uiObjs) x->Tick(deltaTime);
 }
 
 void GameWorld::Render()

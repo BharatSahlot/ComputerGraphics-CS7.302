@@ -14,7 +14,8 @@ class Text : public UIObject
         void Render();
 
         Text* SetAnchor(Anchor anchor) { this->anchor = anchor; return this; }
-        Text* SetColor(glm::vec3 col) { this->col = col; return this; }
+        Text* SetColor(glm::vec3 col) { this->col = glm::vec4(col, 1.f); return this; }
+        Text* SetColor(glm::vec4 col) { this->col = col; return this; }
         Text* SetText(std::string str) { this->str = str;  return this; }
 
         Text* EnableShadow() { hasShadow = true; return this; }
@@ -29,7 +30,7 @@ class Text : public UIObject
     private:
         std::shared_ptr<Font> font;
         Anchor anchor;
-        glm::vec3 col;
+        glm::vec4 col;
         std::string str;
 
         bool hasShadow;

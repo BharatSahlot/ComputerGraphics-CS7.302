@@ -154,7 +154,7 @@ void Player::Tick(float deltaTime)
         checkpointsCleared++;
         if(checkpointsCleared >= checkpoints.size())
         {
-            std::cout << "lap done" << std::endl;
+            lapsDone++;
             checkpointsCleared = 0;
         }
     }

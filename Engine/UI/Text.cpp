@@ -7,7 +7,7 @@
 Text::Text(World* world, std::string name, std::shared_ptr<Font> font, Anchor anchor) : UIObject(world, name),
     anchor(anchor),
     font(font),
-    col(glm::vec3(1, 1, 1)),
+    col(glm::vec4(1, 1, 1, 1)),
     str(""),
     hasShadow(false),
     shadowDistance(0)
@@ -16,7 +16,7 @@ Text::Text(World* world, std::string name, std::shared_ptr<Font> font, Anchor an
 
 Text::Text(World* world, std::string name, std::string font, Anchor anchor) : UIObject(world, name),
     anchor(anchor),
-    col(glm::vec3(1, 1, 1)),
+    col(glm::vec4(1, 1, 1, 1)),
     str(""),
     hasShadow(false),
     shadowDistance(0)

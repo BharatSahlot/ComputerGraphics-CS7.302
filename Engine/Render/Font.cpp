@@ -97,11 +97,11 @@ void Font::Setup()
     glBindVertexArray(0);
 }
 
-void Font::RenderText(std::string text, float x, float y, float scale, glm::mat4 proj, glm::vec3 col)
+void Font::RenderText(std::string text, float x, float y, float scale, glm::mat4 proj, glm::vec4 col)
 {
     mat->Use();
     mat->SetUniformMat4("proj", proj);
-    mat->SetVec3("textColor", col);
+    mat->SetVec4("textColor", col);
     mat->SetInt("text", 0);
 
     if(!hasShadow)
