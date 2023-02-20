@@ -1,4 +1,5 @@
 #include "GameWorld.hpp"
+#include "Engine/Render/Model.hpp"
 #include "Engine/Window/Window.hpp"
 #include "Game/Objects/Audience.hpp"
 #include "Game/Objects/CountdownText.hpp"
@@ -46,6 +47,10 @@ GameWorld::GameWorld(std::shared_ptr<Window> window, Game* game) : World(window)
             "Assets/skybox/front.png",
             "Assets/skybox/back.png",
         }
+    });
+
+    GetResourceManager().AddInResourceQueue("jerrycan", ResourceLoadData<Model> {
+        "Assets/jerrycan.fbx"
     });
 
     Instantiate<Audience>("audience", 50, 50);
