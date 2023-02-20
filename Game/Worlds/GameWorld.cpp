@@ -40,6 +40,10 @@ GameWorld::GameWorld(std::shared_ptr<Window> window, Game* game) : World(window)
         "Assets/Car.fbx"
     });
 
+    GetResourceManager().AddInResourceQueue("aiCar", ResourceLoadData<Model> {
+        "Assets/Car5_Police.fbx"
+    });
+
     sky = GetResourceManager().AddInResourceQueue("sky", ResourceLoadData<Sky> {
         {
             "Assets/skybox/right.png",
@@ -78,7 +82,7 @@ void GameWorld::Start()
     player->onCheckPointReached = [this](int c) { this->OnCheckPointReached(c); };
     player->onFuelcanCollision = [this](Object* can) { this->OnFuelcanCollision(can); };
 
-    Instantiate<AIPlayer>("aiCar1", "car", game, PlayerSettings {
+    Instantiate<AIPlayer>("aiCar1", "aiCar", game, PlayerSettings {
         20.f, // accel 
         10.f, // brake
         9.f, // min friction
@@ -90,7 +94,7 @@ void GameWorld::Start()
         65.f // car body rotation speed
     }, glm::vec3(50, 0, 0));
 
-    Instantiate<AIPlayer>("aiCar2", "car", game, PlayerSettings {
+    Instantiate<AIPlayer>("aiCar2", "aiCar", game, PlayerSettings {
         20.f, // accel 
         10.f, // brake
         9.f, // min friction
@@ -102,7 +106,7 @@ void GameWorld::Start()
         65.f // car body rotation speed
     }, glm::vec3(-50, 0, 0));
 
-    Instantiate<AIPlayer>("aiCar3", "car", game, PlayerSettings {
+    Instantiate<AIPlayer>("aiCar3", "aiCar", game, PlayerSettings {
         20.f, // accel 
         10.f, // brake
         9.f, // min friction
