@@ -34,48 +34,60 @@ ResourceManager* ResourceManager::CreateResourceManager(GLFWwindow* window, Worl
         glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); 
         glDebugMessageCallback(glDebugOutput, nullptr);
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
-    } 
+    }
 
     manager->context = context;
     manager->world = world;
     manager->finished = false;
+    manager->totalModels  = manager->totalTextures  = manager->totalMaterials  = manager->totalFonts = 0;
+    manager->modelsLoaded = manager->texturesLoaded = manager->materialsLoaded = manager->fontsLoaded = 0;
     return manager;
 }
 
 ResourceManager::~ResourceManager()
 {
     if(context) glfwDestroyWindow(context);
+    if(loaderThread.joinable()) loaderThread.join();
 }
 
 void ResourceManager::StartLoading()
 {
-    modelsLoaded = texturesLoaded = materialsLoaded = 0;
+    totalModels = totalTextures = totalMaterials = totalFonts = 0;
+    modelsLoaded = texturesLoaded = materialsLoaded = fontsLoaded = 0;
     loaderThread = std::thread([&]() {
         Loader();
     });
 }
 
-std::string ResourceManager::GetLoadStatus() const
+float ResourceManager::GetLoadStatus(std::string* str) const
 {
     std::stringstream ss;
     if(modelsLoaded < totalModels)
     {
         ss << "Loading models (" << modelsLoaded << "/" << totalModels << ")";
-        return ss.str();
-    }
-
-    if(texturesLoaded < totalTextures)
+        *str = ss.str();
+    } else if(texturesLoaded < totalTextures)
     {
         ss << "Loading textures (" << texturesLoaded << "/" << totalTextures << ")";
-        return ss.str();
-    }
-
-    if(materialsLoaded < totalMaterials)
+        *str = ss.str();
+    } else if(materialsLoaded < totalMaterials)
     {
         ss << "Loading materials (" << materialsLoaded << "/" << totalMaterials << ")";
-        return ss.str();
+        *str = ss.str();
+    } else if(fontsLoaded < totalFonts)
+    {
+        ss << "Loading fonts (" << fontsLoaded << "/" << totalFonts << ")";
+        *str = ss.str();
+    } else
+    {
+        ss << "Loading Finished";
+        *str = ss.str();
     }
-    return "Loading complete";
+    int d = totalModels + totalTextures + totalMaterials + totalFonts;
+    if(d == 0) return 1;
+
+    float r = (float)(modelsLoaded + texturesLoaded + materialsLoaded + fontsLoaded) / d;
+    return r;
 }
 
 bool ResourceManager::HasLoadingFinished() const { return finished; }
@@ -92,13 +104,20 @@ void ResourceManager::Load()
     {
         font->Setup();
     }
+
+    for(auto& [name, font] : skyMap)
+    {
+        font->Setup();
+    }
 }
 
 void ResourceManager::Loader()
 {
+    totalModels = totalTextures = totalMaterials = totalFonts = 0;
     glfwMakeContextCurrent(context);
 
     totalModels = modelQueue.size();
+    totalFonts = fontQueue.size();
     while(!modelQueue.empty())
     {
         auto [name, data] = modelQueue.back();
@@ -112,7 +131,7 @@ void ResourceManager::Loader()
         modelsLoaded++;
     }
 
-    totalTextures = textureQueue.size();
+    totalTextures = textureQueue.size() + skyQueue.size();
     totalMaterials = materialQueue.size();
     while(!textureQueue.empty())
     {
@@ -127,6 +146,21 @@ void ResourceManager::Loader()
         texturesLoaded++;
     }
 
+    while(!skyQueue.empty())
+    {
+        auto [name, data] = skyQueue.back();
+        skyQueue.pop_back();
+
+        if(data.ptr->Load(data.faces) == -1)
+        {
+            std::cerr << "Unable to load sky " << name << std::endl;
+        }
+        skyMap[name] = data.ptr;
+        texturesLoaded++;
+    }
+
+    shaderMap["Shaders/base.vs"] = Shader::MakeShader("Shaders/base.vs", GL_VERTEX_SHADER);
+    shaderMap["Shaders/base.fs"] = Shader::MakeShader("Shaders/base.fs", GL_FRAGMENT_SHADER);
     while(!materialQueue.empty())
     {
         auto [name, data] = materialQueue.back();
@@ -134,12 +168,16 @@ void ResourceManager::Loader()
 
         if(!shaderMap.count(data.vertexShaderFile))
         {
-            shaderMap[data.vertexShaderFile] = Shader::MakeShader(data.vertexShaderFile.c_str(), GL_VERTEX_SHADER);
+            Shader* shader = Shader::MakeShader(data.vertexShaderFile.c_str(), GL_VERTEX_SHADER);
+            if(shader == nullptr) shader = shaderMap.at("Shaders/base.vs");
+            shaderMap[data.vertexShaderFile] = shader;
         }
 
         if(!shaderMap.count(data.fragmentShaderFile))
         {
-            shaderMap[data.fragmentShaderFile] = Shader::MakeShader(data.fragmentShaderFile.c_str(), GL_FRAGMENT_SHADER);
+            Shader* shader = Shader::MakeShader(data.fragmentShaderFile.c_str(), GL_FRAGMENT_SHADER);
+            if(shader == nullptr) shader = shaderMap.at("Shaders/base.fs");
+            shaderMap[data.fragmentShaderFile] = shader;
         }
 
         data.ptr->Load(shaderMap.at(data.vertexShaderFile), shaderMap.at(data.fragmentShaderFile));
@@ -227,6 +265,20 @@ std::shared_ptr<Font> ResourceManager::AddInResourceQueue<Font>(const std::strin
 }
 
 template<>
+std::shared_ptr<Sky> ResourceManager::AddInResourceQueue<Sky>(const std::string& name, ResourceLoadData<Sky> data)
+{
+    for(auto& [tname, tdata]: skyQueue)
+    {
+        if(tname == name) return tdata.ptr;
+    }
+
+    std::shared_ptr<Sky> ptr(new Sky(world));
+    data.ptr = ptr;
+    skyQueue.push_back(std::make_pair(name, data));
+    return ptr;
+}
+
+template<>
 std::shared_ptr<Texture> ResourceManager::Get<>(const std::string &name) const { return textureMap.at(name); }
 
 template<>
@@ -237,3 +289,6 @@ std::shared_ptr<Model> ResourceManager::Get<>(const std::string &name) const { r
 
 template<>
 std::shared_ptr<Font> ResourceManager::Get<>(const std::string &name) const { return fontMap.at(name); }
+
+template<>
+std::shared_ptr<Sky> ResourceManager::Get<>(const std::string &name) const { return skyMap.at(name); }

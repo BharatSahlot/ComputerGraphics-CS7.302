@@ -28,6 +28,8 @@ class Model
         Bounds GetModelBounds(Model& model);
 
     private:
+        // only for planes
+        glm::vec3 planeNormal;
         Mesh* ProcessMesh(aiMesh* mesh, const aiScene* scene);
 
         std::string name;

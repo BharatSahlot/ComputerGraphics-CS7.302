@@ -14,13 +14,15 @@ Camera::Camera(World* world, std::string name, glm::vec3 pos, glm::vec3 look) : 
     this->pos = pos;
 
     front = glm::normalize(look - pos);
-    right   = glm::normalize(glm::cross(front, glm::vec3(0, 1, 0)));
-    up      = glm::normalize(glm::cross(right, front));
+    right = glm::normalize(glm::cross(front, glm::vec3(0, 1, 0)));
+    up    = glm::normalize(glm::cross(right, front));
 
-    std::cout << "Front: " << front.x << ' ' << front.y << ' ' << front.z << std::endl;
-    std::cout << "Up: " << up.x << ' ' << up.y << ' ' << up.z << std::endl;
+    // std::cout << "Front: " << front.x << ' ' << front.y << ' ' << front.z << std::endl;
+    // std::cout << "Up: " << up.x << ' ' << up.y << ' ' << up.z << std::endl;
     view = glm::lookAt(pos, pos + front, up);
     canMove = false;
+
+    clearColor = glm::vec3(0, 0, 0);
 }
 
 void Camera::SetPerspective(float fov, float aspect)
@@ -70,7 +72,7 @@ void Camera::Tick(float deltaTime)
     if(world->GetWindow().GetKeyDown(GLFW_KEY_A)) offset -= right;
     if(world->GetWindow().GetKeyDown(GLFW_KEY_D)) offset += right;
 
-    offset *= 10 * deltaTime;
+    offset *= 100 * deltaTime;
     pos += offset;
 
     view = glm::lookAt(pos, pos + front, up);
@@ -83,7 +85,7 @@ void Camera::Use(glm::vec2 windowDims, glm::vec3 viewport) const
 
     glScissor(viewport.x, viewport.y + windowDims.y - h, w, h);
     glViewport(viewport.x, viewport.y + windowDims.y - h, w, h);
-    glClearColor(0.f, 0.f, 0.f, 1.f);
+    glClearColor(clearColor.x, clearColor.y, clearColor.z, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

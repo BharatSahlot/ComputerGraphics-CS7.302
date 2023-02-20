@@ -11,7 +11,12 @@ struct Bounds
     static Bounds FromMinMax(glm::vec3 mn, glm::vec3 mx);
 
     void Join(Bounds b);
+
     std::vector<glm::vec3> GetRotatedBox(glm::mat4 model) const;
+    std::vector<unsigned int> GetFaces() const;
+
+    // returns a plane midway through the y axis
+    std::vector<glm::vec3> GetRotatedMeanPlane(glm::mat4 model) const;
 
     glm::vec3 center, extents, max, min;
 };

@@ -4,11 +4,11 @@
 #include "Engine/Object.hpp"
 #include <glm/glm.hpp>
 
-// TODO: add transform component to camera
 class Camera : public Object
 {
     public:
         using Object::Object;
+        glm::vec3 clearColor;
         
         bool canMove = true;
 
@@ -32,12 +32,13 @@ class Camera : public Object
         glm::vec3 Position() const { return pos; }
 
     private:
-        glm::vec3 pos;
         glm::vec3 front;
         glm::vec3 right;
         glm::vec3 up;
         glm::vec2 rot;
 
+    protected:
+        glm::vec3 pos;
         glm::mat4 view;
         glm::mat4 proj;
 };

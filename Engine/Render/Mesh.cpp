@@ -10,6 +10,9 @@ Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices, std::shared_ptr
     GenBuffers(vertices, indices);
     this->texture = texture;
     this->material = material;
+
+    this->vertices = vertices;
+    faces = indices;
 }
 
 Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices, std::shared_ptr<Texture> texture, std::shared_ptr<Material> material, Bounds bounds)
@@ -18,6 +21,9 @@ Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices, std::shared_ptr
     this->texture = texture;
     this->material = material;
     this->bounds = bounds;
+
+    this->vertices = vertices;
+    faces = indices;
 }
 
 Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices)
@@ -46,6 +52,9 @@ Mesh::Mesh(vector<float> vertices, vector<unsigned int> indices)
             GL_STATIC_DRAW);
 
     this->indices = indices.size();
+
+    this->vertices = vertices;
+    faces = indices;
 }
 
 void Mesh::GenBuffers(vector<float> vertices, vector<unsigned int> indices)
@@ -98,6 +107,7 @@ void Mesh::Render() const
     }
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
     Material::Unuse();
 }
 
@@ -107,12 +117,14 @@ void Mesh::Render(glm::mat4 model, glm::mat4 view, glm::mat4 proj) const
     {
         if(material->Use() == -1)
         {
-            // std::cerr << "Error rendering mesh " << name << std::endl;
+            std::cerr << "Error rendering mesh " << name << std::endl;
         }
         material->SetUniformMat4("model", model);
         material->SetUniformMat4("view", view);
         material->SetUniformMat4("proj", proj);
         material->SetInt("texture1", 0);
+        material->SetVec3("col", glm::vec3(1, 1, 1));
+        material->SetFloat("oneMinusAlpha", 0);
     }
     if(texture)
     {
@@ -120,4 +132,29 @@ void Mesh::Render(glm::mat4 model, glm::mat4 view, glm::mat4 proj) const
     }
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+
+void Mesh::Render(glm::mat4 model, glm::mat4 view, glm::mat4 proj, float oneMinusAlpha, glm::vec3 color) const
+{
+    if(material)
+    {
+        if(material->Use() == -1)
+        {
+            std::cerr << "Error rendering mesh " << name << std::endl;
+        }
+        material->SetUniformMat4("model", model);
+        material->SetUniformMat4("view", view);
+        material->SetUniformMat4("proj", proj);
+        material->SetInt("texture1", 0);
+        material->SetVec3("col", color);
+        material->SetFloat("oneMinusAlpha", oneMinusAlpha);
+    }
+    if(texture)
+    {
+        texture->Use(0);
+    }
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }

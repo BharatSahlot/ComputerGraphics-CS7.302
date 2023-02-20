@@ -3,45 +3,39 @@
 
 #include "Engine/Object.hpp"
 #include "Engine/Render/Font.hpp"
+#include "Engine/UI/UIObject.hpp"
 
-enum AnchorType
-{
-    BottomLeft,
-    BottomRight,
-    TopLeft,
-    TopRight,
-    Center,
-    CenterTop,
-    CenterBottom,
-};
-
-struct Anchor
-{
-    AnchorType anchorType;
-    glm::vec2 padding;
-    float scale;
-};
-
-class Text
+class Text : public UIObject
 {
     public:
-        World* world;
-        std::string name;
-
         Text(World* world, std::string name, std::shared_ptr<Font> font, Anchor anchor);
         Text(World* world, std::string name, std::string font, Anchor anchor);
 
         void Render();
 
-        void SetAnchor(Anchor anchor) { this->anchor = anchor; }
-        void SetColor(glm::vec3 col) { this->col = col; }
-        void SetText(std::string str) { this->str = str; }
+        Text* SetAnchor(Anchor anchor) { this->anchor = anchor; return this; }
+        Text* SetColor(glm::vec3 col) { this->col = glm::vec4(col, 1.f); return this; }
+        Text* SetColor(glm::vec4 col) { this->col = col; return this; }
+        Text* SetText(std::string str) { this->str = str;  return this; }
+
+        Text* EnableShadow() { hasShadow = true; return this; }
+        Text* DisableShadow() { hasShadow = false; return this; }
+        Text* SetShadow(float distance, glm::vec4 col)
+        {
+            shadowDistance = distance;
+            shadowColor = col;
+            return this;
+        }
 
     private:
         std::shared_ptr<Font> font;
         Anchor anchor;
-        glm::vec3 col;
+        glm::vec4 col;
         std::string str;
+
+        bool hasShadow;
+        float shadowDistance;
+        glm::vec4 shadowColor;
 };
 
 #endif

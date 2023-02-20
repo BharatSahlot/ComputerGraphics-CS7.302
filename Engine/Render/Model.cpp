@@ -178,6 +178,10 @@ int Model::Load(const std::string &path)
 
             if(i == 0) md->meshBounds = mesh1->GetBounds();
             else md->meshBounds.Join(mesh1->GetBounds());
+
+            if(mesh->mNumVertices == 4)
+            {
+            }
         }
 
         for(size_t i = 0; i < node->mNumChildren; i++)

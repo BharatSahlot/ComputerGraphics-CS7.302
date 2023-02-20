@@ -26,17 +26,30 @@ class Font
         int Load(const std::string& file, int size, std::shared_ptr<Material> mat);
         void Setup();
 
-        void RenderText(std::string text, float x, float y, float scale, glm::mat4 proj, glm::vec3 col);
+        void RenderText(std::string text, float x, float y, float scale, glm::mat4 proj, glm::vec4 col);
 
         glm::vec2 GetTextDims(std::string text, float scale) const;
 
+        void EnableShadow() { hasShadow = true; }
+        void DisableShadow() { hasShadow = false; }
+        void SetShadow(float distance, glm::vec4 col)
+        {
+            shadowDistance = distance;
+            shadowColor = col;
+        }
+
     private:
+        float size;
         bool loaded = false;
         std::shared_ptr<Material> mat;
         FT_Face face;
         unsigned int VAO;
         unsigned int VBO;
         std::map<char, Character> characters;
+
+        bool hasShadow;
+        float shadowDistance;
+        glm::vec4 shadowColor;
 };
 
 #endif

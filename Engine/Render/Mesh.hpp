@@ -25,10 +25,14 @@ class Mesh
         void Setup();
         void Render() const;
         void Render(glm::mat4 model, glm::mat4 view, glm::mat4 proj) const;
+        void Render(glm::mat4 model, glm::mat4 view, glm::mat4 proj, float oneMinusAlpha, glm::vec3 color) const;
 
-        const Material& GetMaterial() const { return *material; }
+        Material& GetMaterial() const { return *material; }
 
         Bounds GetBounds() const { return bounds; }
+
+        const std::vector<float>& GetVertices() const { return vertices; }
+        const std::vector<unsigned int>& GetFaces() const { return faces; }
 
     private:
         void GenBuffers(vector<float> vertices, vector<unsigned int> indices);
@@ -40,6 +44,9 @@ class Mesh
 
         std::shared_ptr<Texture> texture;
         Bounds bounds;
+
+        vector<float> vertices;
+        vector<unsigned int> faces;
 };
 
 #endif

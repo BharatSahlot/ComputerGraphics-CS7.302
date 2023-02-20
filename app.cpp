@@ -22,6 +22,7 @@
 #include <vector>
 #include <chrono>
 
+#include "Game/Game.hpp"
 #include "Globals.hpp"
 #include "glm/ext/matrix_transform.hpp"
 
@@ -34,111 +35,26 @@ int main(int argc, const char** argv)
     window->MakeCurrent();
 
     EngineInitGLAD();
-
     window->Init();
 
-    World* world = new World(window);
 
-    auto baseMat = world->GetResourceManager().AddInResourceQueue<Material>("baseMat", ResourceLoadData<Material> {
-        "Shaders/base.vs", "Shaders/base.fs"
-    });
+    // block so it cleans resources before EngineClean()
+    {
+        Game game(window);
 
-    auto fontMat = world->GetResourceManager().AddInResourceQueue<Material>("fontMat", ResourceLoadData<Material> {
-        "Shaders/text.vs", "Shaders/text.fs"
-    });
-
-    auto font = world->GetResourceManager().AddInResourceQueue<Font>("font", ResourceLoadData<Font>{
-        "Assets/font.ttf", 48, "fontMat"
-    });
-
-    world->GetResourceManager().AddInResourceQueue<Material>("textMat", ResourceLoadData<Material> {
-        "Shaders/text.vs", "Shaders/text.fs"
-    });
-
-    auto carModel = world->GetResourceManager().AddInResourceQueue("mesh", ResourceLoadData<Model> {
-        "Car/sportste.fbx"
-    });
-
-    world->GetResourceManager().StartLoading();
-
-    // auto car = world->Instantiate<Object>("Car", carModel);
-    std::shared_ptr<Object> car;
-    const Object* wheelFL = nullptr;
-    const Object* wheelFR = nullptr;
-
-    std::shared_ptr<Text> text;
-
-    auto camera = world->Instantiate<Camera>("Camera");
-    window->SetCamera(camera);
-    camera->Start();
-
-    auto mapCamera = world->Instantiate<Camera>("MapCamera", glm::vec3(0, 50, -5), glm::vec3(0, 0, 0));
-    mapCamera->canMove = false;
-    mapCamera->Start();
-
-    float angle = 0.f;
-    windowFade = 1.f;
-    bool loaded = false;
-    Timer timer;
-    timer.Start();
-    window->SetRenderCallback([&](World* world) -> bool {
-        float delta = timer.Tick();
-        
-        if(!loaded && world->GetResourceManager().HasLoadingFinished())
-        {
-            world->GetResourceManager().Load();
-            loaded = true;
-            car = world->Instantiate<Object>("Car", carModel);
-            wheelFL = world->GetObjectByName<Object>("WheelFL");
-            wheelFR = world->GetObjectByName<Object>("WheelFR");
-
-            text = world->InstantiateText("text", font, Anchor {
-                AnchorType::CenterTop,
-                glm::vec2(0, 0),
-                0.5f
-            });
-        }
-
-        if(!loaded)
-        {
-            std::cout << world->GetResourceManager().GetLoadStatus() << std::endl;
+        Timer timer;
+        timer.Start();
+        window->SetRenderCallback([&]() -> bool {
+            float delta = timer.Tick();
+            game.Tick(delta);
+            game.Render();
             return false;
-        }
+        });
 
-        int fps = (int)std::round(1.f / delta);
-        text->SetText("FPS:" + std::to_string(fps));
+        window->Render();
+    }
 
-        if(fps >= 59) text->SetColor(glm::vec3(0.2, 1, 0.2));
-        else text->SetColor(glm::vec3(1, 0.2, 0.2));
-
-        if(window->GetKeyDown(GLFW_KEY_LEFT)) angle += delta * 70.f;
-        if(window->GetKeyDown(GLFW_KEY_RIGHT)) angle -= delta * 70.f;
-
-        angle = glm::clamp(angle, -30.f, 30.f);
-        wheelFL->transform->SetLocalRotation(glm::vec3(0, 0, glm::radians(angle)));
-        wheelFR->transform->SetLocalRotation(glm::vec3(0, 0, glm::radians(angle)));
-        car->transform->SetLocalRotation(glm::vec3(0, glm::radians(angle), 0));
-        world->Tick(delta);
-
-        camera->Use(glm::vec2(window->Width(), window->Height()), glm::vec3(0, 0, 1.f));
-        Bounds b = car->GetBounds();
-        world->Render();
-        world->DrawRotatedBox(b.GetRotatedBox(car->transform->GetModelMatrix()));
-
-        float h = window->Height() * 0.2f;
-        float w = h * (1920.f / 1080.f);
-
-        mapCamera->SetPerspective(60.f, window->Aspect());
-        mapCamera->Use(glm::vec2(window->Width(), window->Height()), glm::vec3(15, -15, 0.2f));
-        world->Render(*mapCamera);
-
-        return false;
-    });
-
-    window->Render(world);
-
-    delete world;
-
+    // game.Clean();
     EngineClean();
     return 0;
 }

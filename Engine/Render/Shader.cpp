@@ -43,12 +43,12 @@ Shader* Shader::MakeShader(const std::string& path, int shaderType)
     if(!success)
     {
         glGetShaderInfoLog(shader->shaderObject, 512, NULL, infoLog);
-        std::cerr << "error compiling shader\n" << infoLog << std::endl;
+        std::cerr << "error compiling shader " << path << "\n" << infoLog << std::endl;
         delete(shader);
         return nullptr;
     }
 
-    shader->isTransparent = path == "Shaders/glass.fs";
+    shader->isTransparent = path == "Shaders/glass.fs" || path == "Shaders/checkpoint.fs";
     
     return shader;
 }
