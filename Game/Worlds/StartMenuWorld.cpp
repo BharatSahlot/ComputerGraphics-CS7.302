@@ -65,7 +65,7 @@ void StartMenuWorld::Start()
         glm::vec2(0, -170),
         0.4f
     })
-    ->SetText("Use WASD to control car. Escape for pause.");
+    ->SetText("Use WASD to control car. R to toggle the camera view.");
 
     car = Instantiate<Object>("car", "car");
 
