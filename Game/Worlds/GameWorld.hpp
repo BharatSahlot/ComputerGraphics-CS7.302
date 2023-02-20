@@ -1,6 +1,7 @@
 #ifndef GAME_WORLD_H
 #define GAME_WORLD_H
 
+#include "Engine/UI/Text.hpp"
 #include "Engine/Utils/Timer.hpp"
 #include "Engine/World.hpp"
 #include "Game/Game.hpp"
@@ -24,6 +25,7 @@ class GameWorld : public World
         std::shared_ptr<Sky> sky;
 
         std::shared_ptr<Player> player;
+        std::shared_ptr<Text> speedText;
 
         Timer startTimer;
 };

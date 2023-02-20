@@ -32,10 +32,12 @@ class Player : public Object
         float GetMaxFuel() const { return 20; }
 
         float GetHealth() const { return health; }
+        float GetSpeed() const { return glm::length(velocity); }
 
     private:
         float fuel;
         float health;
+        float speed;
 
         int lapsDone;
         int checkpointsCleared;

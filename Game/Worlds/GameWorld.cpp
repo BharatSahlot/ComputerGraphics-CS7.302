@@ -17,6 +17,10 @@ GameWorld::GameWorld(std::shared_ptr<Window> window, Game* game) : World(window)
         "Assets/zeyada.ttf", 96, "textMat"
     });
 
+    GetResourceManager().AddInResourceQueue("gajraj", ResourceLoadData<Font> {
+        "Assets/gajraj.ttf", 96, "textMat"
+    });
+
     GetResourceManager().AddInResourceQueue("font", ResourceLoadData<Font> {
         "Assets/font.ttf", 96, "textMat"
     });
@@ -80,6 +84,14 @@ void GameWorld::Start()
     InstantiateUIObject<CountdownText>("countdownText", 3.f);
     InstantiateUIObject<GameUI>("GameUI");
 
+    speedText = InstantiateUIObject<Text>("speedText", "gajraj", Anchor {
+        AnchorType::BottomRight,
+        glm::vec2(15, 15),
+        0.5
+    });
+    speedText->SetShadow(0.1, glm::vec4(0, 0, 0, 1));
+    speedText->EnableShadow();
+
     startTimer.Start();
     World::Start();
 }
@@ -87,6 +99,10 @@ void GameWorld::Start()
 void GameWorld::Tick(float deltaTime) const
 {
     if(startTimer.TimeSinceStart() >= 3.f) for(auto x: objects) x->Tick(deltaTime);
+
+    int speed = glm::round(player->GetSpeed() * 20);
+    speedText->SetText(std::to_string(speed));
+
     for(auto x: uiObjs) x->Tick(deltaTime);
 }
 
