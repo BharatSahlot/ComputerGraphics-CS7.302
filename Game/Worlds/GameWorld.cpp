@@ -158,7 +158,7 @@ void GameWorld::Start()
         can->transform->SetLocalRotation(glm::vec3(glm::radians(45.f), Random::GetFloat(), 0));
     }
 
-    camera = Instantiate<FollowCamera>("camera", "playerCar", glm::vec3(0, 400, -750));
+    camera = Instantiate<FollowCamera>("camera", "playerCar", glm::vec3(0, 400, -750), glm::vec3(0, 25, 0));
     camera->clearColor = glm::vec3(0);
     camera->canMove = true;
 
