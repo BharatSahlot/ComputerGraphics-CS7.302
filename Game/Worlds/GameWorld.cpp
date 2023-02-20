@@ -1,5 +1,6 @@
 #include "GameWorld.hpp"
 #include "Engine/Render/Model.hpp"
+#include "Engine/Utils/Random.hpp"
 #include "Engine/Window/Window.hpp"
 #include "Game/Objects/Audience.hpp"
 #include "Game/Objects/CountdownText.hpp"
@@ -62,8 +63,6 @@ void GameWorld::Start()
 
     Instantiate<Object>("raceTrack", "RaceTrack");
 
-    Object* obj = GetObjectByName<Object>("Checkpoint");
-
     player = Instantiate<Player>("playerCar", "car", game, PlayerSettings {
         20.f, // accel 
         10.f, // brake
@@ -75,7 +74,52 @@ void GameWorld::Start()
         70.f, // car wheel rotation speed
         65.f // car body rotation speed
     });
-    player->transform->SetLocalPosition(obj->transform->GetWorldPosition() * glm::vec3(1, 0, 1));
+    player->onCheckPointReached = [this](int c) { this->OnCheckPointReached(c); };
+    player->onFuelcanCollision = [this](Object* can) { this->OnFuelcanCollision(can); };
+
+    checkpoints = GetObjectsByPrefix<Object>("Checkpoint");
+    std::sort(checkpoints.begin(), checkpoints.end(), [](Object* a, Object* b) {
+        return a->name < b->name;
+    });
+
+    for(int i = 0; i < checkpoints.size(); i++)
+    {
+        auto can = Instantiate<Object>("FuelCan." + std::to_string(i), "jerrycan");
+        can->SetActive(i != 0 && i <= 3);
+        can->transform->SetLocalScale(glm::vec3(0.3));
+        fuelcans.push_back(can);
+
+        auto cpoint = checkpoints[i];
+        const std::vector<float>& vertices = cpoint->GetMeshes()[0]->GetVertices();
+        const std::vector<unsigned int>& faces = cpoint->GetMeshes()[0]->GetFaces();
+
+        glm::mat4 mat = cpoint->transform->GetModelMatrix();
+        glm::vec3 a = mat * glm::vec4(vertices[8 * faces[0]], 
+                vertices[8 * faces[0] + 1],
+                vertices[8 * faces[0] + 2], 1);
+
+        glm::vec3 b = mat * glm::vec4(vertices[8 * faces[1]],
+                vertices[8 * faces[1] + 1],
+                vertices[8 * faces[1] + 2], 1);
+
+        glm::vec3 c = mat * glm::vec4(vertices[8 * faces[2]],
+                vertices[8 * faces[2] + 1],
+                vertices[8 * faces[2] + 2], 1);
+
+        glm::vec3 norm = glm::normalize(glm::cross(
+                        glm::normalize(b - a),
+                        glm::normalize(c - a)
+                    ));
+
+        glm::vec3 normnorm = glm::normalize(glm::cross(norm, glm::vec3(0, 1, 0)));
+        fuelcanSpawnLines.push_back({ cpoint->transform->GetWorldPosition() * glm::vec3(1, 0, 1), normnorm });
+
+        glm::vec3 pos = fuelcanSpawnLines[i].first + (1.f - 2.f * Random::GetFloat()) * 75.f * fuelcanSpawnLines[i].second;
+
+        pos.y += 15.f;
+        can->transform->SetWorldPosition(pos);
+        can->transform->SetLocalRotation(glm::vec3(glm::radians(45.f), Random::GetFloat(), 0));
+    }
 
     camera = Instantiate<FollowCamera>("camera", "playerCar", glm::vec3(0, 400, -750));
     camera->clearColor = glm::vec3(0);
@@ -103,6 +147,14 @@ void GameWorld::Start()
 
 void GameWorld::Tick(float deltaTime) const
 {
+    for(auto x: fuelcans)
+    {
+        if(!x->IsActive()) continue;
+        float y = glm::degrees(x->transform->GetLocalRotation().y);
+        y += 80.f * deltaTime;
+        x->transform->SetLocalRotation(glm::vec3(glm::radians(45.f), glm::radians(y), 0));
+    }
+
     if(startTimer.TimeSinceStart() >= 3.f) for(auto x: objects) x->Tick(deltaTime);
 
     int speed = glm::round(player->GetSpeed() * 20);
@@ -168,4 +220,20 @@ void GameWorld::Render()
     mapCamera->SetPerspective(90.f, window->Aspect());
     mapCamera->Use(glm::vec2(window->Width(), window->Height()), glm::vec3(15, -15, 0.2f));
     for(auto x: objects) x->Render(mapCamera->View(), mapCamera->Proj());
+}
+
+void GameWorld::OnCheckPointReached(int checkpointReached)
+{
+    int c = (checkpointReached + 3) % checkpoints.size();
+    fuelcans[c]->SetActive(true);
+
+    glm::vec3 pos = fuelcanSpawnLines[c].first + (1.f - 2.f * Random::GetFloat()) * 75.f * fuelcanSpawnLines[c].second;
+
+    pos.y += 15.f;
+    fuelcans[c]->transform->SetWorldPosition(pos);
+}
+
+void GameWorld::OnFuelcanCollision(Object* can)
+{
+    can->SetActive(false);
 }

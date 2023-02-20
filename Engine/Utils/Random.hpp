@@ -9,6 +9,8 @@ namespace Random {
 
     void Init();
     int GetInt();
+
+    // random float 0..1
     float GetFloat();
 
     template<typename It>

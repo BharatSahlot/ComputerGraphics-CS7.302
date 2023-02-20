@@ -88,11 +88,13 @@ void Player::Start()
 
     // checkpoints
     checkpoints = world->GetObjectsByPrefix<Object>("Checkpoint");
-    for(auto x: checkpoints) x->isActive = false;
+    for(auto x: checkpoints) x->SetActive(false);
     std::sort(checkpoints.begin(), checkpoints.end(), [](Object* a, Object* b) {
         return a->name < b->name;
     });
-    checkpoints[1]->isActive = true;
+    checkpoints[1]->SetActive(true);
+
+    fuelCans = world->GetObjectsByPrefix<Object>("FuelCan");
 
     timer.Start();
     checkpointsCleared = lapsDone = 0;
@@ -180,16 +182,26 @@ void Player::Tick(float deltaTime)
 
     if(CheckCheckpointCollision())
     {
+        if(onCheckPointReached) onCheckPointReached(checkpointsCleared + 1);
+
         checkpointsCleared++;
         if(checkpointsCleared >= checkpoints.size())
         {
             lapsDone++;
             checkpointsCleared = 0;
         }
-        checkpoints[(checkpointsCleared + 1) % checkpoints.size()]->isActive = true;
+        checkpoints[(checkpointsCleared + 1) % checkpoints.size()]->SetActive(true);
     }
 
     if(delta != 0) fuel -= deltaTime * 2.f;
+
+    Object* can = CheckFuelcanCollision();
+    if(can != nullptr)
+    {
+        fuel += GetMaxFuel() / 3.f;
+        if(fuel >= GetMaxFuel()) fuel = GetMaxFuel();
+        if(onFuelcanCollision) onFuelcanCollision(can);
+    }
 }
 
 void Player::Respawn()
@@ -358,4 +370,78 @@ bool Player::CheckCheckpointCollision()
         }
     }
     return false;
+}
+
+Object* Player::CheckFuelcanCollision()
+{
+    std::vector<glm::vec3> points = GetBounds().GetRotatedMeanPlane(transform->GetModelMatrix());
+
+    for(Object* can: fuelCans)
+    {
+        can = can->GetChildren()[0].get();
+        auto lines = can->GetBounds().GetRotatedBox(can->transform->GetModelMatrix());
+        // world->DrawRotatedBox(lines);
+        if(!can->IsActive()) continue;
+
+        float dist = glm::distance2(can->transform->GetWorldPosition(), transform->GetWorldPosition());
+        if(dist > collisionRadius * collisionRadius) continue;
+
+        const auto& meshes = can->GetMeshes();
+
+        glm::mat4 mat = can->transform->GetModelMatrix();
+        for(auto mesh: meshes)
+        {
+            const std::vector<float>& vertices = mesh->GetVertices();
+            const std::vector<unsigned int>& faces = mesh->GetFaces();
+
+            for(size_t i = 0; i < faces.size(); i += 3)
+            {
+                glm::vec3 a = mat * glm::vec4(vertices[8 * faces[i]], 
+                        vertices[8 * faces[i] + 1],
+                        vertices[8 * faces[i] + 2], 1);
+
+                glm::vec3 b = mat * glm::vec4(vertices[8 * faces[i + 1]],
+                        vertices[8 * faces[i + 1] + 1],
+                        vertices[8 * faces[i + 1] + 2], 1);
+
+                glm::vec3 c = mat * glm::vec4(vertices[8 * faces[i + 2]],
+                        vertices[8 * faces[i + 2] + 1],
+                        vertices[8 * faces[i + 2] + 2], 1);
+
+                std::vector<int> lines({
+                        0, 1,
+                        1, 2,
+                        2, 3,
+                        3, 0,
+                        });
+
+                // world->DrawLine(a, b);
+                // world->DrawLine(b, c);
+                // world->DrawLine(a, c);
+                for(int l = 0; l < lines.size() / 2; l++)
+                {
+                    glm::vec3 p1 = points[lines[2 * l]];
+                    glm::vec3 p2 = points[lines[2 * l + 1]];
+
+                    glm::vec3 dir = glm::normalize(p1 - p2);
+                    glm::vec3 dir2 = glm::normalize(p2 - p1);
+
+                    glm::vec3 tb;
+                    // world->DrawBox(p1, glm::vec3(1, 1, 1), glm::vec3(1, 0, 0));
+                    if(TriangleLineIntersection(a, b, c, p1, p2, tb))
+                    {
+                        // world->DrawLine(p1, tb, glm::vec3(1, 0, 0));
+                        // world->DrawLine(p2, p1, glm::vec3(1, 0, 1));
+                        return can;
+                    } else if(TriangleLineIntersection(a, b, c, p2, p1, tb))
+                    {
+                        // world->DrawLine(p2, tb, glm::vec3(0, 1, 0));
+                        // world->DrawLine(p2, p1, glm::vec3(0, 0, 1));
+                        return can;
+                    }
+                }
+            }
+        }
+    }
+    return nullptr;
 }

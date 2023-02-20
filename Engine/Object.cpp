@@ -68,3 +68,12 @@ void Object::Render(const glm::mat4& pModel, const glm::mat4& viewMat, const glm
     glm::mat4 model = pModel * transform->GetLocalModelMatrix();
     for(const auto& x: meshes) x->Render(model, viewMat, projMat);
 }
+
+void Object::SetActive(bool active)
+{
+    isActive = active;
+    for(auto obj : children)
+    {
+        obj->SetActive(active);
+    }
+}

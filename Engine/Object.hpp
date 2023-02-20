@@ -16,7 +16,6 @@ class Object
     public:
         World* world;
         std::string name;
-        bool isActive = true;
 
         Transform* transform;
 
@@ -39,11 +38,15 @@ class Object
         const std::vector<std::shared_ptr<Mesh>>& GetMeshes() const { return meshes; }
         const std::vector<std::shared_ptr<Object>>& GetChildren() const { return children; }
 
+        void SetActive(bool active);
+        bool IsActive() const { return isActive; }
+
     protected:
         std::vector<std::shared_ptr<Mesh>> meshes;
         std::vector<std::shared_ptr<Object>> children;
 
     private:
+        bool isActive = true;
         Bounds modelBounds;
         bool isTransparent;
         void ModelToHeirarchy(std::shared_ptr<Model> model);

@@ -4,6 +4,7 @@
 #include "Engine/Object.hpp"
 #include "Engine/Utils/Timer.hpp"
 #include "Game/Game.hpp"
+#include <functional>
 
 struct PlayerSettings
 {
@@ -23,6 +24,9 @@ struct PlayerSettings
 class Player : public Object
 {
     public:
+        std::function<void(Object* obj)> onFuelcanCollision;
+        std::function<void(int checkpointReached)> onCheckPointReached;
+
         Player(World* world, std::string name, const std::string& model, Game* game, PlayerSettings settings);
 
         void Start() override;
@@ -57,6 +61,7 @@ class Player : public Object
         std::vector<Object*> wheels;
         std::vector<Object*> boundaryColliders;
         std::vector<Object*> checkpoints;
+        std::vector<Object*> fuelCans;
 
         bool collided = false;
         Timer collisionTimer, timer;
@@ -64,6 +69,7 @@ class Player : public Object
         void Respawn();
         bool CheckWallCollision();
         bool CheckCheckpointCollision();
+        Object* CheckFuelcanCollision();
 };
 
 #endif

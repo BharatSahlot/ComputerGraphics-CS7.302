@@ -27,7 +27,16 @@ class GameWorld : public World
         std::shared_ptr<Player> player;
         std::shared_ptr<Text> speedText;
 
+        std::vector<Object*> checkpoints;
+        std::vector<std::shared_ptr<Object>> fuelcans;
+
+        // center and plane normal normal
+        std::vector<std::pair<glm::vec3, glm::vec3>> fuelcanSpawnLines;
+
         Timer startTimer;
+
+        void OnCheckPointReached(int checkpointReached);
+        void OnFuelcanCollision(Object* can);
 };
 
 #endif
