@@ -6,6 +6,8 @@
 #include "Game/Game.hpp"
 #include <functional>
 
+class AIPlayer;
+
 struct PlayerSettings
 {
     float accel;
@@ -38,6 +40,8 @@ class Player : public Object
         float GetHealth() const { return health; }
         float GetSpeed() const { return glm::length(velocity); }
 
+        int GetLapsCompleted() const { return lapsDone; }
+
     private:
         float fuel;
         float health;
@@ -63,6 +67,8 @@ class Player : public Object
         std::vector<Object*> checkpoints;
         std::vector<Object*> fuelCans;
 
+        std::vector<AIPlayer*> aiCars;
+
         bool collided = false;
         Timer collisionTimer, timer;
 
@@ -70,6 +76,7 @@ class Player : public Object
         bool CheckWallCollision();
         bool CheckCheckpointCollision();
         Object* CheckFuelcanCollision();
+        void HandleCarCollision(float deltaTime);
 };
 
 #endif

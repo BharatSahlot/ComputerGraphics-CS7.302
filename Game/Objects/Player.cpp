@@ -1,10 +1,12 @@
 #include "Player.hpp"
 #include "Engine/Window/Window.hpp"
+#include "Game/Objects/AIPlayer.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/geometric.hpp"
 #include "glm/gtc/epsilon.hpp"
 #include "glm/gtx/vector_angle.hpp"
 #include "glm/gtx/intersect.hpp"
+#include "Game/Objects/AIPlayer.hpp"
 
 glm::vec3 CalcForward(glm::vec3 rotation)
 {
@@ -69,6 +71,8 @@ float AbsMin(float a, float b)
 Player::Player(World* world, std::string name, const std::string& model, Game* game, PlayerSettings settings)
     : Object(world, name, model), game(game), settings(settings)
 {
+    fuel = GetMaxFuel();
+    health = 100.f;
 }
 
 void Player::Start()
@@ -95,6 +99,8 @@ void Player::Start()
     checkpoints[1]->SetActive(true);
 
     fuelCans = world->GetObjectsByPrefix<Object>("FuelCan");
+
+    aiCars = world->GetObjectsByPrefix<AIPlayer>("aiCar");
 
     timer.Start();
     checkpointsCleared = lapsDone = 0;
@@ -205,6 +211,8 @@ void Player::Tick(float deltaTime)
         if(fuel >= GetMaxFuel()) fuel = GetMaxFuel();
         if(onFuelcanCollision) onFuelcanCollision(can);
     }
+
+    HandleCarCollision(deltaTime);
 }
 
 // void Player::Render(const glm::mat4 &viewMat, const glm::mat4 &projMat)
@@ -455,4 +463,53 @@ Object* Player::CheckFuelcanCollision()
         }
     }
     return nullptr;
+}
+
+void Player::HandleCarCollision(float deltaTime)
+{
+    std::vector<glm::vec3> points = GetBounds().GetRotatedMeanPlane(transform->GetModelMatrix());
+    for(AIPlayer* car: aiCars)
+    {
+        float dist = glm::distance2(car->transform->GetWorldPosition(), transform->GetWorldPosition());
+        if(dist > collisionRadius * collisionRadius) continue;
+
+        const std::vector<glm::vec3>& vertices = car->GetBounds().GetRotatedBox(car->transform->GetModelMatrix());
+        const std::vector<unsigned int>& faces = car->GetBounds().GetFaces();
+
+        for(size_t i = 0; i < faces.size(); i += 3)
+        {
+            glm::vec3 a = vertices[faces[i]];
+            glm::vec3 b = vertices[faces[i + 1]];
+            glm::vec3 c = vertices[faces[i + 2]];
+
+            std::vector<int> lines({
+                    0, 1,
+                    1, 2,
+                    2, 3,
+                    3, 0,
+                    });
+
+            // world->DrawLine(a, b);
+            // world->DrawLine(b, c);
+            // world->DrawLine(a, c);
+            for(int l = 0; l < lines.size() / 2; l++)
+            {
+                glm::vec3 p1 = points[lines[2 * l]];
+                glm::vec3 p2 = points[lines[2 * l + 1]];
+
+                glm::vec3 dir = glm::normalize(p1 - p2);
+                glm::vec3 dir2 = glm::normalize(p2 - p1);
+
+                glm::vec3 tb;
+                // world->DrawBox(p1, glm::vec3(1, 1, 1), glm::vec3(1, 0, 0));
+                if(TriangleLineIntersection(a, b, c, p1, p2, tb))
+                {
+                    health -= 5.f * deltaTime;
+                } else if(TriangleLineIntersection(a, b, c, p2, p1, tb))
+                {
+                    health -= 5.f * deltaTime;
+                }
+            }
+        }
+    }
 }

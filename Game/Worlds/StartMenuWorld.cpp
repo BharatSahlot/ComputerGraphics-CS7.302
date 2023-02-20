@@ -77,7 +77,7 @@ void StartMenuWorld::Tick(float deltaTime) const
     float y = glm::degrees(car->transform->GetLocalRotation().y) + deltaTime * 50.f;
     car->transform->SetLocalRotation(glm::vec3(0, glm::radians(y), 0));
 
-    if(window->GetKeyDown(GLFW_KEY_ENTER))
+    if(game->GetGameWorld().GetResourceManager().HasLoadingFinished() && window->GetKeyDown(GLFW_KEY_ENTER))
     {
         game->SetGameState(GameState::InGame);
     }

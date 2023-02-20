@@ -7,14 +7,17 @@
 #include "Game/Worlds/LoadingWorld.hpp"
 #include "Game/Worlds/StartMenuWorld.hpp"
 #include "Game/Worlds/GameWorld.hpp"
+#include "Game/Worlds/GameOverWorld.hpp"
 
 Game::Game(std::shared_ptr<Window> window) : state(GameState::None)
 {
     loadingWorld = new LoadingWorld(window, this);
     startMenuWorld = new StartMenuWorld(window, this);
     gameWorld = new GameWorld(window, this);
+    gameOverWorld = new GameOverWorld(window, this);
 
     SetGameState(GameState::Loading);
+    deathReason = "Game Over";
 }
 
 void Game::Tick(float deltaTime)
@@ -47,12 +50,21 @@ void Game::SetGameState(GameState state)
             return;
         case InGame:
         case Paused:
-        case Ended:
+            gameOverWorld->GetResourceManager().StartLoading();
             SetActiveWorld(gameWorld);
+            break;
+        case Ended:
+            SetActiveWorld(gameOverWorld);
             break;
         case None:
             break;
     }
+}
+
+void Game::GameOver(std::string reason)
+{
+    deathReason = reason;
+    SetGameState(GameState::Ended);
 }
 
 void Game::SetActiveWorld(World* world)

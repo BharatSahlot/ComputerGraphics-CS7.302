@@ -10,7 +10,7 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtx/norm.hpp"
 
-GameWorld::GameWorld(std::shared_ptr<Window> window, Game* game) : World(window)
+GameWorld::GameWorld(std::shared_ptr<Window> window, Game* game) : World(window), game(game)
 {
     GetResourceManager().AddInResourceQueue("textMat", ResourceLoadData<Material> {
         "Shaders/text.vs", "Shaders/text.fs"
@@ -102,6 +102,18 @@ void GameWorld::Start()
         65.f // car body rotation speed
     }, glm::vec3(-50, 0, 0));
 
+    Instantiate<AIPlayer>("aiCar3", "car", game, PlayerSettings {
+        20.f, // accel 
+        10.f, // brake
+        9.f, // min friction
+        22.f, // max fricion
+        6.f, // max speed
+        -3.f, // min speed
+        40.f, // maximum wheel angle
+        70.f, // car wheel rotation speed
+        65.f // car body rotation speed
+    }, glm::vec3(0, 0, -100));
+
     checkpoints = GetObjectsByPrefix<Object>("Checkpoint");
     std::sort(checkpoints.begin(), checkpoints.end(), [](Object* a, Object* b) {
         return a->name < b->name;
@@ -186,6 +198,10 @@ void GameWorld::Tick(float deltaTime) const
     speedText->SetText(std::to_string(speed));
 
     for(auto x: uiObjs) x->Tick(deltaTime);
+
+    if(player->GetHealth() <= 0) game->GameOver("Game Over");
+    if(player->GetFuel() <= 0) game->GameOver("Player out of fuel");
+    if(player->GetLapsCompleted() >= 3) game->GameOver("Race completed");
 }
 
 void GameWorld::Render()

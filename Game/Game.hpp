@@ -7,6 +7,7 @@
 class LoadingWorld;
 class StartMenuWorld;
 class GameWorld;
+class GameOverWorld;
 
 enum GameState
 {
@@ -24,10 +25,13 @@ class Game
         Game(std::shared_ptr<Window> window);
         ~Game();
 
+        std::string deathReason;
+
         void Tick(float deltaTime);
         void Render();
 
         void SetGameState(GameState state);
+        void GameOver(std::string reason);
 
         StartMenuWorld& GetStartMenuWorld() const { return *startMenuWorld; }
         GameWorld& GetGameWorld() const { return *gameWorld; }
@@ -43,6 +47,7 @@ class Game
         LoadingWorld* loadingWorld;
         StartMenuWorld* startMenuWorld;
         GameWorld* gameWorld;
+        GameOverWorld* gameOverWorld;
 };
 
 #endif

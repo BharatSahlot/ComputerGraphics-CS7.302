@@ -13,6 +13,7 @@ struct Bounds
     void Join(Bounds b);
 
     std::vector<glm::vec3> GetRotatedBox(glm::mat4 model) const;
+    std::vector<unsigned int> GetFaces() const;
 
     // returns a plane midway through the y axis
     std::vector<glm::vec3> GetRotatedMeanPlane(glm::mat4 model) const;
