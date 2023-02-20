@@ -25,6 +25,7 @@ class Mesh
         void Setup();
         void Render() const;
         void Render(glm::mat4 model, glm::mat4 view, glm::mat4 proj) const;
+        void Render(glm::mat4 model, glm::mat4 view, glm::mat4 proj, float oneMinusAlpha, glm::vec3 color) const;
 
         Material& GetMaterial() const { return *material; }
 

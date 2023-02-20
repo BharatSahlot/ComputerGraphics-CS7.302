@@ -123,6 +123,32 @@ void Mesh::Render(glm::mat4 model, glm::mat4 view, glm::mat4 proj) const
         material->SetUniformMat4("view", view);
         material->SetUniformMat4("proj", proj);
         material->SetInt("texture1", 0);
+        material->SetVec3("col", glm::vec3(1, 1, 1));
+        material->SetFloat("oneMinusAlpha", 0);
+    }
+    if(texture)
+    {
+        texture->Use(0);
+    }
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, indices, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+
+void Mesh::Render(glm::mat4 model, glm::mat4 view, glm::mat4 proj, float oneMinusAlpha, glm::vec3 color) const
+{
+    if(material)
+    {
+        if(material->Use() == -1)
+        {
+            std::cerr << "Error rendering mesh " << name << std::endl;
+        }
+        material->SetUniformMat4("model", model);
+        material->SetUniformMat4("view", view);
+        material->SetUniformMat4("proj", proj);
+        material->SetInt("texture1", 0);
+        material->SetVec3("col", color);
+        material->SetFloat("oneMinusAlpha", oneMinusAlpha);
     }
     if(texture)
     {

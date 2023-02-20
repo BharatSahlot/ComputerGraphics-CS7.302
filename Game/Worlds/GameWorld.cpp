@@ -2,6 +2,7 @@
 #include "Engine/Render/Model.hpp"
 #include "Engine/Utils/Random.hpp"
 #include "Engine/Window/Window.hpp"
+#include "Game/Objects/AIPlayer.hpp"
 #include "Game/Objects/Audience.hpp"
 #include "Game/Objects/CountdownText.hpp"
 #include "Game/Objects/GameUI.hpp"
@@ -76,6 +77,30 @@ void GameWorld::Start()
     });
     player->onCheckPointReached = [this](int c) { this->OnCheckPointReached(c); };
     player->onFuelcanCollision = [this](Object* can) { this->OnFuelcanCollision(can); };
+
+    Instantiate<AIPlayer>("aiCar1", "car", game, PlayerSettings {
+        20.f, // accel 
+        10.f, // brake
+        9.f, // min friction
+        22.f, // max fricion
+        6.f, // max speed
+        -3.f, // min speed
+        40.f, // maximum wheel angle
+        70.f, // car wheel rotation speed
+        65.f // car body rotation speed
+    }, glm::vec3(50, 0, 0));
+
+    Instantiate<AIPlayer>("aiCar2", "car", game, PlayerSettings {
+        20.f, // accel 
+        10.f, // brake
+        9.f, // min friction
+        22.f, // max fricion
+        6.f, // max speed
+        -3.f, // min speed
+        40.f, // maximum wheel angle
+        70.f, // car wheel rotation speed
+        65.f // car body rotation speed
+    }, glm::vec3(-50, 0, 0));
 
     checkpoints = GetObjectsByPrefix<Object>("Checkpoint");
     std::sort(checkpoints.begin(), checkpoints.end(), [](Object* a, Object* b) {

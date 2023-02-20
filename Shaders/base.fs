@@ -20,5 +20,5 @@ void main()
 
     float br = max(dot(norm, lightDir), 0.0) + ambient;
     vec3 tex = texture(texture1, TexCoords).rgb * br;
-    FragColor = vec4(tex, 1 - oneMinusAlpha);
+    FragColor = vec4(tex * col, 1 - oneMinusAlpha);
 }

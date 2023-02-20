@@ -16,6 +16,8 @@ class Object
     public:
         World* world;
         std::string name;
+        float oneMinusAlpha;
+        glm::vec3 color;
 
         Transform* transform;
 
@@ -40,6 +42,17 @@ class Object
 
         void SetActive(bool active);
         bool IsActive() const { return isActive; }
+
+        Object* GetChildByName(std::string name)
+        {
+            if(name == this->name) return this;
+            for(auto x: children)
+            {
+                auto c = x->GetChildByName(name);
+                if(c != nullptr) return c;
+            }
+            return nullptr;
+        }
 
     protected:
         std::vector<std::shared_ptr<Mesh>> meshes;

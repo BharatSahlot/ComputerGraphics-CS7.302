@@ -76,9 +76,9 @@ void Player::Start()
     velocity = glm::vec3(0, 0, 0);
     velRotation = prevRotation = bodyRotation = 0;
 
-    carBody = world->GetObjectByName<Object>("Body");
-    wheels.push_back(world->GetObjectByName<Object>("WheelFL"));
-    wheels.push_back(world->GetObjectByName<Object>("WheelFR"));
+    carBody = GetChildByName("Body");
+    wheels.push_back(GetChildByName("WheelFL"));
+    wheels.push_back(GetChildByName("WheelFR"));
 
     // boundary = world->GetObjectByName<Object>("Collider");
     boundaryColliders = world->GetObjectsByPrefix<Object>("Collider");
@@ -103,6 +103,12 @@ void Player::Start()
     Respawn();
 }
 
+void SetAlpha(Object* obj, float alpha)
+{
+    obj->oneMinusAlpha = alpha;
+    for(auto ch: obj->GetChildren()) SetAlpha(ch.get(), alpha);
+}
+
 void Player::Tick(float deltaTime)
 {
     if(collided)
@@ -110,16 +116,12 @@ void Player::Tick(float deltaTime)
         if(collisionTimer.TimeSinceStart() >= 2.f)
         {
             collided = false;
-            auto mat = world->GetResourceManager().Get<Material>("Shaders/base.fs");
-            mat->Use();
-            mat->SetFloat("oneMinusAlpha", 0);
+            SetAlpha(this, 0);
         } else
         {
-            auto mat = world->GetResourceManager().Get<Material>("Shaders/base.fs");
-            mat->Use();
             float t = glm::pow(glm::sin(timer.TimeSinceStart() * 5.f), 4.f);
             t = glm::round(t);
-            mat->SetFloat("oneMinusAlpha", t);
+            SetAlpha(this, t);
         }
     }
 
@@ -190,6 +192,7 @@ void Player::Tick(float deltaTime)
             lapsDone++;
             checkpointsCleared = 0;
         }
+        checkpoints[checkpointsCleared]->SetActive(false);
         checkpoints[(checkpointsCleared + 1) % checkpoints.size()]->SetActive(true);
     }
 
@@ -203,6 +206,14 @@ void Player::Tick(float deltaTime)
         if(onFuelcanCollision) onFuelcanCollision(can);
     }
 }
+
+// void Player::Render(const glm::mat4 &viewMat, const glm::mat4 &projMat)
+// {
+//     auto mat = world->GetResourceManager().Get<Material>("Shaders/base.fs");
+//     mat->Use();
+//     mat->SetFloat("oneMinusAlpha", oneMinusAlpha);
+//     Object::Render(viewMat, projMat);
+// }
 
 void Player::Respawn()
 {
