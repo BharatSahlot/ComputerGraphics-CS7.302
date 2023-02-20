@@ -29,8 +29,9 @@ StartMenuWorld::StartMenuWorld(std::shared_ptr<Window> window, Game* game) : Wor
         "Assets/Car.fbx"
     });
 
-    camera = Instantiate<Camera>("camera", glm::vec3(0, 5, -100), glm::vec3(0, 5, 0));
-    camera->clearColor = glm::vec3(21.f, 154.f, 198.f) / 255.f;
+    camera = Instantiate<Camera>("camera", glm::vec3(0, 25, -100), glm::vec3(0, 5, 0));
+    // camera->clearColor = glm::vec3(21.f, 154.f, 198.f) / 255.f;
+    camera->clearColor = glm::vec3(0.1f, 0.1f, 0.1f);
 }
 
 void StartMenuWorld::Start()

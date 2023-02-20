@@ -309,9 +309,9 @@ bool AIPlayer::CheckCheckpointCollision()
             3, 0,
         });
 
-        world->DrawLine(a, b);
-        world->DrawLine(b, c);
-        world->DrawLine(a, c);
+        // world->DrawLine(a, b);
+        // world->DrawLine(b, c);
+        // world->DrawLine(a, c);
         for(int l = 0; l < lines.size() / 2; l++)
         {
             glm::vec3 p1 = points[lines[2 * l]];
@@ -324,13 +324,13 @@ bool AIPlayer::CheckCheckpointCollision()
             // world->DrawBox(p1, glm::vec3(1, 1, 1), glm::vec3(1, 0, 0));
             if(TriangleLineIntersection(a, b, c, p1, p2, tb))
             {
-                world->DrawLine(p1, tb, glm::vec3(1, 0, 0));
-                world->DrawLine(p2, p1, glm::vec3(1, 0, 1));
+                // world->DrawLine(p1, tb, glm::vec3(1, 0, 0));
+                // world->DrawLine(p2, p1, glm::vec3(1, 0, 1));
                 return true;
             } else if(TriangleLineIntersection(a, b, c, p2, p1, tb))
             {
-                world->DrawLine(p2, tb, glm::vec3(0, 1, 0));
-                world->DrawLine(p2, p1, glm::vec3(0, 0, 1));
+                // world->DrawLine(p2, tb, glm::vec3(0, 1, 0));
+                // world->DrawLine(p2, p1, glm::vec3(0, 0, 1));
                 return true;
             }
         }
