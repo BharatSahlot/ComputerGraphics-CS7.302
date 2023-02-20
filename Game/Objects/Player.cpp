@@ -88,9 +88,11 @@ void Player::Start()
 
     // checkpoints
     checkpoints = world->GetObjectsByPrefix<Object>("Checkpoint");
+    for(auto x: checkpoints) x->isActive = false;
     std::sort(checkpoints.begin(), checkpoints.end(), [](Object* a, Object* b) {
         return a->name < b->name;
     });
+    checkpoints[1]->isActive = true;
 
     timer.Start();
     checkpointsCleared = lapsDone = 0;
@@ -184,6 +186,7 @@ void Player::Tick(float deltaTime)
             lapsDone++;
             checkpointsCleared = 0;
         }
+        checkpoints[(checkpointsCleared + 1) % checkpoints.size()]->isActive = true;
     }
 
     if(delta != 0) fuel -= deltaTime * 2.f;
