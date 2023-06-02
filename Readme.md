@@ -12,3 +12,9 @@ make -C build
 ```
 
 **Note:** FreeType is required for rendering text.
+
+## Screenshots
+
+![Main menu](Screenshots/mainmenu.png) 
+![Race 1](Screenshots/race_1.png) 
+![Race 2](Screenshots/race_2.png) 
